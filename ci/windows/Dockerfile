@@ -86,3 +86,15 @@ RUN mkdir Lib\SDL_sound && \
   copy Lib\SDL_sound\build_x86\Release\SDL2_sound-static.lib Lib\SDL_sound\lib\x86\SDL2_sound-static.lib && \
   copy Lib\SDL_sound\build_x64\Release\SDL2_sound-static.lib Lib\SDL_sound\lib\x64\SDL2_sound-static.lib
 
+ARG SDL_TTF_VERSION=9363bd0f3b10aad5aaf73a63b9d085aba7ef7098
+RUN mkdir Lib\SDL_ttf && \
+  echo "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86 ^&^& pushd Lib\SDL_ttf\VisualC\ ^&^& msbuild SDL_ttf.sln /p:PlatformToolset=v140 /p:Configuration=Release /p:Platform=Win32 /maxcpucount /nologo ^&^& popd > sdlttfvcbuild.bat && \
+  curl -fLOJ "https://github.com/libsdl-org/SDL_ttf/archive/%SDL_TTF_VERSION%.zip" && \
+  echo tar -f SDL_ttf-%SDL_TTF_VERSION%.zip -xvzC Lib\SDL_ttf\ --strip-components 1 ^|^| echo 0 > untarsdlttf.bat  && \
+  untarsdlttf.bat && \
+  del /f SDL_ttf-%SDL_TTF_VERSION%.zip  && \
+  copy Lib\SDL2\lib\x86\SDL2.lib Lib\SDL_ttf\VisualC\external\lib\x86\SDL2.lib && \
+  copy Lib\SDL2\include\* Lib\SDL_ttf\VisualC\external\include\ && \
+  sdlttfvcbuild.bat && \
+  copy Lib\SDL_ttf\build\Release\SDL2_ttf-static.lib Lib\SDL_ttf\lib\SDL2_ttf.lib
+

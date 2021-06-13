@@ -316,8 +316,6 @@ target_sources(engine
     gfx/ali3dogl.h
     gfx/ali3dsw.cpp
     gfx/ali3dsw.h
-    gfx/blender.cpp
-    gfx/blender.h
     gfx/color_engine.cpp
     gfx/ddb.h
     gfx/gfx_util.cpp
@@ -481,7 +479,8 @@ if(MACOS)
     )
 endif()
 
-if (AGS_BUILTIN_PLUGINS)
+# AGS_BUILTIN_PLUGINS
+if (0)
     target_compile_definitions(engine PRIVATE BUILTIN_PLUGINS)
 
     target_sources(engine PRIVATE 

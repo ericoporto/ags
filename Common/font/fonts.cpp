@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <vector>
-#include <alfont.h>
+#include <SDL_ttf.h>
 #include "ac/common.h" // set_our_eip
 #include "ac/gamestructdefines.h"
 #include "font/fonts.h"
@@ -78,14 +78,19 @@ FontInfo::FontInfo()
 
 void init_font_renderer()
 {
-  alfont_init();
-  alfont_text_mode(-1);
+    /* Initialize the TTF library */
+    if (TTF_Init() < 0) {
+        fprintf(stderr, "Couldn't initialize TTF: %s\n",SDL_GetError());
+        SDL_ClearError();
+        SDL_Quit();
+        exit(2);
+    }
 }
 
 void shutdown_font_renderer()
 {
   set_our_eip(9919);
-  alfont_exit();
+  TTF_Quit();
 }
 
 void adjust_y_coordinate_for_text(int* ypos, size_t fontnum)

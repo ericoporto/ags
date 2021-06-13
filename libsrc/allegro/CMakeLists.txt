@@ -279,10 +279,13 @@ set_target_properties(allegro
 
 message("${ALLEGRO_PUBLIC_HEADERS}")
 target_include_directories(allegro 
-   PRIVATE ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include
+   PRIVATE ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include ${SDL2_INCLUDE_DIRS}
    PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include ${PROJECT_SOURCE_DIR}/include
 )
 
+target_link_libraries(allegro
+        ${SDL2_LIBRARY} ${SDL2_LIBRARIES}
+    )
 
 #-----------------------------------------------------------------------------#
 # vim: set sts=4 sw=4 et:

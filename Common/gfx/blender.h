@@ -55,6 +55,8 @@ uint32_t _rgb2argb_blender(uint32_t src_col, uint32_t dst_col, uint32_t src_alph
 // Sets the alpha channel to opaque. Used when drawing a non-alpha sprite onto an alpha-sprite.
 uint32_t _opaque_alpha_blender(uint32_t src_col, uint32_t dst_col, uint32_t src_alpha);
 
+void set_argb2argb_blender(int alpha);
+
 // Additive alpha blender plain copies src over, applying a summ of src and
 // dst alpha values.
 void set_additive_alpha_blender();

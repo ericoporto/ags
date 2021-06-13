@@ -1,7 +1,7 @@
 FetchContent_Declare(
         sdlttf_content
-        URL https://github.com/libsdl-org/SDL_ttf/archive/refs/tags/release-2.0.15.tar.gz
-        URL_HASH MD5=33076315f93d9a8e31dfcf314ce6bdbc
+        URL https://github.com/libsdl-org/SDL_ttf/archive/9363bd0f3b10aad5aaf73a63b9d085aba7ef7098.tar.gz
+        URL_HASH MD5=822a4fc8fc6e46a44cdc7668a21c4a06
 )
 
 FetchContent_GetProperties(sdlttf_content)

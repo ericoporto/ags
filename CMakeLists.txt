@@ -306,11 +306,15 @@ endif()
 ###############################################################################
 # subdirectories of this project
 
-include(FetchFreetype)
-include(FetchSDL_ttf)
+# SDL_ttf has freetype when building for Android
+if(NOT ANDROID)
+    include(FetchFreetype)
+endif()
 
 include(FindLocalOpenAL)
 include(FindLocalAllegro)
+
+include(FetchSDL_ttf)
 
 add_subdirectory(libsrc/glm                     EXCLUDE_FROM_ALL)
 add_subdirectory(libsrc/tinyxml2                EXCLUDE_FROM_ALL)

@@ -1,7 +1,7 @@
 FetchContent_Declare(
         freetype_content
-        URL https://gitlab.freedesktop.org/freetype/freetype/-/archive/master/freetype-master.tar.gz
-        URL_HASH MD5=608129ede6b48570af21df1a481bb4cb
+        URL https://github.com/freetype/freetype/archive/refs/tags/VER-2-10-4.tar.gz
+        URL_HASH MD5=00496c4147705ec55c9cac47ba53049b
 )
 
 FetchContent_GetProperties(freetype_content)
@@ -27,8 +27,9 @@ if(NOT freetype_content)
     add_subdirectory(${freetype_content_SOURCE_DIR} ${freetype_content_BINARY_DIR} EXCLUDE_FROM_ALL)
     include_directories(${freetype_content_SOURCE_DIR}/include/)
     add_library(FreeType::FreeType ALIAS freetype)
+    add_library(Freetype::Freetype ALIAS freetype)
 
-    set(FREETYPE_LIBRARY FreeType::FreeType)
+    set(FREETYPE_LIBRARIES FreeType::FreeType)
     set(FREETYPE_INCLUDE_DIRS ${freetype_content_SOURCE_DIR}/include/)
 
     set(BUILD_SHARED_LIBS "${SAVED_BUILD_SHARED_LIBS}")

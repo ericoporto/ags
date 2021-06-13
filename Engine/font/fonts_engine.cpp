@@ -16,7 +16,7 @@
 //
 //=============================================================================
 
-#include <alfont.h>
+//#include <alfont.h>
 #include "ac/gamesetupstruct.h"
 
 extern int our_eip;

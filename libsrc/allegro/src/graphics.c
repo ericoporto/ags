@@ -17,6 +17,7 @@
 
 
 #include <string.h>
+#include <SDL_surface.h>
 
 #include "allegro.h"
 #include "allegro/internal/aintern.h"
@@ -332,7 +333,60 @@ BITMAP *create_bitmap_ex(int color_depth, int width, int height)
    return bitmap;
 }
 
+BITMAP *wrap_bitmap_sdl_surface(void* surface, int col_depth)
+{
+    GFX_VTABLE *vtable;
+    BITMAP *bitmap;
+    int nr_pointers;
+    int padding;
+    int i;
 
+    int color_depth = col_depth;
+    int width = ((SDL_Surface*) surface)->w;
+    int height = ((SDL_Surface*) surface)->h;
+    ASSERT(width >= 0);
+    ASSERT(height > 0);
+
+    vtable = _get_vtable(color_depth);
+    if (!vtable)
+        return NULL;
+
+    /* We need at least two pointers when drawing, otherwise we get crashes with
+     * Electric Fence.  We think some of the assembly code assumes a second line
+     * pointer is always available.
+     */
+    nr_pointers = MAX(2, height);
+    bitmap = _AL_MALLOC(sizeof(BITMAP) + (sizeof(char *) * nr_pointers));
+    if (!bitmap)
+        return NULL;
+
+    /* This avoids a crash for assembler code accessing the last pixel, as it
+     * read 4 bytes instead of 3.
+     */
+    padding = (color_depth == 24) ? 1 : 0;
+
+    bitmap->dat = ((SDL_Surface*) surface)->pixels;
+
+
+    bitmap->w = bitmap->cr = width;
+    bitmap->h = bitmap->cb = height;
+    bitmap->clip = TRUE;
+    bitmap->cl = bitmap->ct = 0;
+    bitmap->vtable = vtable;
+    bitmap->id = 0;
+    bitmap->extra = NULL;
+    bitmap->x_ofs = 0;
+    bitmap->y_ofs = 0;
+    bitmap->seg = _default_ds();
+
+    if (height > 0) {
+        bitmap->line[0] = bitmap->dat;
+        for (i=1; i<height; i++)
+            bitmap->line[i] = bitmap->line[i-1] + width * BYTES_PER_PIXEL(color_depth);
+    }
+
+    return bitmap;
+}
 
 /* create_bitmap:
  *  Creates a new memory bitmap.

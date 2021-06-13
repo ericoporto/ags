@@ -85,6 +85,8 @@ target_sources(common
     game/roomstruct.h
     game/tra_file.cpp
     game/tra_file.h
+    gfx/blender.cpp
+    gfx/blender.h
     gfx/allegrobitmap.cpp
     gfx/allegrobitmap.h
     gfx/bitmap.cpp
@@ -188,9 +190,9 @@ target_sources(common
 target_link_libraries(common PUBLIC
         ${SDL2_LIBRARY} ${SDL2_LIBRARIES}
         Allegro::Allegro
-        AlFont::AlFont
         AAStr::AAStr
-        glm::glm)
+        glm::glm
+        SDL2_ttf::SDL2_ttf)
 
 if (WIN32)
     target_link_libraries(common PUBLIC shlwapi)
