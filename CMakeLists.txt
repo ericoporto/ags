@@ -306,6 +306,9 @@ endif()
 ###############################################################################
 # subdirectories of this project
 
+include(FetchFreetype)
+include(FetchSDL_ttf)
+
 include(FindLocalOpenAL)
 include(FindLocalAllegro)
 
@@ -314,10 +317,10 @@ add_subdirectory(libsrc/tinyxml2                EXCLUDE_FROM_ALL)
 
 add_subdirectory(Common/libsrc/aastr-0.1.1      EXCLUDE_FROM_ALL)
 
-add_subdirectory(Common/libsrc/freetype-2.1.3   EXCLUDE_FROM_ALL)
-set(FREETYPE_LIBRARIES FreeType::FreeType)
+#add_subdirectory(Common/libsrc/freetype-2.1.3   EXCLUDE_FROM_ALL)
+#set(FREETYPE_LIBRARIES FreeType::FreeType)
 
-add_subdirectory(Common/libsrc/alfont-2.0.9     EXCLUDE_FROM_ALL)
+#add_subdirectory(Common/libsrc/alfont-2.0.9     EXCLUDE_FROM_ALL)
 add_subdirectory(Common)
 
 add_subdirectory(Engine/libsrc/apeg-1.2.1       EXCLUDE_FROM_ALL)
