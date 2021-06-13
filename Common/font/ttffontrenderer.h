@@ -18,7 +18,9 @@
 #include "font/agsfontrenderer.h"
 #include "util/string.h"
 
-struct ALFONT_FONT;
+
+#include "SDL_ttf.h"
+
 
 class TTFFontRenderer : public IAGSFontRendererInternal {
 public:
@@ -58,7 +60,7 @@ public:
 private:
     struct FontData
     {
-        ALFONT_FONT     *AlFont;
+        TTF_Font      *Font;
         FontRenderParams Params;
     };
     std::map<int, FontData> _fontData;

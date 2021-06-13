@@ -186,8 +186,8 @@ target_sources(common
 
 target_link_libraries(common PUBLIC
         ${SDL2_LIBRARY} ${SDL2_LIBRARIES}
+        SDL2_ttf::SDL2_ttf
         Allegro::Allegro
-        AlFont::AlFont
         AAStr::AAStr
         glm::glm)
 

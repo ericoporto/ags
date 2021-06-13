@@ -116,8 +116,31 @@ RUN cd /tmp && \
   cd /tmp/SDL_sound  && \
   mkdir /tmp/SDL_sound/build && \
   cd /tmp/SDL_sound/build && \
-  cmake -DSDL2_DIR=/usr/local/lib/cmake/SDL2  -DSDLSOUND_DECODER_MIDI=1 ..  && make -j$(getconf _NPROCESSORS_ONLN) && make install && \
+  cmake -DCMAKE_BUILD_TYPE=Release -DSDL2_DIR=/usr/local/lib/cmake/SDL2  -DSDLSOUND_DECODER_MIDI=1 ..  && make -j$(getconf _NPROCESSORS_ONLN) && make install && \
   rm /usr/local/lib/libSDL2_sound.*so* && \
   rm -r /tmp/SDL_sound
+
+ARG FREETYPE_VERSION=2-10-4
+RUN cd /tmp && \
+  curl -fLsS "https://github.com/freetype/freetype/archive/refs/tags/VER-$FREETYPE_VERSION.tar.gz" --output Freetype.tar.gz && \
+  tar -xvzf Freetype.tar.gz && \
+  mv freetype-VER-$FREETYPE_VERSION Freetype &&  \
+  cd /tmp/Freetype  && \
+  mkdir /tmp/Freetype/build && \
+  cd /tmp/Freetype/build && \
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=1 -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=1 -DCMAKE_DISABLE_FIND_PACKAGE_PNG=1 -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=1 -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=1 ..  && make -j$(getconf _NPROCESSORS_ONLN) && make install && \
+  rm -r /tmp/Freetype
+
+# Build and install SDL_ttf
+ARG SDL_TTF_VERSION=9363bd0f3b10aad5aaf73a63b9d085aba7ef7098
+RUN cd /tmp && \
+  curl -fLsS "https://github.com/libsdl-org/SDL_ttf/archive/$SDL_TTF_VERSION.tar.gz" --output SDL_ttf.tar.gz && \
+  tar -xvzf SDL_ttf.tar.gz && \
+  mv SDL_ttf-$SDL_TTF_VERSION SDL_ttf &&  \
+  cd /tmp/SDL_ttf  && \
+  mkdir /tmp/SDL_ttf/build && \
+  cd /tmp/SDL_ttf/build && \
+  cmake  -DCMAKE_BUILD_TYPE=Release -DSDL2_DIR=/usr/local/lib/cmake/SDL2 ..  && make -j$(getconf _NPROCESSORS_ONLN) && make install && \
+  rm -r /tmp/SDL_ttf
 
 RUN ldconfig -v

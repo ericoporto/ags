@@ -483,7 +483,8 @@ if(MACOS)
     )
 endif()
 
-if (AGS_BUILTIN_PLUGINS)
+# AGS_BUILTIN_PLUGINS
+if (0)
     target_compile_definitions(engine PRIVATE BUILTIN_PLUGINS)
 
     target_sources(engine PRIVATE 

@@ -35,6 +35,7 @@ if(NOT sdl2_content_POPULATED)
         set(SDL_FORCE_STATIC_VCRT ON CACHE BOOL "static windows static vcrc")
         add_subdirectory(${sdl2_content_SOURCE_DIR} ${sdl2_content_BINARY_DIR} EXCLUDE_FROM_ALL)
         add_library(SDL2::SDL2 ALIAS SDL2-static)
+        add_library(SDL2::SDL2-static ALIAS SDL2-static)
     endif()
     add_library(SDL2::SDL2main ALIAS SDL2main)
 

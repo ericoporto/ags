@@ -283,6 +283,8 @@ target_include_directories(allegro
    PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include ${PROJECT_SOURCE_DIR}/include
 )
 
+target_link_libraries(allegro SDL2::SDL2)
+
 
 #-----------------------------------------------------------------------------#
 # vim: set sts=4 sw=4 et:

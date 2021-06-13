@@ -21,6 +21,7 @@
 
 #include "base.h"
 #include "fixed.h"
+#include "palette.h"
 
 #ifdef __cplusplus
    extern "C" {
@@ -287,6 +288,7 @@ AL_FUNC(int, get_color_depth, (void));
 AL_FUNC(void, set_color_conversion, (int mode));
 AL_FUNC(int, get_color_conversion, (void));
 AL_FUNC(BITMAP *, create_bitmap, (int width, int height));
+AL_FUNC(BITMAP *, wrap_bitmap_sdl_surface, (void* surface));
 AL_FUNC(BITMAP *, create_bitmap_ex, (int color_depth, int width, int height));
 AL_FUNC(BITMAP *, create_sub_bitmap, (BITMAP *parent, int x, int y, int width, int height));
 AL_FUNC(void, destroy_bitmap, (BITMAP *bitmap));

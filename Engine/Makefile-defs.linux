@@ -1,9 +1,7 @@
 USE_BUILT_IN_LIBSRC = 0
 USE_MIDI_PATCH = 1
 
-include Makefile-defs.freetype
-
-INCDIR = ../Engine ../Common ../Common/libinclude ../Common/libsrc/alfont-2.0.9 ../Engine/libsrc/apeg-1.2.1/ ../libsrc/mojoAL ../Plugins ../Engine/libsrc/glad/include ../libsrc/glm $(ALLEGRO_SRCDIR)/include
+INCDIR = ../Engine ../Common ../Common/libinclude ../Engine/libsrc/apeg-1.2.1/ ../libsrc/mojoAL ../Plugins ../Engine/libsrc/glad/include ../libsrc/glm $(ALLEGRO_SRCDIR)/include
 LIBDIR =
 
 CFLAGS := -O2 -g \
@@ -34,8 +32,8 @@ LIBS += $(shell pkg-config --libs vorbisfile)
 SDL2_CFLAGS = $(shell sdl2-config --cflags)
 SDL2_LIBS = $(shell sdl2-config --libs)
 
-CFLAGS += $(SDL2_CFLAGS)
-LIBS += $(SDL2_LIBS) -lSDL2_sound
+CFLAGS += $(SDL2_CFLAGS) -I/usr/local/include/freetype2/
+LIBS += $(SDL2_LIBS) -lSDL2_sound -lSDL2_ttf -lfreetype
 
 LIBS += -ldl -lpthread -lm
 
