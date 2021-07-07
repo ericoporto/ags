@@ -33,6 +33,13 @@
 #include "platform/base/agsplatformdriver.h"
 #include "platform/base/sys_main.h"
 
+#if AGS_PLATFORM_OS_EMSCRIPTEN
+#include "emscripten.h"
+EM_JS(int, get_canvas_width, (), { return canvas.width; });
+EM_JS(int, get_canvas_height, (), { return canvas.height; });
+EM_JS(void, do_resize_after_time, (), {setInterval(function(){window.dispatchEvent(new Event('resize'));},200)});
+#endif
+
 // Don't try to figure out the window size on the these ports because the port resizes itself.
 #if AGS_PLATFORM_OS_IOS || AGS_PLATFORM_OS_ANDROID
 #define USE_SIMPLE_GFX_INIT
@@ -120,7 +127,7 @@ bool find_nearest_supported_mode(const IGfxModeList &modes, const Size &wanted_s
     {
         wanted_ratio = (ratio_reference->Height << kShift) / ratio_reference->Width;
     }
-    
+
     int nearest_width = 0;
     int nearest_height = 0;
     int nearest_width_diff = 0;
@@ -157,7 +164,7 @@ bool find_nearest_supported_mode(const IGfxModeList &modes, const Size &wanted_s
             nearest_mode = mode;
             break;
         }
-      
+
         int diff_w = abs(wanted_size.Width - mode.Width);
         int diff_h = abs(wanted_size.Height - mode.Height);
         bool same_diff_w_higher = (diff_w == nearest_width_diff && nearest_width < wanted_size.Width);
@@ -531,13 +538,22 @@ bool graphics_mode_update_render_frame()
 
     DisplayMode dm = gfxDriver->GetDisplayMode();
     Size screen_size = Size(dm.Width, dm.Height);
+
+#if AGS_PLATFORM_OS_EMSCRIPTEN
+    if(dm.IsWindowed() && String::Wrapper(gfxDriver->GetDriverID()) != "Software")
+    {
+        screen_size = Size(get_canvas_width(),  get_canvas_height());
+        do_resize_after_time();
+    }
+#endif
+
     Size native_size = gfxDriver->GetNativeSize();
     Size frame_size = get_game_frame_from_screen_size(native_size, screen_size, CurFrameSetup);
     Rect render_frame = CenterInRect(RectWH(screen_size), RectWH(frame_size));
 
     if (!gfxDriver->SetRenderFrame(render_frame))
     {
-        Debug::Printf(kDbgMsg_Error, "Failed to set render frame (%d, %d, %d, %d : %d x %d). Error: %s", 
+        Debug::Printf(kDbgMsg_Error, "Failed to set render frame (%d, %d, %d, %d : %d x %d). Error: %s",
             render_frame.Left, render_frame.Top, render_frame.Right, render_frame.Bottom,
             render_frame.GetWidth(), render_frame.GetHeight(), SDL_GetError());
         return false;
