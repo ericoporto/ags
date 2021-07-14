@@ -803,6 +803,7 @@ namespace AGS.Editor
                 _interactiveTasks = new InteractiveTasks(_agsEditor.Tasks);
                 ColorThemes = new ColorThemes(_agsEditor, _agsEditor.Settings);
                 _mainForm = new frmMain();
+                _agsEditor.Tasks.SetProcessBridge(_mainForm.pnlConsole.ProcessBridge);
                 SetEditorWindowSize();
                 _treeManager = new ProjectTree(_mainForm.projectPanel.projectTree);
                 _treeManager.OnContextMenuClick += new ProjectTree.MenuClickHandler(_mainForm_OnMenuClick);
