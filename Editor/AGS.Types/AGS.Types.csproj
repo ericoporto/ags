@@ -115,6 +115,7 @@
     <Compile Include="EditorFeatures\MenuCommand.cs" />
     <Compile Include="EditorFeatures\MenuCommands.cs" />
     <Compile Include="EditorFeatures\MessageBoxIconType.cs" />
+    <Compile Include="EditorFeatures\ProcessEventArgs.cs" />
     <Compile Include="EditorFeatures\RoomTemplate.cs" />
     <Compile Include="Enums\BlendMode.cs" />
     <Compile Include="Enums\FontAutoOutlineStyle.cs" />
@@ -159,6 +160,7 @@
     <Compile Include="GlobalVariables.cs" />
     <Compile Include="GUIControlGroup.cs" />
     <Compile Include="HelperTypes\SpriteInfo.cs" />
+    <Compile Include="Interfaces\IProcessBridge.cs" />
     <Compile Include="Interfaces\IRePopulatableComponent.cs" />
     <Compile Include="Interfaces\ILoadedRoom.cs" />
     <Compile Include="InteractionSchema.cs" />

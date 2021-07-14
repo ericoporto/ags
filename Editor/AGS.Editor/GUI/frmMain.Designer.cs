@@ -52,6 +52,7 @@ namespace AGS.Editor
             this.pnlCallStack = new AGS.Editor.CallStackPanel();
             this.pnlFindResults = new AGS.Editor.FindResultsPanel();
             this.pnlOutput = new AGS.Editor.OutputPanel();
+            this.pnlConsole = new AGS.Editor.ConsolePanel();
             this.projectPanel = new AGS.Editor.ProjectPanel();
             this.propertiesPanel = new AGS.Editor.PropertiesPanel();
             this.mainMenu = new MenuStripExtended();
@@ -204,6 +205,26 @@ namespace AGS.Editor
             this.pnlOutput.Visible = true;
             this.pnlOutput.VisibleState = WeifenLuo.WinFormsUI.Docking.DockState.DockBottom;
             // 
+            // pnlConsole
+            // 
+            this.pnlConsole.ClientSize = new System.Drawing.Size(489, 65);
+            this.pnlConsole.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlConsole.DockPanel = this.mainContainer;
+            this.pnlConsole.DockState = WeifenLuo.WinFormsUI.Docking.DockState.Unknown;
+            this.pnlConsole.FloatPane = null;
+            this.pnlConsole.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.pnlConsole.IsFloat = false;
+            this.pnlConsole.IsHidden = true;
+            this.pnlConsole.HideOnClose = true;
+            this.pnlConsole.Location = new System.Drawing.Point(0, 0);
+            this.pnlConsole.Name = "pnlConsole";
+            this.pnlConsole.Text = "Console";
+            this.pnlConsole.Pane = null;
+            this.pnlConsole.PanelPane = null;
+            this.pnlConsole.ShowHint = WeifenLuo.WinFormsUI.Docking.DockState.DockBottom;
+            this.pnlConsole.Visible = true;
+            this.pnlConsole.VisibleState = WeifenLuo.WinFormsUI.Docking.DockState.DockBottom;
+            // 
             // projectPanel
             // 
             this.projectPanel.DockPanel = this.mainContainer;
@@ -309,6 +330,7 @@ namespace AGS.Editor
         private AGS.Editor.TabbedDocumentManager tabbedDocumentContainer1;
         internal ToolStripExtended toolStrip;
         internal OutputPanel pnlOutput;
+        internal ConsolePanel pnlConsole;
         private System.Windows.Forms.StatusStrip statusStrip;
         internal System.Windows.Forms.ToolStripStatusLabel statusLabel;
         internal CallStackPanel pnlCallStack;

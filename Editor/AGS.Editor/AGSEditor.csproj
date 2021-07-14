@@ -158,6 +158,8 @@
     <Compile Include="GUI\NumberEntryWithInfoDialog.Designer.cs">
       <DependentUpon>NumberEntryWithInfoDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\Panel\Console\ConsoleEventArgs.cs" />
+    <Compile Include="GUI\Panel\Console\ProcessBridge.cs" />
     <Compile Include="GUI\Progress.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -202,6 +204,12 @@
     </Compile>
     <Compile Include="GUI\NumberEntryDialog.Designer.cs">
       <DependentUpon>NumberEntryDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\Panel\Console\ConsolePanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Panel\Console\ConsolePanel.Designer.cs">
+      <DependentUpon>ConsolePanel.cs</DependentUpon>
     </Compile>
     <Compile Include="Panes\Room\RoomEditFilters\CharactersEditorFilter.cs" />
     <Compile Include="Panes\Room\RoomEditFilters\DesignTimeProperties.cs" />
@@ -365,6 +373,9 @@
     <EmbeddedResource Include="Panes\BigPropertySheet.resx">
       <SubType>Designer</SubType>
       <DependentUpon>BigPropertySheet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Panel\Console\ConsolePanel.resx">
+      <DependentUpon>ConsolePanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Panes\GUIEditor.resx">
       <SubType>Designer</SubType>

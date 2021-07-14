@@ -25,6 +25,12 @@ namespace AGS.Editor
 
         private Process _testGameProcess = null;
         private bool _runningGameWithDebugger = false;
+        private IProcessBridge _processBridge;
+
+        public void SetProcessBridge(IProcessBridge processBridge)
+        {
+            _processBridge = processBridge;
+        }
 
         public void CreateNewGameFromTemplate(string templateFileName, string newGameDirectory)
         {
@@ -427,7 +433,11 @@ namespace AGS.Editor
                 " \"" + AudioClip.AUDIO_CACHE_DIRECTORY + "\"" +
                 " \"" + "Speech" + "\"";
 
-            RunEXEFile(Path.Combine(AGSEditor.DEBUG_OUTPUT_DIRECTORY, Factory.AGSEditor.BaseGameFileName + ".exe"), parameter, true);
+            parameter += " --log-stdout=all:info --console-attach";
+
+            string exename = Path.Combine(AGSEditor.DEBUG_OUTPUT_DIRECTORY, Factory.AGSEditor.BaseGameFileName + ".exe");
+
+            RunEXEFile(exename, parameter, true);
 
             if (withDebugger)
             {
@@ -462,16 +472,12 @@ namespace AGS.Editor
                 {
                     throw new FileNotFoundException("Game EXE '" + exeName + "' has not been built. Use the Build EXE command and then try again.");
                 }
-
-                _testGameProcess = new Process();
-                _testGameProcess.StartInfo.FileName = exeName;
-                _testGameProcess.StartInfo.Arguments = parameter;
+                            
+                _testGameProcess = _processBridge.StartProcess(exeName, parameter);
                 if (raiseEventOnExit)
                 {
-                    _testGameProcess.EnableRaisingEvents = true;
-                    _testGameProcess.Exited += new EventHandler(_testGameProcess_Exited);
+                    _processBridge.OnExit += new EventHandler(_testGameProcess_Exited);
                 }
-                _testGameProcess.Start();
             }
             catch (Exception ex)
             {

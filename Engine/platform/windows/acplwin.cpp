@@ -717,6 +717,7 @@ void AGSWin32::WriteStdOut(const char *fmt, ...) {
   {
     vprintf(fmt, ap);
     printf("\n");
+    fflush(stdout);
   }
   va_end(ap);
 }
@@ -737,6 +738,7 @@ void AGSWin32::WriteStdErr(const char *fmt, ...) {
   {
     vfprintf(stderr, fmt, ap);
     fprintf(stderr, "\n");
+    fflush(stderr);
   }
   va_end(ap);
 }
