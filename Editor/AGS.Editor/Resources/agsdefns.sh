@@ -70,6 +70,10 @@
 
 #define SCR_NO_VALUE   31998   // $AUTOCOMPLETEIGNORE$
 
+#ifdef SCRIPT_API_v360
+  #define GAMEPAD_DEFAULT_DEADZONE 0.125
+#endif
+
 enum bool {
   false = 0,
   true = 1
@@ -468,6 +472,39 @@ enum InputType
   eInputKeyboard = 0x02000000,
   eInputMouse    = 0x04000000,
   eInputAny      = 0xFF000000
+};
+
+enum eGamepad_Axis
+{
+    eGamepad_AxisInvalid=0,
+    eGamepad_AxisLeftX,
+    eGamepad_AxisLeftY,
+    eGamepad_AxisRightX,
+    eGamepad_AxisRightY,
+    eGamepad_AxisTriggerLeft,
+    eGamepad_AxisTriggerRight,
+    eGamepad_AxisCount
+};
+
+enum eGamepad_Button
+{
+    eGamepad_ButtonInvalid=0,
+    eGamepad_ButtonA,
+    eGamepad_ButtonB,
+    eGamepad_ButtonX,
+    eGamepad_ButtonY,
+    eGamepad_ButtonBack,
+    eGamepad_ButtonGuide,
+    eGamepad_ButtonStart,
+    eGamepad_ButtonLeftStick,
+    eGamepad_ButtonRightStick,
+    eGamepad_ButtonLeftShoulder,
+    eGamepad_ButtonRightShoulder,
+    eGamepad_ButtonDpadUp,
+    eGamepad_ButtonDpadDown,
+    eGamepad_ButtonDpadLeft,
+    eGamepad_ButtonDpadRight,
+    eGamepad_ButtonCount
 };
 #endif
 
@@ -3072,6 +3109,24 @@ builtin struct Screen {
 };
 #endif
 
+#ifdef SCRIPT_API_v360
+builtin managed struct Gamepad{  
+  /// get number of connected joysticks
+  import static int GetCount(); // $AUTOCOMPLETESTATICONLY$ 
+  /// attempt to open a gamepad, returns null if it's not a valid gamepad
+  import static Gamepad* Open(int index); // $AUTOCOMPLETESTATICONLY$ 
+  /// if joystick is a valid gamepad, get it's name
+  import static String GetName(int index); // $AUTOCOMPLETESTATICONLY$ 
+  /// gamepad name
+  import readonly attribute String Name;  
+  /// checks if gamepad is really connected
+  import bool IsConnected();    
+  /// checks if a gamepad button is pressed, including dpad.
+  import bool IsButtonDown(eGamepad_Button button);    
+  /// get gamepad axis or trigger, trigger only has positive values.
+  import float GetAxis(eGamepad_Axis axis, float dead_zone = GAMEPAD_DEFAULT_DEADZONE);
+};
+#endif
 
 
 import readonly Character *player;
