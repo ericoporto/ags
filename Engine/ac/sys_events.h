@@ -105,6 +105,12 @@ extern volatile int sys_mouse_x; // mouse x position
 extern volatile int sys_mouse_y; // mouse y position
 extern volatile int sys_mouse_z; // mouse wheel position
 
+// Joystick and Gamepad input handling
+//
+bool ags_joystick_event_ready();
+SDL_Event ags_get_next_joystick_event();
+bool ags_gamepad_event_ready();
+SDL_Event ags_get_next_gamepad_event();
 
 // Other input utilities
 //

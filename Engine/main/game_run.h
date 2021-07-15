@@ -49,4 +49,7 @@ bool run_service_mb_controls(eAGSMouseButton &mbut, int &mwheelz);
 // TODO: refactor this
 void update_polled_stuff();
 
+struct GamepadInput;
+bool run_service_gamepad_controls(GamepadInput &out_key);
+
 #endif // __AGS_EE_MAIN__GAMERUN_H

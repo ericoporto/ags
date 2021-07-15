@@ -99,6 +99,8 @@ target_sources(engine
     ac/dynobj/scriptdynamicsprite.h
     ac/dynobj/scriptfile.cpp
     ac/dynobj/scriptfile.h
+    ac/dynobj/scriptjoystick.cpp
+    ac/dynobj/scriptjoystick.h
     ac/dynobj/scriptgui.h
     ac/dynobj/scripthotspot.h
     ac/dynobj/scriptinvitem.h
@@ -124,6 +126,8 @@ target_sources(engine
     ac/file.h
     ac/game.cpp
     ac/game.h
+    ac/joystick.cpp
+    ac/joystick.h
     ac/gamesetup.cpp
     ac/gamesetup.h
     ac/gamestate.cpp

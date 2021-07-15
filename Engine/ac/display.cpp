@@ -47,6 +47,7 @@
 #include "ac/mouse.h"
 #include "media/audio/audio_system.h"
 #include "ac/timer.h"
+#include "joystick.h"
 
 using namespace AGS::Common;
 using namespace AGS::Common::BitmapHelper;
@@ -346,7 +347,23 @@ ScreenOverlay *_display_main(int xx, int yy, int wii, const char *text, int disp
             }
             if (do_break)
                 break;
-            
+
+            GamepadInput gp;
+            if (run_service_gamepad_controls(gp) && (
+                    gp.Button == eAGSGamepad_ButtonA ||
+                    gp.Button == eAGSGamepad_ButtonB ||
+                    gp.Button == eAGSGamepad_ButtonX ||
+                    gp.Button == eAGSGamepad_ButtonY)) {
+                check_skip_cutscene_gamepad (gp.Button);
+                if (play.fast_forward)
+                    break;
+                if ((skip_setting & SKIP_KEYPRESS) && !play.IsIgnoringInput())
+                {
+                    play.SetWaitSkipResult(SKIP_GAMEPAD, gp.Button);
+                    break;
+                }
+            }
+
             update_polled_stuff();
 
             if (play.fast_forward == 0)
