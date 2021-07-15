@@ -70,6 +70,10 @@
 
 #define SCR_NO_VALUE   31998   // $AUTOCOMPLETEIGNORE$
 
+#ifdef SCRIPT_API_v360
+  #define AXIS_DEFAULT_DEADZONE 0.125
+#endif
+
 enum bool {
   false = 0,
   true = 1
@@ -467,7 +471,55 @@ enum InputType
   // 0x0100... is used internally to define Timeout (may be worked around in the future)
   eInputKeyboard = 0x02000000,
   eInputMouse    = 0x04000000,
+  eInputGamepad  = 0x08000000,
   eInputAny      = 0xFF000000
+};
+
+enum eGamepad_Axis
+{
+    eGamepad_AxisInvalid=0,
+    eGamepad_AxisLeftX,
+    eGamepad_AxisLeftY,
+    eGamepad_AxisRightX,
+    eGamepad_AxisRightY,
+    eGamepad_AxisTriggerLeft,
+    eGamepad_AxisTriggerRight,
+    eGamepad_AxisCount
+};
+
+enum eGamepad_Button
+{
+    eGamepad_ButtonInvalid=0,
+    eGamepad_ButtonA,
+    eGamepad_ButtonB,
+    eGamepad_ButtonX,
+    eGamepad_ButtonY,
+    eGamepad_ButtonBack,
+    eGamepad_ButtonGuide,
+    eGamepad_ButtonStart,
+    eGamepad_ButtonLeftStick,
+    eGamepad_ButtonRightStick,
+    eGamepad_ButtonLeftShoulder,
+    eGamepad_ButtonRightShoulder,
+    eGamepad_ButtonDpadUp,
+    eGamepad_ButtonDpadDown,
+    eGamepad_ButtonDpadLeft,
+    eGamepad_ButtonDpadRight,
+    eGamepad_ButtonCount
+};
+
+enum eJoystick_Hat
+{
+    eJoystick_HatInvalid = -1,
+    eJoystick_HatCentered = 0,
+    eJoystick_HatUp = 0x01,
+    eJoystick_HatRight = 0x02,
+    eJoystick_HatDown = 0x04,
+    eJoystick_HatLeft = 0x08,
+    eJoystick_HatRightUp = 0x03,
+    eJoystick_HatRightDown = 0x06,
+    eJoystick_HatLeftUp = 0x09,
+    eJoystick_HatLeftDown = 0x0C,
 };
 #endif
 
@@ -3076,6 +3128,36 @@ builtin struct Screen {
 };
 #endif
 
+#ifdef SCRIPT_API_v360
+builtin managed struct Joystick{
+  /// get number of connected joysticks
+  import static readonly attribute int Length; // $AUTOCOMPLETESTATICONLY$
+  /// attempt to open a joystick, returns null if it is invalid or in case of errors
+  import static readonly attribute Joystick* Joysticks[]; // $AUTOCOMPLETESTATICONLY$
+  /// gamepad name
+  import readonly attribute String Name;
+  /// checks if joystick is really connected
+  import readonly attribute bool IsConnected;
+  /// checks if joystick is a valid gamepad
+  import readonly attribute bool IsGamepad;
+  /// checks if a gamepad button is pressed, including dpad.
+  import bool IsGamepadButtonDown(eGamepad_Button button);
+  /// get gamepad axis or trigger, trigger only has positive values.
+  import float GetGamepadAxis(eGamepad_Axis axis, float dead_zone = AXIS_DEFAULT_DEADZONE); 
+  /// get joystick axis or trigger, by index
+  import float GetAxis(int axis, float dead_zone = AXIS_DEFAULT_DEADZONE);
+  /// checks if a gamepad button is pressed, including dpad.
+  import bool IsButtonDown(int button);
+  /// checks if a gamepad button is pressed, including dpad.
+  import eJoystick_Hat GetHat(int hat);
+  /// get axis count
+  import readonly attribute int AxisCount;
+  /// get button count
+  import readonly attribute int ButtonCount;
+  /// get hat count
+  import readonly attribute int HatCount;
+};
+#endif
 
 
 import readonly Character *player;
