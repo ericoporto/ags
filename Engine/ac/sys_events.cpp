@@ -16,6 +16,7 @@
 #include <SDL.h>
 #include "core/platform.h"
 #include "ac/common.h"
+#include "ac/gamepad.h"
 #include "ac/gamesetupstruct.h"
 #include "ac/keycode.h"
 #include "ac/mouse.h"
@@ -512,6 +513,38 @@ void ags_wait_until_keypress()
     ags_clear_input_buffer();
 }
 
+// ----------------------------------------------------------------------------
+// GAMEPAD INPUT
+// ----------------------------------------------------------------------------
+
+static std::deque<SDL_Event> g_gamepadEvtQueue;
+
+bool ags_gamepad_event_ready()
+{
+    return g_gamepadEvtQueue.size() > 0;
+}
+
+SDL_Event ags_get_next_gamepad_event()
+{
+    if (g_gamepadEvtQueue.size() > 0)
+    {
+        auto evt = g_gamepadEvtQueue.front();
+        g_gamepadEvtQueue.pop_front();
+        return evt;
+    }
+    SDL_Event empty = {};
+    return empty;
+}
+
+static void on_sdl_gamepad_button(const SDL_Event &event)
+{
+    g_gamepadEvtQueue.push_back(event);
+}
+
+static void on_sdl_gamepad_device(const SDL_Event &event)
+{
+    g_gamepadEvtQueue.push_back(event);
+}
 
 // ----------------------------------------------------------------------------
 // EVENTS
@@ -579,6 +612,13 @@ void sys_evt_process_one(const SDL_Event &event) {
         break;
     case SDL_MOUSEWHEEL:
         on_sdl_mouse_wheel(event.wheel);
+        break;
+    case SDL_CONTROLLERBUTTONDOWN:
+        on_sdl_gamepad_button(event);
+        break;
+    case SDL_CONTROLLERDEVICEADDED:
+    case SDL_CONTROLLERDEVICEREMOVED:
+        on_sdl_gamepad_device(event);
         break;
     }
 }

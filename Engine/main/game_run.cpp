@@ -61,6 +61,7 @@
 #include "plugin/plugin_engine.h"
 #include "script/script.h"
 #include "script/script_runtime.h"
+#include "ac/gamepad.h"
 
 using namespace AGS::Common;
 
@@ -471,6 +472,20 @@ bool run_service_mb_controls(eAGSMouseButton &mbut, int &mwheelz)
     return true;
 }
 
+bool run_service_gamepad_controls(GamepadInput &out_key)
+{
+    const bool key_valid = ags_gamepad_event_ready();
+    const SDL_Event key_evt = key_valid ? ags_get_next_gamepad_event() : SDL_Event();
+
+    switch (key_evt.type) {
+        case SDL_CONTROLLERBUTTONDOWN:
+        case SDL_CONTROLLERBUTTONUP:
+            out_key.Button = Gamepad_Button_SDLtoAGS(static_cast<SDL_GameControllerButton>(key_evt.cbutton.button));
+            break;
+    }
+    return true;
+}
+
 // Runs default keyboard handling
 static void check_keyboard_controls()
 {
@@ -588,6 +603,53 @@ static void check_keyboard_controls()
     }
 }
 
+// Runs default gamepad handling
+static void check_gamepad_controls()
+{
+    // First check for service engine's combinations (mouse lock, display mode switch, and so forth)
+    GamepadInput gi;
+    if (!run_service_gamepad_controls(gi)) {
+        return;
+    }
+    eAGSGamepad_Button gbn = gi.Button;
+    // Then, check cutscene skip
+    check_skip_cutscene_gamepad(gbn);
+    if (play.fast_forward) {
+        return;
+    }
+    if (play.IsIgnoringInput()) {
+        return;
+    }
+
+    // skip speech if desired by Speech.SkipStyle
+    if ((play.text_overlay_on > 0) && (play.cant_skip_speech & SKIP_KEYPRESS)) {
+        // only allow a key to remove the overlay if the icon bar isn't up
+        if (IsGamePaused() == 0) {
+            // check if it requires a specific keypress
+            if ((play.skip_speech_specific_key > 0) &&
+                (gbn != play.skip_speech_specific_key)) { }
+            else
+            {
+                remove_screen_overlay(play.text_overlay_on);
+                play.SetWaitSkipResult(SKIP_GAMEPAD, gbn);
+            }
+        }
+
+        return;
+    }
+
+    if ((play.wait_counter != 0) && (play.key_skip_wait & SKIP_KEYPRESS) != 0) {
+        play.SetWaitSkipResult(SKIP_GAMEPAD, gbn);
+        return;
+    }
+
+    if (inside_script) {
+        // Don't queue up another keypress if it can't be run instantly
+        debug_script_log("Gamepad button %d ignored (game blocked)", gbn);
+        return;
+    }
+}
+
 // check_controls: checks mouse & keyboard interface
 static void check_controls() {
     our_eip = 1007;
@@ -598,6 +660,10 @@ static void check_controls() {
     // Handle all the buffered key events
     while (ags_keyevent_ready())
         check_keyboard_controls();
+
+    // Handle all the buffered gamepad events
+    while (ags_gamepad_event_ready())
+        check_gamepad_controls();
 }
 
 static void check_room_edges(size_t numevents_was)

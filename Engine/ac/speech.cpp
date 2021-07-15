@@ -38,7 +38,7 @@ int user_to_internal_skip_speech(SkipSpeechStyle userval)
     case kSkipSpeechNone:
         return SKIP_NONE;
     case kSkipSpeechKeyMouseTime:
-        return SKIP_AUTOTIMER | SKIP_KEYPRESS | SKIP_MOUSECLICK;
+        return SKIP_AUTOTIMER | SKIP_KEYPRESS | SKIP_MOUSECLICK | SKIP_GAMEPAD;
     case kSkipSpeechKeyTime:
         return SKIP_AUTOTIMER | SKIP_KEYPRESS;
     case kSkipSpeechTime:

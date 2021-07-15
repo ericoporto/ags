@@ -46,4 +46,7 @@ bool run_service_key_controls(KeyInput &kgn);
 // otherwise returns true and provides mouse button code.
 bool run_service_mb_controls(eAGSMouseButton &mbut, int &mwheelz);
 
+struct GamepadInput;
+bool run_service_gamepad_controls(GamepadInput &out_key);
+
 #endif // __AGS_EE_MAIN__GAMERUN_H
