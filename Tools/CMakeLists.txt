@@ -127,7 +127,9 @@ target_link_libraries(trac PUBLIC libtools)
 #----- agfbuildgen --------------------------------------------
 add_executable(agfbuildgen agfbuildgen/main.cpp
         agfbuildgen/ninja_syntax.cpp
-        agfbuildgen/ninja_syntax.h)
+        agfbuildgen/ninja_syntax.h
+        agfbuildgen/ninja_generator.cpp
+        agfbuildgen/ninja_generator.h)
 set_target_properties(agfbuildgen PROPERTIES
         CXX_STANDARD 11
         CXX_EXTENSIONS NO
