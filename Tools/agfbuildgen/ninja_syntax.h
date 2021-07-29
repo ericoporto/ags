@@ -43,6 +43,7 @@ class NinjaWriter {
 private:
     OutputWriterInterface* _output;
     int _width;
+    void Line(const AGString& text, int indent=0);
 public:
     explicit NinjaWriter(OutputWriterInterface* output, int width=78);
     ~NinjaWriter() = default;
@@ -54,7 +55,7 @@ public:
               bool generator=false, const AGString& pool="", bool restat=false, const AGString& rspfile="",
               const AGString& rspfile_content="", const AGString& deps="");
     void Build(const std::vector<AGString>& outputs, const AGString& rule, const std::vector<AGString>& inputs={}, const std::vector<AGString>& implicit={}, const std::vector<AGString>& order_only={},
-               const std::vector<AGString>& variables={}, const std::vector<AGString>& implicit_outputs={}, const AGString& pool="", const AGString& dyndep="");
+               const std::vector<std::pair<AGString, AGString>>& variables={}, const std::vector<AGString>& implicit_outputs={}, const AGString& pool="", const AGString& dyndep="");
     void Include(const AGString& path);
     void Subninja(const AGString& path);
     void Default(const std::vector<AGString>& paths);
