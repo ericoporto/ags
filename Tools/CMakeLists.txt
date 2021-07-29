@@ -18,6 +18,7 @@ set(TOOLS_COMMON_SOURCES
         ../Common/game/room_file_base.cpp
         ../Common/game/tra_file.cpp
         ../Common/util/bufferedstream.cpp
+        ../Common/util/cmdlineopts.cpp
         ../Common/util/data_ext.cpp
         ../Common/util/datastream.cpp
         ../Common/util/directory.cpp
@@ -121,6 +122,17 @@ set_target_properties(trac PROPERTIES
         CXX_EXTENSIONS NO
         )
 target_link_libraries(trac PUBLIC libtools)
+
+
+#----- agfbuildgen --------------------------------------------
+add_executable(agfbuildgen agfbuildgen/main.cpp
+        agfbuildgen/ninja_syntax.cpp
+        agfbuildgen/ninja_syntax.h)
+set_target_properties(agfbuildgen PROPERTIES
+        CXX_STANDARD 11
+        CXX_EXTENSIONS NO
+        )
+target_link_libraries(agfbuildgen PUBLIC libtools)
 
 # Bundle-like target to build all tools
 add_custom_target(Tools)
