@@ -18,6 +18,7 @@ set(TOOLS_COMMON_SOURCES
         ../Common/game/room_file_base.cpp
         ../Common/game/tra_file.cpp
         ../Common/util/bufferedstream.cpp
+        ../Common/util/cmdlineopts.cpp
         ../Common/util/data_ext.cpp
         ../Common/util/datastream.cpp
         ../Common/util/directory.cpp
@@ -121,6 +122,19 @@ set_target_properties(trac PROPERTIES
         CXX_EXTENSIONS NO
         )
 target_link_libraries(trac PUBLIC libtools)
+
+#----- visualtest ---------------------------------------------
+add_executable(visualtest visualtest/main.cpp
+        ../Common/util/path_ex.cpp
+        ../Common/gfx/allegrobitmap.cpp
+        ../Common/gfx/bitmap.cpp
+        ../Common/util/wgt2allg.cpp
+        ../Engine/gfx/color_engine.cpp)
+set_target_properties(visualtest PROPERTIES
+        CXX_STANDARD 11
+        CXX_EXTENSIONS NO
+        )
+target_link_libraries(visualtest PUBLIC libtools Allegro::Allegro AlFont::AlFont AAStr::AAStr)
 
 # Bundle-like target to build all tools
 add_custom_target(Tools)
