@@ -11,6 +11,7 @@ namespace AGS.Editor
 {
     public partial class ProjectPanel : DockContent
     {
+        private int _projectTreeNodeCount;
         public ProjectPanel()
         {
             InitializeComponent();
@@ -31,16 +32,57 @@ namespace AGS.Editor
             if(split_txt.Length > 1)
             {
                 string txt_to_search = split_txt[1].Trim();
-                return txt_to_search == search;
+                if(txt_to_search.Length > 0) {
+                    string txt_to_search2 = txt_to_search.Substring(1);
+                    return (txt_to_search == search || txt_to_search2.Equals(search, StringComparison.InvariantCultureIgnoreCase));
+                }
             }
             return false;
+        }
+
+        private void UpdateAutoCompleteR(TreeNodeCollection p_Nodes)
+        {
+            foreach (TreeNode node in p_Nodes)
+            {
+                if (node.Text.Length > 0)
+                {
+                    string[] split_txt = node.Text?.Split(':');
+                    if (split_txt.Length > 1)
+                    {
+                        string txt_to_search = split_txt[1].Trim();
+                        if (txt_to_search.Length > 0)
+                        {
+                            textBox1.AutoCompleteCustomSource.Add(txt_to_search);
+                        }
+                    }
+                    else
+                    {
+                        string txt_to_search = split_txt[0].Trim();
+                        if (txt_to_search.Length > 0)
+                        {
+                            textBox1.AutoCompleteCustomSource.Add(txt_to_search);
+                        }
+                    }
+                }
+
+                if (node.Nodes.Count > 0)
+                {
+                    UpdateAutoCompleteR(node.Nodes);
+                }
+            }
+        }
+
+        private void UpdateAutoComplete()
+        {
+            textBox1.AutoCompleteCustomSource.Clear();
+            UpdateAutoCompleteR(projectTree.Nodes);
         }
 
         private TreeNode SearchTreeView(string p_sSearchTerm, TreeNodeCollection p_Nodes)
         {
             foreach (TreeNode node in p_Nodes)
             {
-                if (node.Text == p_sSearchTerm || ContainsTextAtRight(node.Text, ':', p_sSearchTerm))
+                if (node.Text.Equals(p_sSearchTerm, StringComparison.InvariantCultureIgnoreCase) || ContainsTextAtRight(node.Text, ':', p_sSearchTerm))
                 {
                     return node;
                 }
@@ -60,6 +102,10 @@ namespace AGS.Editor
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
+            if (_projectTreeNodeCount != projectTree.GetNodeCount(true)) { 
+                UpdateAutoComplete();
+                _projectTreeNodeCount = projectTree.GetNodeCount(true);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
