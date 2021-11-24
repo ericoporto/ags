@@ -1,0 +1,10 @@
+<!-- https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build -->
+<Project>
+
+  <PropertyGroup>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+	<!-- We control versioning through AssemblyInfo.cs so we need to control it. Consider moving this information into a props file -->
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+</Project>
