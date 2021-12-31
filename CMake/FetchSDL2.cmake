@@ -1,7 +1,7 @@
 FetchContent_Declare(
     sdl2_content
-    URL https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.0.12.tar.gz
-    URL_HASH MD5=7ccff5e151cbca26476f6fcaae3ac46c
+    URL https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.0.18.tar.gz
+    URL_HASH MD5=647e2890385e5f13b9aeee2e27fa26e7
 )
 
 FetchContent_GetProperties(sdl2_content)
