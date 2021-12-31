@@ -31,8 +31,8 @@ build_linux_cmake_task:
     dockerfile: ci/linux/Dockerfile
     docker_arguments:
       matrix:
-        - FROM_DEBIAN: debian:jessie
-        - FROM_DEBIAN: i386/debian:jessie
+        - FROM_DEBIAN: debian:stretch
+        - FROM_DEBIAN: i386/debian:stretch
   env:
     matrix:
       - BUILD_TYPE: release
@@ -55,8 +55,8 @@ build_linux_debian_task:
     dockerfile: ci/linux/Dockerfile
     docker_arguments:
       matrix:
-        - FROM_DEBIAN: debian:jessie
-        - FROM_DEBIAN: i386/debian:jessie
+        - FROM_DEBIAN: debian:stretch
+        - FROM_DEBIAN: i386/debian:stretch
   env:
     matrix:
       - RPATH_PREFIX: lib
@@ -106,8 +106,8 @@ build_linux_make_task:
     dockerfile: ci/linux/Dockerfile
     docker_arguments:
       matrix:
-        - FROM_DEBIAN: debian:jessie
-        - FROM_DEBIAN: i386/debian:jessie
+        - FROM_DEBIAN: debian:stretch
+        - FROM_DEBIAN: i386/debian:stretch
   build_script: |
     arch=$(dpkg --print-architecture)
     make --directory=Engine
