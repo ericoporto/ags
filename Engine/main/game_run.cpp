@@ -1109,5 +1109,5 @@ void update_polled_stuff_if_runtime()
     }
 
     if (editor_debugging_initialized)
-        check_for_messages_from_editor();
+        check_for_messages_from_debugger();
 }
