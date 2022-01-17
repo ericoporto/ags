@@ -17,6 +17,7 @@ option(AGS_NO_MP3_PLAYER "Disable MP3" OFF)
 option(AGS_NO_VIDEO_PLAYER "Disable Video" OFF)
 option(AGS_BUILTIN_PLUGINS "Built in plugins" ON)
 option(AGS_DEBUG_MANAGED_OBJECTS "Managed Objects Log" OFF)
+option(AGS_PREFER_OPEN_AL_SOFT "Use OpenAL Soft instead of MojoAL if supported" OFF)
 set(AGS_BUILD_STR "" CACHE STRING "Engine Build Information")
 
 
@@ -28,6 +29,7 @@ message(" AGS_NO_MP3_PLAYER: ${AGS_NO_MP3_PLAYER}")
 message(" AGS_NO_VIDEO_PLAYER: ${AGS_NO_VIDEO_PLAYER}")
 message(" AGS_BUILTIN_PLUGINS: ${AGS_BUILTIN_PLUGINS}")
 message(" AGS_DEBUG_MANAGED_OBJECTS: ${AGS_DEBUG_MANAGED_OBJECTS}")
+message(" AGS_PREFER_OPEN_AL_SOFT: ${AGS_PREFER_OPEN_AL_SOFT}")
 message("----------------------------------------")
 
 # Tools like ninja don't have a pseudo-terminal so compilers assume no coloured output
