@@ -76,10 +76,19 @@ namespace AGS.Editor
             {
                 XmlNode logTextNode = doc.DocumentElement.SelectSingleNode("Text");
                 XmlNode logGroupIDNode = doc.DocumentElement.SelectSingleNode("GroupID");
-                XmlNode logGroupNameNode = doc.DocumentElement.SelectSingleNode("GroupName");
-                XmlNode logMTNode = doc.DocumentElement.SelectSingleNode("MT");
                 XmlNode logMTIDNode = doc.DocumentElement.SelectSingleNode("MTID");
-                LogMessage(logTextNode.InnerText, logGroupIDNode.InnerText, logGroupNameNode.InnerText, logMTIDNode.InnerText, logMTNode.InnerText);
+                LogGroup group;
+                LogLevel level;
+                try
+                {
+                    group = (LogGroup)Convert.ToInt32(logGroupIDNode.InnerText);
+                    level = (LogLevel)Convert.ToInt32(logMTIDNode.InnerText);
+                }
+                catch
+                {
+                    return;
+                }
+                LogMessage(logTextNode.InnerText, group, level);
             }
         }
 
@@ -127,9 +136,9 @@ namespace AGS.Editor
             _communicator.SendMessage("<Engine Command=\"READY\" EditorWindow=\"" + editorHwnd + "\" />");
         }
 
-        public void LogMessage(string message, string groupID, string groupName, string mtID, string mt)
+        public void LogMessage(string message, LogGroup group, LogLevel level)
         {
-            Factory.GUIController.ShowEngineLogPanel(message, groupID, groupName, mtID, mt);
+            Factory.GUIController.ShowEngineLogPanel(message, group, level);
         }
 
 		public void EngineHasExited()

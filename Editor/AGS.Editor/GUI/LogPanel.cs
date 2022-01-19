@@ -8,14 +8,21 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
+using AGS.Editor;
 
 namespace AGS.Editor
 {
     public partial class LogPanel : DockContent
     {
+        private LogBuffer _logBuffer = new LogBuffer();
+        private bool _bufferNeedsSync = false;
         public LogPanel()
         {
             InitializeComponent();
+            comboBox_Game_LogLevel.SelectedIndex = 6;
+            comboBox_Script_LogLevel.SelectedIndex = 6;
+            _logBuffer.ValueChanged += new System.EventHandler(this.BufferChanged);
+            timerLogBufferSync.Start();
         }
 
         delegate void SetTextCallback(string text);
@@ -32,15 +39,47 @@ namespace AGS.Editor
             }
             else
             {
-                this.logTextBox.Text += text;
+                this.logTextBox.Text = text;
                 this.logTextBox.SelectionStart = this.logTextBox.TextLength;
                 this.logTextBox.ScrollToCaret();
                 Show();
             }
         }
-        public void WriteLogMessage(string message, string groupID, string groupName, string mtID, string mt)
+
+        private void BufferChanged(object sender, EventArgs e)
         {
-            SetText("[" + groupName + "][" + mt + "]: " + message + "\n");
+            _bufferNeedsSync = true;
+        }
+
+        public void Clear()
+        {
+            _logBuffer.Clear();
+        }
+        public void WriteLogMessage(string message, LogGroup group, LogLevel level)
+        {
+            _logBuffer.Append(message, group, level);
+        }
+
+        private void comboBox_Game_LogLevel_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            LogLevel level = (LogLevel)comboBox_Game_LogLevel.SelectedIndex;
+            _logBuffer.SetLogLevel(LogGroup.Game, level);
+            _bufferNeedsSync = true;
+        }
+
+        private void timerLogBufferSync_Tick(object sender, EventArgs e)
+        {
+            if (!_bufferNeedsSync) return;
+
+            SetText(_logBuffer.ToString());
+            _bufferNeedsSync = false;
+        }
+
+        private void comboBox_Script_LogLevel_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            LogLevel level = (LogLevel)comboBox_Script_LogLevel.SelectedIndex;
+            _logBuffer.SetLogLevel(LogGroup.Script, level);
+            _bufferNeedsSync = true;
         }
     }
 }
