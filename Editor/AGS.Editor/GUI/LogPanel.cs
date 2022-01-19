@@ -33,6 +33,8 @@ namespace AGS.Editor
             else
             {
                 this.logTextBox.Text += text;
+                this.logTextBox.SelectionStart = this.logTextBox.TextLength;
+                this.logTextBox.ScrollToCaret();
                 Show();
             }
         }
