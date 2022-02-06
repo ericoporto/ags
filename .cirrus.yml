@@ -41,7 +41,7 @@ build_linux_cmake_task:
     arch=$(dpkg --print-architecture)
     filename=${BUILD_TYPE}_$arch
     mkdir build_$filename && cd build_$filename
-    cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DAGS_BUILD_COMPILER=1 -DAGS_TESTS=1  .. && make
+    cmake -G "Ninja" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DAGS_BUILD_COMPILER=1 -DAGS_TESTS=1  .. && ninja -j4
   test_linux_script: |
     arch=$(dpkg --print-architecture)
     filename=${BUILD_TYPE}_$arch

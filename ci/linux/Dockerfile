@@ -99,11 +99,23 @@ RUN curl -fLsS "https://github.com/xiph/theora/archive/refs/tags/v${LIBTHEORA_VE
   rm /tmp/libtheora-${LIBTHEORA_VERSION}.tar.gz 
 
 # Build and install CMake
-ARG CMAKE_VERSION=3.14.5
+ARG CMAKE_VERSION=3.22.2
 RUN curl -fLsS "https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION.tar.gz" | tar -f - -xvzC /tmp && \
   cd /tmp/cmake-$CMAKE_VERSION && \
   ./configure --system-curl && make -j$(getconf _NPROCESSORS_ONLN) && make install && \
   rm -r /tmp/cmake-$CMAKE_VERSION
+
+ARG NINJA_VERSION=1.10.2
+RUN curl -fLsS "https://github.com/ninja-build/ninja/archive/refs/tags/v${NINJA_VERSION}.tar.gz" --output /tmp/ninja-${NINJA_VERSION}.tar.gz && \
+  tar --file=/tmp/ninja-${NINJA_VERSION}.tar.gz -xvzC /tmp && \
+  cd /tmp/ninja-${NINJA_VERSION} && \
+  mkdir build-cmake && \
+  cmake -Bbuild-cmake && \
+  cmake --build build-cmake && \
+  cd build-cmake && \
+  cp ninja /usr/bin && \
+  rm -r /tmp/ninja-${NINJA_VERSION} && \
+  rm /tmp/ninja-${NINJA_VERSION}.tar.gz 
 
 # Build and install SDL_sound
 ARG SDL2_SOUND_VERSION=ebcf0fe725448f9dbaa7884114e0b96b9c041570
