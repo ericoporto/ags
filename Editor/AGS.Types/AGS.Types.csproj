@@ -89,6 +89,9 @@
     <Compile Include="Attributes\ScriptFunctionParametersAttribute.cs" />
     <Compile Include="AudioClip.cs" />
     <Compile Include="AudioClipFolder.cs" />
+    <Compile Include="BuildTarget.cs" />
+    <Compile Include="BuildTargetFolder.cs" />
+    <Compile Include="BuildTargetType.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="EditorFeatures\AutoComplete\ScriptDefine.cs" />
     <Compile Include="EditorFeatures\AutoComplete\ScriptEnum.cs" />
@@ -118,6 +121,7 @@
     <Compile Include="EditorFeatures\MessageBoxIconType.cs" />
     <Compile Include="EditorFeatures\RoomTemplate.cs" />
     <Compile Include="Enums\AndroidBuildFormat.cs" />
+    <Compile Include="Enums\BuildTargetPlatformType.cs" />
     <Compile Include="Enums\FontAutoOutlineStyle.cs" />
     <Compile Include="Enums\CrossfadeSpeed.cs" />
     <Compile Include="Enums\CustomPropertyAppliesTo.cs" />

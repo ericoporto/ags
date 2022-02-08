@@ -54,6 +54,8 @@ namespace AGS.Types
         private ViewFolders _views;
         private AudioClipFolders _audioClips;
         private List<AudioClipType> _audioClipTypes;
+        private BuildTargetFolders _buildTargets;
+        private List<BuildTargetType> _buildTargetTypes;
         private ScriptFolders _scripts;
         private ScriptsAndHeaders _scriptsToCompile;
         private TextParser _textParser;
@@ -90,6 +92,8 @@ namespace AGS.Types
             _views = new ViewFolders("Main");
             _audioClips = new AudioClipFolders("Main");
             _audioClipTypes = new List<AudioClipType>();
+            _buildTargets = new BuildTargetFolders("Main");
+            _buildTargetTypes = new List<BuildTargetType>();
             _textParser = new TextParser();
             _lipSync = new LipSync();
             _propertySchema = new CustomPropertySchema();
@@ -298,6 +302,21 @@ namespace AGS.Types
         public IList<AudioClipType> AudioClipTypes
         {
             get { return _audioClipTypes; }
+        }
+
+        public BuildTargetFolder RootBuildTargetFolder
+        {
+            get { return _buildTargets.RootFolder; }
+        }
+
+        public IList<BuildTarget> BuildTargetFlatList
+        {
+            get { return _buildTargets.FlatList; }
+        }
+
+        public IList<BuildTargetType> BuildTargetTypes
+        {
+            get { return _buildTargetTypes; }
         }
 
         public Scripts Scripts

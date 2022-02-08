@@ -106,6 +106,7 @@
     </Compile>
     <Compile Include="ColorThemes\Controls\MainMenuColorTable.cs" />
     <Compile Include="ColorThemes\Controls\ToolStripColorTable.cs" />
+    <Compile Include="Components\BuildComponent.cs" />
     <Compile Include="Components\CharacterIDChangedEventArgs.cs" />
     <Compile Include="Components\CharacterRoomChangedEventArgs.cs" />
     <Compile Include="Components\CharactersComponent.cs" />
@@ -767,9 +768,15 @@
     <EmbeddedResource Include="Resources\ags_cup.png" />
     <EmbeddedResource Include="Resources\audio_indicator.ico" />
     <EmbeddedResource Include="Resources\delay_indicator.ico" />
+    <EmbeddedResource Include="Resources\build-windows.ico" />
     <Content Include="Resources\audio_player-pause.ico" />
     <Content Include="Resources\audio_player-play.ico" />
     <Content Include="Resources\audio_player-stop.ico" />
+    <EmbeddedResource Include="Resources\build-linux.ico" />
+    <EmbeddedResource Include="Resources\build-macos.ico" />
+    <EmbeddedResource Include="Resources\build-android.ico" />
+    <EmbeddedResource Include="Resources\build-web.ico" />
+    <EmbeddedResource Include="Resources\build-custom.ico" />
     <Content Include="Resources\editor.ico" />
     <None Include="Resources\eye.png" />
     <None Include="Resources\eye closed.png" />
