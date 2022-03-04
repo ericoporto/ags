@@ -57,9 +57,16 @@ namespace AGS.Editor
             }
         }
 
-        private void sldZoomLevel_ValueChanged(object sender, EventArgs e)
+        private void UpdateZoomScales()
         {
             UpdateLoopVisuals();
+            if (checkBoxLockZoom.Checked) this.viewPreview.ZoomScale = this.sldZoomLevel.ZoomScale;
+
+        }
+
+        private void sldZoomLevel_ValueChanged(object sender, EventArgs e)
+        {
+            UpdateZoomScales();
         }
 
         private void InitializeControls()
@@ -290,25 +297,23 @@ namespace AGS.Editor
         }
 
 		private void UpdateWhetherPreviewIsShown()
-		{
-			viewPreview.Visible = chkShowPreview.Checked;
-			
-			if (viewPreview.Visible)
+        {
+            splitContainerPrevAndEd.Panel1Collapsed = !chkShowPreview.Checked;
+            viewPreview.Visible = chkShowPreview.Checked;
+
+            if (chkShowPreview.Checked)
 			{
                 // Adjust control size to match user's DPI settings
                 viewPreview.Width = viewPreview.PreferredSize.Width;
                 viewPreview.Height = viewPreview.PreferredSize.Height;
 
-				editorPanel.Left = viewPreview.Right;
 				viewPreview.ViewToPreview = _editingView;
 			}
 			else
 			{
-				editorPanel.Left = 0;
 				viewPreview.ReleaseResources();
 			}
 
-			editorPanel.Width = this.ClientSize.Width - editorPanel.Left;
 			editorPanel.AutoScrollPosition = new Point(0, 0);
 		}
 
@@ -317,7 +322,12 @@ namespace AGS.Editor
 			UpdateWhetherPreviewIsShown();
 		}
 
-		private void ViewEditor_Resize(object sender, EventArgs e)
+        private void checkBoxLockZoom_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateZoomScales();
+        }
+
+        private void ViewEditor_Resize(object sender, EventArgs e)
 		{
 			if (this.ClientSize.Width > editorPanel.Left)
 			{
@@ -348,7 +358,6 @@ namespace AGS.Editor
             btnNewLoop.FlatAppearance.BorderSize = t.GetInt("view-editor/btn-new-option/flat/border/size");
             btnNewLoop.FlatAppearance.BorderColor = t.GetColor("view-editor/btn-new-option/flat/border/color");
         }
-
 
     }
 }

@@ -24,6 +24,7 @@ namespace AGS.Editor
         {
             InitializeComponent();
             Factory.GUIController.ColorThemes.Apply(LoadColorTheme);
+            sldZoomLevel.ZoomScale = Factory.AGSEditor.CurrentGame.GUIScaleFactor;
         }
 
         public string Title
@@ -48,9 +49,15 @@ namespace AGS.Editor
 		{
 			get { return _dynamicUpdates; }
 			set { _dynamicUpdates = value; }
-		}
+        }
 
-		public void ReleaseResources()
+        public float ZoomScale
+        {
+            get { return this.sldZoomLevel.ZoomScale; }
+            set { this.sldZoomLevel.ZoomScale = value; }
+        }
+
+        public void ReleaseResources()
 		{
 			StopTimer();
 			chkAnimate.Checked = false;
@@ -97,43 +104,53 @@ namespace AGS.Editor
             }
         }
 
+        private int Scale(int value)
+        {
+            float scale = sldZoomLevel.ZoomScale;
+            int scaled_value = (int)(value * scale);
+            if (value != 0 && scaled_value == 0) scaled_value = 1;
+            return scaled_value;
+        }
+
+        private ViewFrame getCurrentFrame()
+        {
+            if ((_view != null) && (udLoop.Value < _view.Loops.Count) &&
+                (udFrame.Value < _view.Loops[(int)udLoop.Value].Frames.Count))
+            {
+                return _view.Loops[(int)udLoop.Value].Frames[(int)udFrame.Value];
+            }
+
+            return new ViewFrame();
+        }
+
+        private Size getSpriteSize()
+        {
+            if ((_view != null) && (udLoop.Value < _view.Loops.Count) &&
+                (udFrame.Value < _view.Loops[(int)udLoop.Value].Frames.Count))
+            {
+                ViewFrame thisFrame = getCurrentFrame();
+                int spriteNum = thisFrame.Image;
+                Size spriteSize = Utilities.GetSizeSpriteWillBeRenderedInGame(spriteNum);
+                spriteSize = new Size { Width = Scale(spriteSize.Width), Height = Scale(spriteSize.Height) };
+                return spriteSize;
+            }
+
+            return new Size { Width = 1, Height = 1 };
+        }
+
         private void previewPanel_Paint(object sender, PaintEventArgs e)
         {
             if ((_view != null) && (udLoop.Value < _view.Loops.Count) &&
                 (udFrame.Value < _view.Loops[(int)udLoop.Value].Frames.Count))
             {
-                ViewFrame thisFrame = _view.Loops[(int)udLoop.Value].Frames[(int)udFrame.Value];
-                int spriteNum = thisFrame.Image;
-                int scale = Factory.AGSEditor.CurrentGame.GUIScaleFactor;
-                Size spriteSize = Utilities.GetSizeSpriteWillBeRenderedInGame(spriteNum);
-                spriteSize = new Size { Width = spriteSize.Width * scale, Height = spriteSize.Height * scale };
-                if (spriteSize.Width <= previewPanel.ClientSize.Width && spriteSize.Height <= previewPanel.ClientSize.Height)
-                {
-                    int x = chkCentrePivot.Checked ? previewPanel.ClientSize.Width / 2 - spriteSize.Width / 2 : 0;
-                    int y = previewPanel.ClientSize.Height - spriteSize.Height;
-                    IntPtr hdc = e.Graphics.GetHdc();
-                    Factory.NativeProxy.DrawSprite(hdc, x, y, spriteSize.Width, spriteSize.Height, spriteNum, thisFrame.Flipped);
-                    e.Graphics.ReleaseHdc();
-                }
-                else
-				{
-					Bitmap bmp = Utilities.GetBitmapForSpriteResizedKeepingAspectRatio(new Sprite(spriteNum, spriteSize.Width, spriteSize.Height), previewPanel.ClientSize.Width, previewPanel.ClientSize.Height, chkCentrePivot.Checked, false, SystemColors.Control);
+                Size spriteSize = getSpriteSize();
+                ViewFrame thisFrame = getCurrentFrame();
 
-                    if (thisFrame.Flipped)
-                    {
-                        Point urCorner = new Point(0, 0);
-                        Point ulCorner = new Point(bmp.Width, 0);
-                        Point llCorner = new Point(bmp.Width, bmp.Height);
-                        Point[] destPara = { ulCorner, urCorner, llCorner };
-                        e.Graphics.DrawImage(bmp, destPara);
-                    }
-                    else
-                    {
-                        e.Graphics.DrawImage(bmp, 1, 1);
-                    }
-
-					bmp.Dispose();
-				}
+                int x = chkCentrePivot.Checked ? previewPanel.ClientSize.Width / 2 - spriteSize.Width / 2 : 0;
+                int y = previewPanel.ClientSize.Height - spriteSize.Height;
+                IntPtr hdc = e.Graphics.GetHdc();
+                Factory.NativeProxy.DrawSprite(hdc, x, y, spriteSize.Width, spriteSize.Height, thisFrame.Image, thisFrame.Flipped);
+                e.Graphics.ReleaseHdc();
             }
         }
 
@@ -233,6 +250,29 @@ namespace AGS.Editor
         {
         }
 
+        private void sldZoomLevel_ValueChanged(object sender, EventArgs e)
+        {
+            previewPanel.Size = getSpriteSize();
+
+            previewPanel.Invalidate();
+        }
+
+        void flowLayoutPanel1_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (ModifierKeys.HasFlag(Keys.Control))
+            {
+                int movement = e.Delta;
+                if (movement > 0)
+                {
+                    sldZoomLevel.Increase();
+                }
+                else
+                {
+                    sldZoomLevel.Decrease();
+                }
+            }
+        }
+
         private void LoadColorTheme(ColorTheme t)
         {
             mainGroupBox.BackColor = t.GetColor("view-preview/background");
@@ -244,5 +284,6 @@ namespace AGS.Editor
             udDelay.BackColor = t.GetColor("view-preview/numeric-delay/background");
             udDelay.ForeColor = t.GetColor("view-preview/numeric-delay/foreground");
         }
+
     }
 }
