@@ -37,16 +37,17 @@ namespace AGS.Editor
             // 
             // sldZoomLevel
             // 
+            this.sldZoomLevel.AutoSize = false;
             this.sldZoomLevel.Location = new System.Drawing.Point(45, 0);
             this.sldZoomLevel.Name = "sldZoomLevel";
-            this.sldZoomLevel.Size = new System.Drawing.Size(118, 56);
+            this.sldZoomLevel.Size = new System.Drawing.Size(118, 25);
             this.sldZoomLevel.TabIndex = 0;
             this.sldZoomLevel.ValueChanged += new System.EventHandler(this.sldZoomLevel_ValueChanged);
             // 
             // labelName
             // 
             this.labelName.AutoSize = true;
-            this.labelName.Location = new System.Drawing.Point(3, 10);
+            this.labelName.Location = new System.Drawing.Point(3, 3);
             this.labelName.Name = "labelName";
             this.labelName.Size = new System.Drawing.Size(48, 17);
             this.labelName.TabIndex = 3;
@@ -54,10 +55,12 @@ namespace AGS.Editor
             // 
             // textBoxZoomValue
             // 
-            this.textBoxZoomValue.Location = new System.Drawing.Point(169, 5);
+            this.textBoxZoomValue.BackColor = System.Drawing.SystemColors.Control;
+            this.textBoxZoomValue.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBoxZoomValue.Location = new System.Drawing.Point(156, 3);
             this.textBoxZoomValue.MaxLength = 6;
             this.textBoxZoomValue.Name = "textBoxZoomValue";
-            this.textBoxZoomValue.Size = new System.Drawing.Size(47, 22);
+            this.textBoxZoomValue.Size = new System.Drawing.Size(47, 15);
             this.textBoxZoomValue.TabIndex = 4;
             this.textBoxZoomValue.Text = "100%";
             this.textBoxZoomValue.WordWrap = false;
@@ -73,7 +76,7 @@ namespace AGS.Editor
             this.Controls.Add(this.sldZoomLevel);
             this.Controls.Add(this.labelName);
             this.Name = "ZoomTrackbar";
-            this.Size = new System.Drawing.Size(221, 31);
+            this.Size = new System.Drawing.Size(203, 28);
             ((System.ComponentModel.ISupportInitialize)(this.sldZoomLevel)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
