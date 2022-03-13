@@ -77,6 +77,15 @@ namespace AGS.Editor.Preferences
         Windowed = 2
     }
 
+    [Flags]
+    public enum ScintillaTechnology
+    {
+        [Description("Default (GDI)")]
+        Default = 0,
+        [Description("DirectWrite")]
+        DirectWrite = 1
+    }
+
     public class ColorThemeTypeConverter : BaseListSelectTypeConverter<string, string>
     {
         protected override Dictionary<string, string> GetValueList(ITypeDescriptorContext context)
@@ -762,6 +771,25 @@ namespace AGS.Editor.Preferences
             {
                 if (value < 6) value = 6;
                 this["ScriptTipFontSize"] = value;
+            }
+        }
+
+        [Browsable(true)]
+        [DisplayName("Render Technology")]
+        [Description("The renderer used to draw the text in the Script Editor control. (default: GDI).")]
+        [Category("Script Editor")]
+        [UserScopedSettingAttribute()]
+        [DefaultSettingValueAttribute("Default")]
+        [TypeConverter(typeof(EnumTypeConverter))]
+        public ScintillaTechnology ScintillaTechnology
+        {
+            get
+            {
+                return (ScintillaTechnology)this["ScintillaTechnology"];
+            }
+            set
+            {
+                this["ScintillaTechnology"] = value;
             }
         }
 

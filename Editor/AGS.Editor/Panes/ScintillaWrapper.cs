@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using AGS.Editor.Preferences;
 
 namespace AGS.Editor
 {
@@ -103,6 +104,10 @@ namespace AGS.Editor
         private int _scriptFontSize = Factory.AGSEditor.Settings.ScriptFontSize;
         private string _calltipFont = Factory.AGSEditor.Settings.ScriptTipFont;
         private int _calltipFontSize = Factory.AGSEditor.Settings.ScriptTipFontSize;
+        
+        private Technology _technology = Factory.AGSEditor.Settings.ScintillaTechnology == Preferences.ScintillaTechnology.DirectWrite ?
+                Technology.DirectWrite : Technology.Default;
+
         private ColorTheme _theme;
 
         private void UpdateColorTheme()
@@ -233,6 +238,8 @@ namespace AGS.Editor
 
         public void UpdateAllStyles()
         {
+            this.scintillaControl1.Technology = _technology;
+
             scintillaControl1.StyleResetDefault();
 
             this.scintillaControl1.Styles[Style.Default].Font = _scriptFont;
@@ -2389,6 +2396,13 @@ namespace AGS.Editor
         {
             set { _calltipFontSize = value; }
             get { return _calltipFontSize; }
+        }
+
+        public ScintillaTechnology ScintillaTechnology
+        {
+            set { _technology = (value == ScintillaTechnology.DirectWrite ?
+                Technology.DirectWrite : Technology.Default);  }
+            get { return _technology == Technology.Default ? ScintillaTechnology.Default : ScintillaTechnology.DirectWrite; }
         }
 
         void IScriptEditorControl.ShowLineNumbers()
