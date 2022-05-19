@@ -850,6 +850,10 @@ int WaitMouseKey(int nloops) {
     return WaitImpl(FLAG_SKIP_KEYPRESS | FLAG_SKIP_MOUSECLICK | FLAG_SKIP_AUTOTIMER, nloops);
 }
 
+int WaitInput(int input_flags, int nloops) {
+    return WaitImpl(input_flags | FLAG_SKIP_AUTOTIMER, nloops);
+}
+
 void SkipWait() {
     play.wait_counter = 0;
 }
