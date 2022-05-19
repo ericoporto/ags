@@ -815,11 +815,11 @@ void SetGraphicalVariable (const char *varName, int p_value) {
 int WaitImpl(int skip_type, int nloops)
 {
     // if skipping cutscene and expecting user input: don't wait at all
-    if (play.fast_forward && ((skip_type & ~SKIP_AUTOTIMER) != 0))
+    if (play.fast_forward && ((skip_type & ~FLAG_SKIP_AUTOTIMER) != 0))
         return 0;
 
     play.wait_counter = nloops;
-    play.wait_skipped_by = SKIP_NONE;
+    play.wait_skipped_by = FLAG_SKIP_NONE;
     play.wait_skipped_by_data = 0;
     play.key_skip_wait = skip_type;
 
@@ -828,26 +828,26 @@ int WaitImpl(int skip_type, int nloops)
     if (game.options[OPT_BASESCRIPTAPI] < kScriptAPI_v360)
     {
         // < 3.6.0 return 1 is skipped by user input, otherwise 0
-        return ((play.wait_skipped_by & (SKIP_KEYPRESS | SKIP_MOUSECLICK)) != 0) ? 1 : 0;
+        return ((play.wait_skipped_by & (FLAG_SKIP_KEYPRESS | FLAG_SKIP_MOUSECLICK)) != 0) ? 1 : 0;
     }
     // >= 3.6.0 return positive keycode, negative mouse button code, or 0 as time-out
     return play.GetWaitSkipResult();
 }
 
 void scrWait(int nloops) {
-    WaitImpl(SKIP_AUTOTIMER, nloops);
+    WaitImpl(FLAG_SKIP_AUTOTIMER, nloops);
 }
 
 int WaitKey(int nloops) {
-    return WaitImpl(SKIP_KEYPRESS | SKIP_AUTOTIMER, nloops);
+    return WaitImpl(FLAG_SKIP_KEYPRESS | FLAG_SKIP_AUTOTIMER, nloops);
 }
 
 int WaitMouse(int nloops) {
-    return WaitImpl(SKIP_MOUSECLICK | SKIP_AUTOTIMER, nloops);
+    return WaitImpl(FLAG_SKIP_MOUSECLICK | FLAG_SKIP_AUTOTIMER, nloops);
 }
 
 int WaitMouseKey(int nloops) {
-    return WaitImpl(SKIP_KEYPRESS | SKIP_MOUSECLICK | SKIP_AUTOTIMER, nloops);
+    return WaitImpl(FLAG_SKIP_KEYPRESS | FLAG_SKIP_MOUSECLICK | FLAG_SKIP_AUTOTIMER, nloops);
 }
 
 void SkipWait() {

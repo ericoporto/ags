@@ -252,14 +252,14 @@ static void check_mouse_controls()
         check_skip_cutscene_mclick(mbut);
 
         if (play.fast_forward || play.IsIgnoringInput()) { /* do nothing if skipping cutscene or input disabled */ }
-        else if ((play.wait_counter != 0) && (play.key_skip_wait & SKIP_MOUSECLICK) != 0) {
-            play.SetWaitSkipResult(SKIP_MOUSECLICK, mbut);
+        else if ((play.wait_counter != 0) && (play.key_skip_wait & FLAG_SKIP_MOUSECLICK) != 0) {
+            play.SetWaitSkipResult(FLAG_SKIP_MOUSECLICK, mbut);
         }
         else if (play.text_overlay_on > 0) {
-            if (play.cant_skip_speech & SKIP_MOUSECLICK)
+            if (play.cant_skip_speech & FLAG_SKIP_MOUSECLICK)
             {
                 remove_screen_overlay(play.text_overlay_on);
-                play.SetWaitSkipResult(SKIP_MOUSECLICK, mbut);
+                play.SetWaitSkipResult(FLAG_SKIP_MOUSECLICK, mbut);
             }
         }
         else if (!IsInterfaceEnabled()) ;  // blocking cutscene, ignore mouse
@@ -495,7 +495,7 @@ static void check_keyboard_controls()
     }
 
     // skip speech if desired by Speech.SkipStyle
-    if ((play.text_overlay_on > 0) && (play.cant_skip_speech & SKIP_KEYPRESS)) {
+    if ((play.text_overlay_on > 0) && (play.cant_skip_speech & FLAG_SKIP_KEYPRESS)) {
         // only allow a key to remove the overlay if the icon bar isn't up
         if (IsGamePaused() == 0) {
             // check if it requires a specific keypress
@@ -504,15 +504,15 @@ static void check_keyboard_controls()
             else
             {
                 remove_screen_overlay(play.text_overlay_on);
-                play.SetWaitSkipResult(SKIP_KEYPRESS, kgn);
+                play.SetWaitSkipResult(FLAG_SKIP_KEYPRESS, kgn);
             }
         }
 
         return;
     }
 
-    if ((play.wait_counter != 0) && (play.key_skip_wait & SKIP_KEYPRESS) != 0) {
-        play.SetWaitSkipResult(SKIP_KEYPRESS, kgn);
+    if ((play.wait_counter != 0) && (play.key_skip_wait & FLAG_SKIP_KEYPRESS) != 0) {
+        play.SetWaitSkipResult(FLAG_SKIP_KEYPRESS, kgn);
         return;
     }
 

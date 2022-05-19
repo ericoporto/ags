@@ -423,8 +423,8 @@ int GameState::GetWaitSkipResult() const
 {
     switch (wait_skipped_by)
     {
-    case SKIP_KEYPRESS: return wait_skipped_by_data;
-    case SKIP_MOUSECLICK: return -(wait_skipped_by_data + 1); // convert to 1-based code and negate
+    case FLAG_SKIP_KEYPRESS: return wait_skipped_by_data;
+    case FLAG_SKIP_MOUSECLICK: return -(wait_skipped_by_data + 1); // convert to 1-based code and negate
     default: return 0;
     }
 }

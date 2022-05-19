@@ -1139,7 +1139,7 @@ void start_skipping_cutscene () {
     if (play.text_overlay_on > 0)
     {
         remove_screen_overlay(play.text_overlay_on);
-        play.SetWaitSkipResult(SKIP_AUTOTIMER);
+        play.SetWaitSkipResult(FLAG_SKIP_AUTOTIMER);
     }
 }
 

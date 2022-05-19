@@ -36,41 +36,41 @@ int user_to_internal_skip_speech(SkipSpeechStyle userval)
     switch (userval)
     {
     case kSkipSpeechNone:
-        return SKIP_NONE;
+        return FLAG_SKIP_NONE;
     case kSkipSpeechKeyMouseTime:
-        return SKIP_AUTOTIMER | SKIP_KEYPRESS | SKIP_MOUSECLICK;
+        return FLAG_SKIP_AUTOTIMER | FLAG_SKIP_KEYPRESS | FLAG_SKIP_MOUSECLICK;
     case kSkipSpeechKeyTime:
-        return SKIP_AUTOTIMER | SKIP_KEYPRESS;
+        return FLAG_SKIP_AUTOTIMER | FLAG_SKIP_KEYPRESS;
     case kSkipSpeechTime:
-        return SKIP_AUTOTIMER;
+        return FLAG_SKIP_AUTOTIMER;
     case kSkipSpeechKeyMouse:
-        return SKIP_KEYPRESS | SKIP_MOUSECLICK;
+        return FLAG_SKIP_KEYPRESS | FLAG_SKIP_MOUSECLICK;
     case kSkipSpeechMouseTime:
-        return SKIP_AUTOTIMER | SKIP_MOUSECLICK;
+        return FLAG_SKIP_AUTOTIMER | FLAG_SKIP_MOUSECLICK;
     case kSkipSpeechKey:
-        return SKIP_KEYPRESS;
+        return FLAG_SKIP_KEYPRESS;
     case kSkipSpeechMouse:
-        return SKIP_MOUSECLICK;
+        return FLAG_SKIP_MOUSECLICK;
     default:
         quit("user_to_internal_skip_speech: unknown userval");
-        return SKIP_NONE;
+        return FLAG_SKIP_NONE;
     }
 }
 
 SkipSpeechStyle internal_skip_speech_to_user(int internal_val)
 {
-    if (internal_val & SKIP_AUTOTIMER)
+    if (internal_val & FLAG_SKIP_AUTOTIMER)
     {
-        internal_val &= ~SKIP_AUTOTIMER;
-        if (internal_val == (SKIP_KEYPRESS | SKIP_MOUSECLICK))
+        internal_val &= ~FLAG_SKIP_AUTOTIMER;
+        if (internal_val == (FLAG_SKIP_KEYPRESS | FLAG_SKIP_MOUSECLICK))
         {
             return kSkipSpeechKeyMouseTime;
         }
-        else if (internal_val == SKIP_KEYPRESS)
+        else if (internal_val == FLAG_SKIP_KEYPRESS)
         {
             return kSkipSpeechKeyTime;
         }
-        else if (internal_val == SKIP_MOUSECLICK)
+        else if (internal_val == FLAG_SKIP_MOUSECLICK)
         {
             return kSkipSpeechMouseTime;
         }
@@ -78,15 +78,15 @@ SkipSpeechStyle internal_skip_speech_to_user(int internal_val)
     }
     else
     {
-        if (internal_val == (SKIP_KEYPRESS | SKIP_MOUSECLICK))
+        if (internal_val == (FLAG_SKIP_KEYPRESS | FLAG_SKIP_MOUSECLICK))
         {
             return kSkipSpeechKeyMouse;
         }
-        else if (internal_val == SKIP_KEYPRESS)
+        else if (internal_val == FLAG_SKIP_KEYPRESS)
         {
             return kSkipSpeechKey;
         }
-        else if (internal_val == SKIP_MOUSECLICK)
+        else if (internal_val == FLAG_SKIP_MOUSECLICK)
         {
             return kSkipSpeechMouse;
         }

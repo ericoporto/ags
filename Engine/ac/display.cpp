@@ -267,7 +267,7 @@ ScreenOverlay *_display_main(int xx, int yy, int wii, const char *text, int disp
         // If fast-forwarding, then skip immediately
         if (play.fast_forward) {
             remove_screen_overlay(OVER_TEXTMSG);
-            play.SetWaitSkipResult(SKIP_AUTOTIMER);
+            play.SetWaitSkipResult(FLAG_SKIP_AUTOTIMER);
             play.messagetime=-1;
             return nullptr;
         }
@@ -285,9 +285,9 @@ ScreenOverlay *_display_main(int xx, int yy, int wii, const char *text, int disp
                 check_skip_cutscene_mclick(mbut);
                 if (play.fast_forward)
                     break;
-                if (skip_setting & SKIP_MOUSECLICK && !play.IsIgnoringInput())
+                if (skip_setting & FLAG_SKIP_MOUSECLICK && !play.IsIgnoringInput())
                 {
-                    play.SetWaitSkipResult(SKIP_MOUSECLICK, mbut);
+                    play.SetWaitSkipResult(FLAG_SKIP_MOUSECLICK, mbut);
                     break;
                 }
             }
@@ -296,9 +296,9 @@ ScreenOverlay *_display_main(int xx, int yy, int wii, const char *text, int disp
                 check_skip_cutscene_keypress (kp.Key);
                 if (play.fast_forward)
                     break;
-                if ((skip_setting & SKIP_KEYPRESS) && !play.IsIgnoringInput())
+                if ((skip_setting & FLAG_SKIP_KEYPRESS) && !play.IsIgnoringInput())
                 {
-                    play.SetWaitSkipResult(SKIP_KEYPRESS, kp.Key);
+                    play.SetWaitSkipResult(FLAG_SKIP_KEYPRESS, kp.Key);
                     break;
                 }
             }
@@ -323,9 +323,9 @@ ScreenOverlay *_display_main(int xx, int yy, int wii, const char *text, int disp
                     countdown = 0;
             }
             // Test for the timed auto-skip
-            if ((countdown < 1) && (skip_setting & SKIP_AUTOTIMER))
+            if ((countdown < 1) && (skip_setting & FLAG_SKIP_AUTOTIMER))
             {
-                play.SetWaitSkipResult(SKIP_AUTOTIMER);
+                play.SetWaitSkipResult(FLAG_SKIP_AUTOTIMER);
                 play.SetIgnoreInput(play.ignore_user_input_after_text_timeout_ms);
                 break;
             }

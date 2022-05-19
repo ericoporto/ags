@@ -734,8 +734,8 @@ void engine_init_game_settings()
     play.music_queue_size = 0;
     play.shakesc_length = 0;
     play.wait_counter=0;
-    play.SetWaitSkipResult(SKIP_NONE);
-    play.key_skip_wait = SKIP_NONE;
+    play.SetWaitSkipResult(FLAG_SKIP_NONE);
+    play.key_skip_wait = FLAG_SKIP_NONE;
     play.cur_music_number=-1;
     play.music_repeat=1;
     play.music_master_volume=100 + LegacyMusicMasterVolumeAdjustment;
