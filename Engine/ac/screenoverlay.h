@@ -31,10 +31,10 @@ using namespace AGS; // FIXME later
 
 enum OverlayFlags
 {
-    kOver_AlphaChannel     = 0x0001,
-    kOver_PositionAtRoomXY = 0x0002, // room-relative position, may be in ui
-    kOver_RoomLayer        = 0x0004, // work in room layer (as opposed to UI)
-    kOver_SpriteReference  = 0x0008, // reference persistent sprite
+    kfOver_AlphaChannel     = 0x0001,
+    kfOver_PositionAtRoomXY = 0x0002, // room-relative position, may be in ui
+    kfOver_RoomLayer        = 0x0004, // work in room layer (as opposed to UI)
+    kfOver_SpriteReference  = 0x0008, // reference persistent sprite
 };
 
 struct ScreenOverlay
@@ -54,16 +54,16 @@ struct ScreenOverlay
     int zorder = INT_MIN;
     int transparency = 0;
 
-    bool HasAlphaChannel() const { return (_flags & kOver_AlphaChannel) != 0; }
-    bool IsSpriteReference() const { return (_flags & kOver_SpriteReference) != 0; }
-    bool IsRoomRelative() const { return (_flags & kOver_PositionAtRoomXY) != 0; }
-    bool IsRoomLayer() const { return (_flags & kOver_RoomLayer) != 0; }
-    void SetAlphaChannel(bool on) { on ? _flags |= kOver_AlphaChannel : _flags &= ~kOver_AlphaChannel; }
-    void SetRoomRelative(bool on) { on ? _flags |= kOver_PositionAtRoomXY : _flags &= ~kOver_PositionAtRoomXY; }
+    bool HasAlphaChannel() const { return (_flags & kfOver_AlphaChannel) != 0; }
+    bool IsSpriteReference() const { return (_flags & kfOver_SpriteReference) != 0; }
+    bool IsRoomRelative() const { return (_flags & kfOver_PositionAtRoomXY) != 0; }
+    bool IsRoomLayer() const { return (_flags & kfOver_RoomLayer) != 0; }
+    void SetAlphaChannel(bool on) { on ? _flags |= kfOver_AlphaChannel : _flags &= ~kfOver_AlphaChannel; }
+    void SetRoomRelative(bool on) { on ? _flags |= kfOver_PositionAtRoomXY : _flags &= ~kfOver_PositionAtRoomXY; }
     void SetRoomLayer(bool on)
     {
-        on ? _flags |= (kOver_RoomLayer | kOver_PositionAtRoomXY) :
-             _flags &= ~(kOver_RoomLayer | kOver_PositionAtRoomXY);
+        on ? _flags |= (kfOver_RoomLayer | kfOver_PositionAtRoomXY) :
+             _flags &= ~(kfOver_RoomLayer | kfOver_PositionAtRoomXY);
     }
     // Gets actual overlay's image, whether owned by overlay or by a sprite reference
     Common::Bitmap *GetImage() const;

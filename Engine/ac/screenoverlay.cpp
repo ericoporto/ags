@@ -27,7 +27,7 @@ Bitmap *ScreenOverlay::GetImage() const
 
 void ScreenOverlay::SetImage(std::unique_ptr<Common::Bitmap> pic)
 {
-    _flags &= ~kOver_SpriteReference;
+    _flags &= ~kfOver_SpriteReference;
     _pic = std::move(pic);
     _sprnum = -1;
     offsetX = offsetY = 0;
@@ -43,7 +43,7 @@ void ScreenOverlay::SetImage(std::unique_ptr<Common::Bitmap> pic)
 
 void ScreenOverlay::SetSpriteNum(int sprnum)
 {
-    _flags |= kOver_SpriteReference;
+    _flags |= kfOver_SpriteReference;
     _pic.reset();
     _sprnum = sprnum;
     offsetX = offsetY = 0;
@@ -76,9 +76,9 @@ void ScreenOverlay::ReadFromFile(Stream *in, bool &has_bitmap, int32_t cmp_ver)
     else
     {
         if (in->ReadBool()) // has alpha
-            _flags |= kOver_AlphaChannel;
+            _flags |= kfOver_AlphaChannel;
         if (!(in->ReadBool())) // screen relative position
-            _flags |= kOver_PositionAtRoomXY;
+            _flags |= kfOver_PositionAtRoomXY;
     }
 
     if (cmp_ver >= 1)
@@ -94,7 +94,7 @@ void ScreenOverlay::ReadFromFile(Stream *in, bool &has_bitmap, int32_t cmp_ver)
         scaleHeight = in->ReadInt32();
     }
 
-    if (_flags & kOver_SpriteReference)
+    if (_flags & kfOver_SpriteReference)
     {
         _sprnum = pic;
         has_bitmap = false;
@@ -109,7 +109,7 @@ void ScreenOverlay::ReadFromFile(Stream *in, bool &has_bitmap, int32_t cmp_ver)
 void ScreenOverlay::WriteToFile(Stream *out) const
 {
     out->WriteInt32(0); // ddb 32-bit pointer value (nasty legacy format)
-    if (_flags & kOver_SpriteReference)
+    if (_flags & kfOver_SpriteReference)
         out->WriteInt32(_sprnum); // sprite reference
     else
         out->WriteInt32(_pic ? 1 : 0); // has bitmap
