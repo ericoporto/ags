@@ -241,8 +241,8 @@ void Object_SetLightLevel(ScriptObject *objj, int light_level)
         quit("!SetObjectTint: invalid object number specified");
 
     objs[obj].tint_light = light_level;
-    objs[obj].flags &= ~OBJF_HASTINT;
-    objs[obj].flags |= OBJF_HASLIGHT;
+    objs[obj].flags &= ~kfObj_HasTint;
+    objs[obj].flags |= kfObj_HasLight;
 }
 
 int Object_GetTintRed(ScriptObject *obj)
@@ -333,15 +333,15 @@ int Object_GetClickable(ScriptObject *objj) {
     if (!is_valid_object(objj->id))
         quit("!Object.Clickable: Invalid object specified");
 
-    if (objs[objj->id].flags & OBJF_NOINTERACT)
+    if (objs[objj->id].flags & kfObj_NoInteract)
         return 0;
     return 1;
 }
 
 void Object_SetManualScaling(ScriptObject *objj, bool on)
 {
-    if (on) objs[objj->id].flags &= ~OBJF_USEROOMSCALING;
-    else objs[objj->id].flags |= OBJF_USEROOMSCALING;
+    if (on) objs[objj->id].flags &= ~kfObj_UseRoomScaling;
+    else objs[objj->id].flags |= kfObj_UseRoomScaling;
     // clear the cache
     mark_object_changed(objj->id);
 }
@@ -358,7 +358,7 @@ int Object_GetIgnoreScaling(ScriptObject *objj) {
     if (!is_valid_object(objj->id))
         quit("!Object.IgnoreScaling: Invalid object specified");
 
-    if (objs[objj->id].flags & OBJF_USEROOMSCALING)
+    if (objs[objj->id].flags & kfObj_UseRoomScaling)
         return 0;
     return 1;
 }
@@ -368,7 +368,7 @@ int Object_GetScaling(ScriptObject *objj) {
 }
 
 void Object_SetScaling(ScriptObject *objj, int zoomlevel) {
-    if ((objs[objj->id].flags & OBJF_USEROOMSCALING) != 0)
+    if ((objs[objj->id].flags & kfObj_UseRoomScaling) != 0)
     {
         debug_script_warn("Object.Scaling: cannot set property unless ManualScaling is enabled");
         return;
@@ -381,13 +381,13 @@ void Object_SetScaling(ScriptObject *objj, int zoomlevel) {
 }
 
 void Object_SetSolid(ScriptObject *objj, int solid) {
-    objs[objj->id].flags &= ~OBJF_SOLID;
+    objs[objj->id].flags &= ~kfObj_Solid;
     if (solid)
-      objs[objj->id].flags |= OBJF_SOLID;
+      objs[objj->id].flags |= kfObj_Solid;
 }
 
 int Object_GetSolid(ScriptObject *objj) {
-    if (objs[objj->id].flags & OBJF_SOLID)
+    if (objs[objj->id].flags & kfObj_Solid)
         return 1;
     return 0;
 }
@@ -420,7 +420,7 @@ int Object_GetIgnoreWalkbehinds(ScriptObject *chaa) {
     if (!is_valid_object(chaa->id))
         quit("!Object.IgnoreWalkbehinds: Invalid object specified");
 
-    if (objs[chaa->id].flags & OBJF_NOWALKBEHINDS)
+    if (objs[chaa->id].flags & kfObj_NoWalkBehinds)
         return 1;
     return 0;
 }

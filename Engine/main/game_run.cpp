@@ -417,7 +417,7 @@ bool run_service_key_controls(KeyInput &out_key)
                 objs[ff].on,
                 (objs[ff].moving > 0) ? "yes" : "no", objs[ff].cycling,
                 objs[ff].num, objs[ff].transparent,
-                ((objs[ff].flags & OBJF_NOINTERACT) != 0) ? 0 : 1);
+                    ((objs[ff].flags & kfObj_NoInteract) != 0) ? 0 : 1);
         }
         Display(infobuf);
         int chd = game.playercharacter;

@@ -21,15 +21,11 @@
 #define EXIT_CRASH  92
 #define EXIT_ERROR  93
 
-
 #if defined (OBSOLETE)
 #define NUM_MISC      20
 #define NUMOTCON      7                 // number of conditions before standing on
 #define NUM_CONDIT    (120 + NUMOTCON)
 #endif
-
-
-
 
 #define MAX_SCRIPT_NAME_LEN 20
 
@@ -105,15 +101,5 @@
 
 // The game to screen coordinate conversion multiplier in hi-res type games
 #define HIRES_COORD_MULTIPLIER 2
-
-// object flags (currently only a char)
-#define OBJF_NOINTERACT        1  // not clickable
-#define OBJF_NOWALKBEHINDS     2  // ignore walk-behinds
-#define OBJF_HASTINT           4  // the tint_* members are valid
-#define OBJF_USEREGIONTINTS    8  // obey region tints/light areas
-#define OBJF_USEROOMSCALING 0x10  // obey room scaling areas
-#define OBJF_SOLID          0x20  // blocks characters from moving
-#define OBJF_LEGACY_LOCKED  0x40  // object position is locked in the editor (OBSOLETE since 3.5.0)
-#define OBJF_HASLIGHT       0x80  // the tint_light is valid and treated as brightness
 
 #endif // __AC_DEFINES_H

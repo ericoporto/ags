@@ -1416,7 +1416,7 @@ int construct_object_gfx(int aa, int *drawnWidth, int *drawnHeight, bool alwaysU
     int zoom_level = 100;
 
     // calculate the zoom level
-    if ((objs[aa].flags & OBJF_USEROOMSCALING) == 0)
+    if ((objs[aa].flags & kfObj_UseRoomScaling) == 0)
     {
         zoom_level = objs[aa].zoom;
     }
@@ -1446,7 +1446,7 @@ int construct_object_gfx(int aa, int *drawnWidth, int *drawnHeight, bool alwaysU
 
     tint_red = tint_green = tint_blue = tint_level = tint_light = light_level = 0;
 
-    if (objs[aa].flags & OBJF_HASTINT) {
+    if (objs[aa].flags & kfObj_HasTint) {
         // object specific tint, use it
         tint_red = objs[aa].tint_r;
         tint_green = objs[aa].tint_g;
@@ -1455,14 +1455,14 @@ int construct_object_gfx(int aa, int *drawnWidth, int *drawnHeight, bool alwaysU
         tint_light = objs[aa].tint_light;
         light_level = 0;
     }
-    else if (objs[aa].flags & OBJF_HASLIGHT)
+    else if (objs[aa].flags & kfObj_HasLight)
     {
         light_level = objs[aa].tint_light;
     }
     else {
         // get the ambient or region tint
         int ignoreRegionTints = 1;
-        if (objs[aa].flags & OBJF_USEREGIONTINTS)
+        if (objs[aa].flags & kfObj_UseRegionTints)
             ignoreRegionTints = 0;
 
         get_local_tint(objs[aa].x, objs[aa].y, ignoreRegionTints,
@@ -1608,7 +1608,7 @@ void prepare_objects_for_drawing() {
 
         int usebasel = objs[aa].get_baseline();
 
-        if (objs[aa].flags & OBJF_NOWALKBEHINDS) {
+        if (objs[aa].flags & kfObj_NoWalkBehinds) {
             // ignore walk-behinds, do nothing
             if (walkBehindMethod == DrawAsSeparateSprite)
             {

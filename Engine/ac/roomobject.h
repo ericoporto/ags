@@ -19,11 +19,24 @@
 #define __AGS_EE_AC__ROOMOBJECT_H
 
 #include "core/types.h"
+#include "core/platform.h"
 #include "ac/common_defines.h"
 #include "util/string.h"
 
 namespace AGS { namespace Common { class Stream; }}
 using namespace AGS; // FIXME later
+
+// object flags (currently only a char)
+enum ObjectFlags {
+    kfObj_NoInteract     = 0x01, // not clickable
+    kfObj_NoWalkBehinds  = 0x02, // ignore walk-behinds
+    kfObj_HasTint        = 0x04, // the tint_* members are valid
+    kfObj_UseRegionTints = 0x08, // obey region tints/light areas
+    kfObj_UseRoomScaling = 0x10, // obey room scaling areas
+    kfObj_Solid          = 0x20, // blocks characters from moving
+    kfObj_LegacyLocked   = 0x40, // object position is locked in the editor (OBSOLETE since 3.5.0)
+    kfObj_HasLight       = 0x80  // the tint_light is valid and treated as brightness
+};
 
 // IMPORTANT: exposed to plugin API as AGSObject!
 // keep that in mind if extending this struct, and dont change existing fields
@@ -57,8 +70,8 @@ struct RoomObject {
     int get_height();
     int get_baseline();
 
-    inline bool has_explicit_light() const { return (flags & OBJF_HASLIGHT) != 0; }
-    inline bool has_explicit_tint()  const { return (flags & OBJF_HASTINT) != 0; }
+    inline bool has_explicit_light() const { return (flags & ObjectFlags::kfObj_HasLight) != 0; }
+    inline bool has_explicit_tint()  const { return (flags & ObjectFlags::kfObj_HasTint) != 0; }
 
 	void UpdateCyclingView(int ref_id);
 

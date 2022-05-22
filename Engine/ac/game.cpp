@@ -1228,7 +1228,7 @@ int __GetLocationType(int xxx,int yyy, int allowHotspot0) {
 
     int winner = 0;
     // if it's an Ignore Walkbehinds object, then ignore the walkbehind
-    if ((objat >= 0) && ((objs[objat].flags & OBJF_NOWALKBEHINDS) != 0))
+    if ((objat >= 0) && ((objs[objat].flags & kfObj_NoWalkBehinds) != 0))
         wbat = 0;
     if ((charat >= 0) && ((game.chars[charat].flags & CHF_NOWALKBEHINDS) != 0))
         wbat = 0;

@@ -69,7 +69,7 @@ int GetObjectIDAtRoom(int roomx, int roomy)
     // Iterate through all objects in the room
     for (aa=0;aa<croom->numobj;aa++) {
         if (objs[aa].on != 1) continue;
-        if (objs[aa].flags & OBJF_NOINTERACT)
+        if (objs[aa].flags & kfObj_NoInteract)
             continue;
         int xxx=objs[aa].x,yyy=objs[aa].y;
         int isflipped = 0;
@@ -111,17 +111,17 @@ void SetObjectTint(int obj, int red, int green, int blue, int opacity, int lumin
     objs[obj].tint_b = blue;
     objs[obj].tint_level = opacity;
     objs[obj].tint_light = (luminance * 25) / 10;
-    objs[obj].flags &= ~OBJF_HASLIGHT;
-    objs[obj].flags |= OBJF_HASTINT;
+    objs[obj].flags &= ~kfObj_HasLight;
+    objs[obj].flags |= kfObj_HasTint;
 }
 
 void RemoveObjectTint(int obj) {
     if (!is_valid_object(obj))
         quit("!RemoveObjectTint: invalid object");
 
-    if (objs[obj].flags & (OBJF_HASTINT | OBJF_HASLIGHT)) {
+    if (objs[obj].flags & (kfObj_HasTint | kfObj_HasLight)) {
         debug_script_log("Un-tint object %d", obj);
-        objs[obj].flags &= ~(OBJF_HASTINT | OBJF_HASLIGHT);
+        objs[obj].flags &= ~(kfObj_HasTint | kfObj_HasLight);
     }
     else {
         debug_script_warn("RemoveObjectTint called but object was not tinted");
@@ -408,9 +408,9 @@ void MoveObjectDirect(int objj,int xx,int yy,int spp) {
 void SetObjectClickable (int cha, int clik) {
     if (!is_valid_object(cha))
         quit("!SetObjectClickable: Invalid object specified");
-    objs[cha].flags&=~OBJF_NOINTERACT;
+    objs[cha].flags&=~kfObj_NoInteract;
     if (clik == 0)
-        objs[cha].flags|=OBJF_NOINTERACT;
+        objs[cha].flags|=kfObj_NoInteract;
 }
 
 void SetObjectIgnoreWalkbehinds (int cha, int clik) {
@@ -418,9 +418,9 @@ void SetObjectIgnoreWalkbehinds (int cha, int clik) {
         quit("!SetObjectIgnoreWalkbehinds: Invalid object specified");
     if (game.options[OPT_BASESCRIPTAPI] >= kScriptAPI_v350)
         debug_script_warn("IgnoreWalkbehinds is not recommended for use, consider other solutions");
-    objs[cha].flags&=~OBJF_NOWALKBEHINDS;
+    objs[cha].flags&=~kfObj_NoWalkBehinds;
     if (clik)
-        objs[cha].flags|=OBJF_NOWALKBEHINDS;
+        objs[cha].flags|=kfObj_NoWalkBehinds;
     mark_object_changed(cha);
 }
 

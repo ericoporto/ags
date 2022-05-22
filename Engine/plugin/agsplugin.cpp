@@ -35,6 +35,7 @@
 #include "ac/movelist.h"
 #include "ac/parser.h"
 #include "ac/path_helper.h"
+#include "ac/roomobject.h"
 #include "ac/roomstatus.h"
 #include "ac/string.h"
 #include "ac/spritecache.h"
