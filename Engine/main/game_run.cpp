@@ -641,7 +641,7 @@ static void game_loop_check_controls(bool checkControls)
 
 static void game_loop_do_update()
 {
-    if (debug_flags & DBG_NOUPDATE) ;
+    if (debug_flags & kfDbg_NoUpdate) ;
     else if (game_paused==0) update_stuff();
 }
 

@@ -31,17 +31,19 @@ bool send_message_to_editor(const char *msg);
 bool send_exception_to_editor(const char *qmsg);
 void check_debug_keys();
 
-#define DBG_NOIFACE       1
-#define DBG_NODRAWSPRITES 2
-#define DBG_NOOBJECTS     4
-#define DBG_NOUPDATE      8
-#define DBG_NOSFX      0x10
-#define DBG_NOMUSIC    0x20
-#define DBG_NOSCRIPT   0x40
-// #define DBG_DBGSCRIPT  0x80 // unused
-#define DBG_DEBUGMODE 0x100
-#define DBG_REGONLY   0x200
-#define DBG_NOVIDEO   0x400
+enum DebugFlags {
+    kfDbg_NoIface       = 0x0001,
+    kfDbg_NoDrawSprites = 0x0002,
+    kfDbg_NoObjects     = 0x0004,
+    kfDbg_NoUpdate      = 0x0008,
+    kfDbg_NoSfx         = 0x0010,
+    kfDbg_NoMusic       = 0x0020,
+    kfDbg_NoScript      = 0x0040,
+//  kfDbg_DbgScript     = 0x0080, // unused
+    kfDbg_DebugMode     = 0x0100,
+    kfDbg_RegOnly       = 0x0200,
+    kfDbg_NoVideo       = 0x0400
+};
 
 enum FPSDisplayMode
 {

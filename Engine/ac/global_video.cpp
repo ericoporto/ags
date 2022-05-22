@@ -38,7 +38,7 @@ void PlayFlic(int numb, int scr_flags)
     EndSkippingUntilCharStops();
     if (play.fast_forward)
         return;
-    if (debug_flags & DBG_NOVIDEO)
+    if (debug_flags & kfDbg_NoVideo)
         return;
 
     // AGS 2.x: If the screen is faded out, fade in again when playing a movie.
@@ -73,7 +73,7 @@ void PlayVideo(const char* name, int skip, int scr_flags) {
     EndSkippingUntilCharStops();
     if (play.fast_forward)
         return;
-    if (debug_flags & DBG_NOVIDEO)
+    if (debug_flags & kfDbg_NoVideo)
         return;
 
     // Convert PlayVideo flags to common video flags

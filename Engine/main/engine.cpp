@@ -406,7 +406,7 @@ void engine_init_debug()
 {
     if (usetup.show_fps)
         display_fps = kFPS_Forced;
-    if ((debug_flags & (~DBG_DEBUGMODE)) >0) {
+    if ((debug_flags & (~kfDbg_DebugMode)) > 0) {
         platform->DisplayAlert("Engine debugging enabled.\n"
             "\nNOTE: You have selected to enable one or more engine debugging options.\n"
             "These options cause many parts of the game to behave abnormally, and you\n"
@@ -818,7 +818,7 @@ void engine_init_game_settings()
     for (ee = 0; ee < MAX_ROOM_BGFRAMES; ee++) 
         play.raw_modified[ee] = 0;
     play.game_speed_modifier = 0;
-    if (debug_flags & DBG_DEBUGMODE)
+    if (debug_flags & kfDbg_DebugMode)
         play.debug_mode = 1;
     play.shake_screen_yoff = 0;
 

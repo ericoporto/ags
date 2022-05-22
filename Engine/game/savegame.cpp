@@ -483,7 +483,7 @@ HSaveError DoAfterRestore(const PreservedParams &pp, const RestoredData &r_data)
     play.separate_music_lib = pp.MusicVOX;
 
     // Restore debug flags
-    if (debug_flags & DBG_DEBUGMODE)
+    if (debug_flags & kfDbg_DebugMode)
         play.debug_mode = 1;
 
     // recache queued clips

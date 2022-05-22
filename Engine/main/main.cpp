@@ -236,7 +236,7 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[])
             justDisplayVersion = true;
         }
         else if (ags_stricmp(arg,"--updatereg") == 0)
-            debug_flags |= DBG_REGONLY;
+            debug_flags |= kfDbg_RegOnly;
         else if ((ags_stricmp(arg,"--startr") == 0) && (ee < argc-1)) {
             override_start_room = atoi(argv[ee+1]);
             ee++;
@@ -323,15 +323,15 @@ static int main_process_cmdline(ConfigTree &cfg, int argc, char *argv[])
             cfg["language"]["translation"] = "";
         else if (ags_stricmp(arg, "--fps") == 0)
             cfg["misc"]["show_fps"] = "1";
-        else if (ags_stricmp(arg, "--test") == 0) debug_flags |= DBG_DEBUGMODE;
-        else if (ags_stricmp(arg, "--noiface") == 0) debug_flags |= DBG_NOIFACE;
-        else if (ags_stricmp(arg, "--nosprdisp") == 0) debug_flags |= DBG_NODRAWSPRITES;
-        else if (ags_stricmp(arg, "--nospr") == 0) debug_flags |= DBG_NOOBJECTS;
-        else if (ags_stricmp(arg, "--noupdate") == 0) debug_flags |= DBG_NOUPDATE;
-        else if (ags_stricmp(arg, "--nosound") == 0) debug_flags |= DBG_NOSFX;
-        else if (ags_stricmp(arg, "--nomusic") == 0) debug_flags |= DBG_NOMUSIC;
-        else if (ags_stricmp(arg, "--noscript") == 0) debug_flags |= DBG_NOSCRIPT;
-        else if (ags_stricmp(arg, "--novideo") == 0) debug_flags |= DBG_NOVIDEO;
+        else if (ags_stricmp(arg, "--test") == 0) debug_flags |= kfDbg_DebugMode;
+        else if (ags_stricmp(arg, "--noiface") == 0) debug_flags |= kfDbg_NoIface;
+        else if (ags_stricmp(arg, "--nosprdisp") == 0) debug_flags |= kfDbg_NoDrawSprites;
+        else if (ags_stricmp(arg, "--nospr") == 0) debug_flags |= kfDbg_NoObjects;
+        else if (ags_stricmp(arg, "--noupdate") == 0) debug_flags |= kfDbg_NoUpdate;
+        else if (ags_stricmp(arg, "--nosound") == 0) debug_flags |= kfDbg_NoSfx;
+        else if (ags_stricmp(arg, "--nomusic") == 0) debug_flags |= kfDbg_NoMusic;
+        else if (ags_stricmp(arg, "--noscript") == 0) debug_flags |= kfDbg_NoScript;
+        else if (ags_stricmp(arg, "--novideo") == 0) debug_flags |= kfDbg_NoVideo;
         else if (ags_stricmp(arg, "--rotation") == 0 && (argc > ee + 1))
             cfg["graphics"]["rotation"] = argv[++ee];
         else if (ags_strnicmp(arg, "--log-", 6) == 0 && arg[6] != 0)
@@ -411,7 +411,7 @@ int ags_entry_point(int argc, char *argv[]) {
     main_set_gamedir();
 
     // Update shell associations and exit
-    if (debug_flags & DBG_REGONLY)
+    if (debug_flags & kfDbg_RegOnly)
         exit(EXIT_NORMAL);
 
     int result = 0;

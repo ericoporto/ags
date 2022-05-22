@@ -2021,13 +2021,13 @@ void prepare_room_sprites()
 
     clear_sprite_list();
 
-    if ((debug_flags & DBG_NOOBJECTS) == 0)
+    if ((debug_flags & kfDbg_NoObjects) == 0)
     {
         prepare_objects_for_drawing();
         prepare_characters_for_drawing();
         add_roomovers_for_drawing();
 
-        if ((debug_flags & DBG_NODRAWSPRITES) == 0)
+        if ((debug_flags & kfDbg_NoDrawSprites) == 0)
         {
             our_eip = 34;
 
@@ -2210,7 +2210,7 @@ void draw_gui_and_overlays()
 
     // Add GUIs
     our_eip=35;
-    if (((debug_flags & DBG_NOIFACE)==0) && (displayed_room >= 0)) {
+    if (((debug_flags & kfDbg_NoIface) == 0) && (displayed_room >= 0)) {
         if (playerchar->activeinv >= MAX_INV) {
             quit("!The player.activeinv variable has been corrupted, probably as a result\n"
                 "of an incorrect assignment in the game script.");
