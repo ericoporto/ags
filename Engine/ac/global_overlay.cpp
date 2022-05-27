@@ -29,16 +29,16 @@ int CreateGraphicOverlay(int x, int y, int slott, int trans) {
 }
 
 int CreateTextOverlay(int xx, int yy, int wii, int fontid, int text_color, const char* text, int disp_type) {
-    int allowShrink = 0;
+    TextShrink shrink_type = kTextShrinkNone;
 
     if (xx != OVR_AUTOPLACE) {
         data_to_game_coords(&xx,&yy);
         wii = data_to_game_coord(wii);
     }
     else  // allow DisplaySpeechBackground to be shrunk
-        allowShrink = 1;
+        shrink_type = kTextShrinkLeft;
 
-    auto *over = Overlay_CreateTextCore(false, xx, yy, wii, fontid, text_color, text, disp_type, allowShrink);
+    auto *over = Overlay_CreateTextCore(false, xx, yy, wii, fontid, text_color, text, disp_type, shrink_type);
     return over ? over->type : 0;
 }
 

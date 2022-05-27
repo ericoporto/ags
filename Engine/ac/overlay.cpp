@@ -210,12 +210,12 @@ ScreenOverlay *Overlay_CreateGraphicCore(bool room_layer, int x, int y, int slot
 }
 
 ScreenOverlay *Overlay_CreateTextCore(bool room_layer, int x, int y, int width, int font, int text_color,
-    const char *text, int disp_type, int allow_shrink)
+    const char *text, int disp_type, TextShrink shrink_type)
 {
     if (width < 8) width = play.GetUIViewport().GetWidth() / 2;
     if (x < 0) x = play.GetUIViewport().GetWidth() / 2 - width / 2;
     if (text_color == 0) text_color = 16;
-    return _display_main(x, y, width, text, disp_type, font, -text_color, 0, allow_shrink, false, room_layer);
+    return _display_main(x, y, width, text, disp_type, font, -text_color, 0, shrink_type, false, room_layer);
 }
 
 ScriptOverlay* Overlay_CreateGraphicalEx(bool room_layer, int x, int y, int slot, int transparent, bool clone)
@@ -234,7 +234,7 @@ ScriptOverlay* Overlay_CreateTextualEx(bool room_layer, int x, int y, int width,
 {
     data_to_game_coords(&x, &y);
     width = data_to_game_coord(width);
-    auto *over = Overlay_CreateTextCore(room_layer, x, y, width, font, colour, text, DISPLAYTEXT_NORMALOVERLAY, 0);
+    auto *over = Overlay_CreateTextCore(room_layer, x, y, width, font, colour, text, DISPLAYTEXT_NORMALOVERLAY, kTextShrinkNone);
     return over ? create_scriptoverlay(*over) : nullptr;
 }
 

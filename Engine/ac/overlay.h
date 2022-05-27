@@ -18,6 +18,7 @@
 #ifndef __AGS_EE_AC__OVERLAY_H
 #define __AGS_EE_AC__OVERLAY_H
 #include <vector>
+#include "ac/display.h"
 #include "ac/screenoverlay.h"
 #include "ac/dynobj/scriptoverlay.h"
 #include "util/geometry.h"
@@ -36,7 +37,7 @@ ScriptOverlay* Overlay_CreateGraphical(int x, int y, int slot, int transparent);
 ScriptOverlay* Overlay_CreateTextual(int x, int y, int width, int font, int colour, const char* text);
 ScreenOverlay *Overlay_CreateGraphicCore(bool room_layer, int x, int y, int slot, bool transparent, bool clone);
 ScreenOverlay *Overlay_CreateTextCore(bool room_layer, int x, int y, int width, int font, int text_color,
-    const char *text, int disp_type, int allow_shrink);
+    const char *text, int disp_type, TextShrink shrink_type);
 
 int  find_overlay_of_type(int type);
 void remove_screen_overlay(int type);

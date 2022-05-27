@@ -69,10 +69,10 @@ struct DisplayVars
 } disp;
 
 // Pass yy = -1 to find Y co-ord automatically
-// allowShrink = 0 for none, 1 for leftwards, 2 for rightwards
+// shrink_type = 0 for none, 1 for leftwards, 2 for rightwards
 // pass blocking=2 to create permanent overlay
 ScreenOverlay *_display_main(int xx, int yy, int wii, const char *text, int disp_type, int usingfont,
-    int asspch, int isThought, int allowShrink, bool overlayPositionFixed, bool roomlayer)
+                             int asspch, int isThought, TextShrink shrink_type, bool overlayPositionFixed, bool roomlayer)
 {
     const bool use_speech_textwindow = (asspch < 0) && (game.options[OPT_SPEECHTYPE] >= 2);
     const bool use_thought_gui = (isThought) && (game.options[OPT_THOUGHTGUI] > 0);
@@ -141,13 +141,13 @@ ScreenOverlay *_display_main(int xx, int yy, int wii, const char *text, int disp
     if (longestline < wii - paddingDoubledScaled) {
         // shrink the width of the dialog box to fit the text
         int oldWid = wii;
-        //if ((asspch >= 0) || (allowShrink > 0))
+        //if ((asspch >= 0) || (shrink_type > 0))
         // If it's not speech, or a shrink is allowed, then shrink it
-        if ((asspch == 0) || (allowShrink > 0))
+        if ((asspch == 0) || (shrink_type != kTextShrinkNone))
             wii = longestline + paddingDoubledScaled;
 
         // shift the dialog box right to align it, if necessary
-        if ((allowShrink == 2) && (xx >= 0))
+        if ((shrink_type == kTextShrinkRight) && (xx >= 0))
             xx += (oldWid - wii);
     }
 
@@ -365,7 +365,7 @@ ScreenOverlay *_display_main(int xx, int yy, int wii, const char *text, int disp
     return nullptr;
 }
 
-void _display_at(int xx, int yy, int wii, const char *text, int disp_type, int asspch, int isThought, int allowShrink, bool overlayPositionFixed) {
+void _display_at(int xx, int yy, int wii, const char *text, int disp_type, int asspch, int isThought, TextShrink shrink_type, bool overlayPositionFixed) {
     int usingfont=FONT_NORMAL;
     if (asspch) usingfont=FONT_SPEECH;
     // TODO: _display_at may be called from _displayspeech, which can start
@@ -379,7 +379,7 @@ void _display_at(int xx, int yy, int wii, const char *text, int disp_type, int a
     {// TODO: is there any need for this flag?
         need_stop_speech = true;
     }
-    _display_main(xx, yy, wii, text, disp_type, usingfont, asspch, isThought, allowShrink, overlayPositionFixed);
+    _display_main(xx, yy, wii, text, disp_type, usingfont, asspch, isThought, shrink_type, overlayPositionFixed);
 
     if (need_stop_speech)
         stop_voice_speech();
