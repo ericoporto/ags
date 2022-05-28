@@ -520,6 +520,8 @@ namespace AGS.Editor
                 " \"" + AudioClip.AUDIO_CACHE_DIRECTORY + "\"" +
                 " \"" + "Speech" + "\"";
 
+            Factory.GUIController.ClearEngineLogMessages();
+
             RunEXEFile(Path.Combine(AGSEditor.DEBUG_OUTPUT_DIRECTORY, Factory.AGSEditor.BaseGameFileName + ".exe"), parameter, true);
 
             if (withDebugger)
