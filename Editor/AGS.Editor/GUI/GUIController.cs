@@ -330,6 +330,12 @@ namespace AGS.Editor
                 _mainForm.pnlOutput.Show();
             }
         }
+
+        public void ClearEngineLogMessages()
+        {
+            _mainForm.pnlEngineLog.Clear();
+        }
+
         public void ShowEngineLogPanel(string message, LogGroup group, LogLevel level)
         {
             _mainForm.pnlEngineLog.WriteLogMessage(message, group, level);
