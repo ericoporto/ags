@@ -330,6 +330,10 @@ namespace AGS.Editor
                 _mainForm.pnlOutput.Show();
             }
         }
+        public void ShowEngineLogPanel(string message, string groupID, string groupName, string mtID, string mt)
+        {
+            _mainForm.pnlEngineLog.WriteLogMessage(message, groupID, groupName, mtID, mt);
+        }
 
         public void ShowOutputPanel(string[] messages, string imageKey = "BuildIcon")
         {

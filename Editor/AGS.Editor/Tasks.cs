@@ -501,7 +501,7 @@ namespace AGS.Editor
             if (withDebugger)
             {
                 // debugger connection params
-                parameter = "--enabledebugger " + Factory.AGSEditor.Debugger.InstanceIdentifier;
+                parameter = "--log-debugger=all:all --enabledebugger " + Factory.AGSEditor.Debugger.InstanceIdentifier;
             }
             else if (Factory.AGSEditor.Settings.TestGameWindowStyle == TestGameWindowStyle.Windowed)
             {

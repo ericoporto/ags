@@ -72,6 +72,15 @@ namespace AGS.Editor
             {
 				EngineHasExited();
             }
+            else if (command == "LOG")
+            {
+                XmlNode logTextNode = doc.DocumentElement.SelectSingleNode("Text");
+                XmlNode logGroupIDNode = doc.DocumentElement.SelectSingleNode("GroupID");
+                XmlNode logGroupNameNode = doc.DocumentElement.SelectSingleNode("GroupName");
+                XmlNode logMTNode = doc.DocumentElement.SelectSingleNode("MT");
+                XmlNode logMTIDNode = doc.DocumentElement.SelectSingleNode("MTID");
+                LogMessage(logTextNode.InnerText, logGroupIDNode.InnerText, logGroupNameNode.InnerText, logMTIDNode.InnerText, logMTNode.InnerText);
+            }
         }
 
         private DebugCallStack ParseCallStackIntoObjectForm(string callStackFromEngine, string errorMessage)
@@ -116,6 +125,11 @@ namespace AGS.Editor
             }
 
             _communicator.SendMessage("<Engine Command=\"READY\" EditorWindow=\"" + editorHwnd + "\" />");
+        }
+
+        public void LogMessage(string message, string groupID, string groupName, string mtID, string mt)
+        {
+            Factory.GUIController.ShowEngineLogPanel(message, groupID, groupName, mtID, mt);
         }
 
 		public void EngineHasExited()

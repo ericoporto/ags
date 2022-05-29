@@ -52,6 +52,7 @@ namespace AGS.Editor
                 projectPanel,
                 propertiesPanel,
                 pnlOutput,
+                pnlEngineLog,
                 pnlFindResults,
                 pnlCallStack
             };
@@ -453,6 +454,7 @@ namespace AGS.Editor
             pnlCallStack.Show(mainContainer, DockState.DockBottom);
             pnlFindResults.Show(pnlCallStack.Pane, pnlCallStack);
             pnlOutput.Show(pnlCallStack.Pane, pnlFindResults);
+            pnlEngineLog.Show();
             projectPanel.Show(mainContainer, DockState.DockRight);
             propertiesPanel.Show(projectPanel.Pane, DockAlignment.Bottom, 0.5f);
         }
