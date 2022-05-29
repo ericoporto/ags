@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using AGS.Editor;
+using AGS.Types.Enums;
 
 namespace AGS.Editor
 {

@@ -134,6 +134,8 @@
     <Compile Include="Enums\InterfaceDisabledAction.cs" />
     <Compile Include="Enums\InventoryHotspotMarkerStyle.cs" />
     <Compile Include="Enums\LipSyncType.cs" />
+    <Compile Include="Enums\LogGroup.cs" />
+    <Compile Include="Enums\LogLevel.cs" />
     <Compile Include="Enums\PaletteColourType.cs" />
     <Compile Include="Enums\RoomAreaMaskType.cs" />
     <Compile Include="Enums\RoomResolution.cs" />

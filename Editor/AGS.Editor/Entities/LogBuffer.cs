@@ -5,32 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using AGS.Types.Enums;
 
 namespace AGS.Editor
 {
-    public enum LogGroup
-    {
-        None = -1,
-        Main = 0,
-        Game,
-        Script,
-        SprCache,
-        ManObj,
-        SDL,
-        NumGroups
-    }
 
-    public enum LogLevel
-    {
-        None = 0,
-        Alert,
-        Fatal,
-        Error,
-        Warn,
-        Info,
-        Debug,
-        NumLevels
-    }
     class LogEntry
     {
         public string Text { get; private set; }
