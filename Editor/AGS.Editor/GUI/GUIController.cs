@@ -8,6 +8,7 @@ using System.Xml;
 using Microsoft.Win32;
 using AGS.Editor.Components;
 using AGS.Types;
+using AGS.Types.Enums;
 using AGS.Types.AutoComplete;
 using AGS.Types.Interfaces;
 using AGS.Editor.Preferences;

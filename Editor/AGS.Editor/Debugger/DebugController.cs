@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using System.Windows.Forms;
+using AGS.Types.Enums;
 
 namespace AGS.Editor
 {
