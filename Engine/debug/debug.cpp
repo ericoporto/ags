@@ -88,13 +88,49 @@ int first_debug_line = 0, last_debug_line = 0, display_console = 0;
 float fps = std::numeric_limits<float>::quiet_NaN();
 FPSDisplayMode display_fps = kFPS_Hide;
 
+class DebuggerLogOutputTarget : public AGS::Common::IOutputHandler
+{
+public:
+    DebuggerLogOutputTarget() {};
+    virtual ~DebuggerLogOutputTarget() {};
+
+    void PrintMessage(const DebugMessage &msg) override
+    {
+        if(editor_debugger == nullptr) return;
+
+        char messageToSend[STD_BUFFER_SIZE];
+        sprintf(messageToSend, "<?xml version=\"1.0\" encoding=\"Windows-1252\"?><Debugger Command=\"LOG\">");
+#if AGS_PLATFORM_OS_WINDOWS
+        sprintf(&messageToSend[strlen(messageToSend)], "  <EngineWindow>%d</EngineWindow> ", (int)sys_win_get_window());
+#endif
+        sprintf(&messageToSend[strlen(messageToSend)], "  <Text><![CDATA[%s]]></Text> ",  msg.Text.GetCStr());
+        sprintf(&messageToSend[strlen(messageToSend)], "  <GroupID>%d</GroupID> ", msg.GroupID);
+        sprintf(&messageToSend[strlen(messageToSend)], "  <GroupName>%s</GroupName> ", msg.GroupName.GetCStr());
+        sprintf(&messageToSend[strlen(messageToSend)], "  <MTID>%d</MTID> ", msg.MT);
+        switch (msg.MT) {
+            case kDbgMsg_Alert: sprintf(&messageToSend[strlen(messageToSend)], "  <MT>alert</MT> "); break;
+            case kDbgMsg_None:  sprintf(&messageToSend[strlen(messageToSend)], "  <MT>none</MT> ");  break;
+            case kDbgMsg_Fatal: sprintf(&messageToSend[strlen(messageToSend)], "  <MT>fatal</MT> "); break;
+            case kDbgMsg_Error: sprintf(&messageToSend[strlen(messageToSend)], "  <MT>error</MT> "); break;
+            case kDbgMsg_Warn:  sprintf(&messageToSend[strlen(messageToSend)], "  <MT>warn</MT> ");  break;
+            case kDbgMsg_Info:  sprintf(&messageToSend[strlen(messageToSend)], "  <MT>info</MT> ");  break;
+            case kDbgMsg_Debug: sprintf(&messageToSend[strlen(messageToSend)], "  <MT>debug</MT> "); break;
+        }
+        strcat(messageToSend, "</Debugger>");
+
+        editor_debugger->SendMessageToEditor(messageToSend);
+    }
+};
+
 std::unique_ptr<MessageBuffer> DebugMsgBuff;
 std::unique_ptr<LogFile> DebugLogFile;
 std::unique_ptr<ConsoleOutputTarget> DebugConsole;
+std::unique_ptr<DebuggerLogOutputTarget> DebuggerLog;
 
 const String OutputMsgBufID = "buffer";
 const String OutputFileID = "file";
 const String OutputSystemID = "stdout";
+const String OutputDebuggerLogID = "debugger";
 const String OutputGameConsoleID = "console";
 
 
@@ -153,6 +189,12 @@ PDebugOutput create_log_output(const String &name, const String &path = "", LogF
     {
         DebugConsole.reset(new ConsoleOutputTarget());
         return DbgMgr.RegisterOutput(OutputGameConsoleID, DebugConsole.get(), kDbgMsg_None);
+    }
+    else if (name.CompareNoCase(OutputDebuggerLogID) == 0)
+    {
+        DebuggerLog.reset(new DebuggerLogOutputTarget());
+        return DbgMgr.RegisterOutput(OutputDebuggerLogID, DebuggerLog.get(), kDbgMsg_All);
+
     }
     return nullptr;
 }
@@ -276,6 +318,9 @@ void apply_debug_config(const ConfigTree &cfg)
           DbgGroupOption(kDbgGroup_SDL, kDbgMsg_Info),
         });
     bool legacy_log_enabled = CfgReadBoolInt(cfg, "misc", "log", false);
+        
+    apply_log_config(cfg, OutputDebuggerLogID, /* defaults */ true, {DbgGroupOption(kDbgGroup_Script, kDbgMsg_All) });
+
     apply_log_config(cfg, OutputFileID,
         /* defaults */
         legacy_log_enabled,
@@ -333,6 +378,7 @@ void shutdown_debug()
     DebugMsgBuff.reset();
     DebugLogFile.reset();
     DebugConsole.reset();
+    DebuggerLog.reset();
 }
 
 void debug_set_console(bool enable)
