@@ -50,6 +50,7 @@ namespace AGS.Editor
             this.logTextBox.ForeColor = System.Drawing.Color.White;
             this.logTextBox.Location = new System.Drawing.Point(0, 0);
             this.logTextBox.Name = "logTextBox";
+            this.logTextBox.ReadOnly = true;
             this.logTextBox.Size = new System.Drawing.Size(800, 398);
             this.logTextBox.TabIndex = 0;
             this.logTextBox.Text = "";
