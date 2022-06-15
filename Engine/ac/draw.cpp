@@ -2600,6 +2600,7 @@ void construct_game_screen_overlay(bool draw_mouse)
         }
         lastmx = mousex; lastmy = mousey;
     }
+    update_hardware_cursor_graphic();
 
     if (play.screen_is_faded_out == 0)
     {

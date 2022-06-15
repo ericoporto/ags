@@ -33,7 +33,9 @@
 #include "ac/spritecache.h"
 #include "gfx/graphicsdriver.h"
 #include "gfx/gfxfilter.h"
+#include "gfx/gfx_util.h"
 #include "platform/base/agsplatformdriver.h"
+#include "SDL_mouse.h"
 
 using namespace AGS::Common;
 using namespace AGS::Engine;
@@ -54,6 +56,14 @@ char alpha_blend_cursor = 0;
 Bitmap *dotted_mouse_cursor = nullptr;
 IDriverDependantBitmap *mouseCursor = nullptr;
 Bitmap *blank_mouse_cursor = nullptr;
+// Hardware Cursor
+int prev_cur_spriteslot = -1;
+int hcur_last_spriteslot = -1;
+SDL_Surface *hcur_sdl_surface = nullptr;
+std::unique_ptr<Bitmap> hcur_bitmap = nullptr;
+SDL_Cursor * hcur_sdl_cursor = nullptr;
+const Point hcur_base_point = Point(32, 32);
+Point hcur_prev_point = Point(1, 1);
 
 // The Mouse:: functions are static so the script doesn't pass
 // in an object parameter
@@ -369,12 +379,55 @@ void update_cached_mouse_cursor()
     mouseCursor = gfxDriver->CreateDDBFromBitmap(mousecurs[0], alpha_blend_cursor != 0);
 }
 
+void update_hardware_cursor_graphic() {
+    int width, height, hotspot_x, hotspot_y;
+    Bitmap* cur_bitmap;
+    Size sz;
+    if(hcur_prev_point != GameScaling.Scale(hcur_base_point)) {
+        hcur_prev_point = GameScaling.Scale(hcur_base_point);
+        hcur_last_spriteslot = -1;
+    }
+
+    if(play.mouse_cursor_hidden || prev_cur_spriteslot <= 0) {
+        SDL_ShowCursor(0);
+        hcur_last_spriteslot = -1;
+        return;
+    }
+
+    if(hcur_last_spriteslot == prev_cur_spriteslot) return;
+    hcur_last_spriteslot = prev_cur_spriteslot;
+
+    cur_bitmap = spriteset[hcur_last_spriteslot];
+    width = GameScaling.X.ScaleDistance(cur_bitmap->GetWidth());
+    height = GameScaling.Y.ScaleDistance(cur_bitmap->GetHeight());
+    hotspot_x = GameScaling.X.ScaleDistance(game.mcurs[cur_cursor].hotx);
+    hotspot_y = GameScaling.Y.ScaleDistance(game.mcurs[cur_cursor].hoty);
+    sz = Size(width, height);
+
+    if(hcur_bitmap) hcur_bitmap->Destroy();
+
+    hcur_bitmap.reset (BitmapHelper::CreateBitmap(width, height, cur_bitmap->GetColorDepth()));
+
+    Bitmap* res_bmp = transform_sprite(cur_bitmap, alpha_blend_cursor, hcur_bitmap, sz, BitmapFlip::kBitmap_NoFlip);
+
+    if(hcur_sdl_cursor) SDL_FreeCursor(hcur_sdl_cursor);
+    if(hcur_sdl_surface) SDL_FreeSurface(hcur_sdl_surface);
+
+    hcur_sdl_surface = GfxUtil::CreateSDL_SurfaceFromBitmap(res_bmp);
+    hcur_sdl_cursor = SDL_CreateColorCursor(hcur_sdl_surface, hotspot_x, hotspot_y);
+    SDL_SetCursor(hcur_sdl_cursor);
+    SDL_ShowCursor(1);
+}
+
 void set_new_cursor_graphic (int spriteslot) {
+    prev_cur_spriteslot = spriteslot;
     mousecurs[0] = spriteset[spriteslot];
 
     // It looks like spriteslot 0 can be used in games with version 2.72 and lower.
     // The NULL check should ensure that the sprite is valid anyway.
-    if (((spriteslot < 1) && (loaded_game_file_version > kGameVersion_272)) || (mousecurs[0] == nullptr))
+    //if (((spriteslot < 1) && (loaded_game_file_version > kGameVersion_272)) || (mousecurs[0] == nullptr))
+    // FIX-ME: HACK TO HIDE CURSOR
+    if(true)
     {
         if (blank_mouse_cursor == nullptr)
         {
