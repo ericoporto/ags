@@ -106,6 +106,17 @@ bool sys_audio_init(const String &driver_name)
         if (!res)
             Debug::Printf(kDbgMsg_Error, "Failed to initialize audio backend: %s", SDL_GetError());
     }
+    if (!res)
+    {
+        for(const String& possible_driver : platform->GetKnownGoodAudioDrivers()) {
+            res = SDL_AudioInit(possible_driver.GetCStr()) == 0;
+            if (!res)
+                Debug::Printf(kDbgMsg_Error, "Failed to initialize audio driver %s; error: %s",
+                              possible_driver.GetCStr(), SDL_GetError());
+            else
+                break;
+        }
+    }
     if (res)
         Debug::Printf(kDbgMsg_Info, "Audio driver: %s", SDL_GetCurrentAudioDriver());
     return res;

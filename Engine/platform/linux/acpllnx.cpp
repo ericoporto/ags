@@ -27,6 +27,7 @@ struct AGSLinux : AGSPlatformXDGUnix {
   eScriptSystemOSID GetSystemOSID() override;
   int  InitializeCDPlayer() override;
   void ShutdownCDPlayer() override;
+  std::vector<String> GetKnownGoodAudioDrivers() override;
 };
 
 
@@ -44,6 +45,11 @@ int AGSLinux::InitializeCDPlayer() {
 
 void AGSLinux::ShutdownCDPlayer() {
   cd_exit();
+}
+
+std::vector<String> AGSLinux::GetKnownGoodAudioDrivers()
+{
+    return {"pulseaudio", "alsa", "jack", "pipewire"};
 }
 
 AGSPlatformDriver* AGSPlatformDriver::CreateDriver()

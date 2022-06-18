@@ -96,6 +96,7 @@ struct AGSWin32 : AGSPlatformDriver {
   void ResumeApplication() override;
   void ValidateWindowSize(int &x, int &y, bool borderless) const override;
   SDL_Surface *CreateWindowIcon() override;
+  std::vector<String> GetKnownGoodAudioDrivers() override;
 
   // Returns command line argument in a UTF-8 format
   String GetCommandArg(size_t arg_index) override;
@@ -474,6 +475,11 @@ String AGSWin32::GetCommandArg(size_t arg_index)
         arg = Path::WidePathToUTF8(wargv[arg_index]);
     LocalFree(wargv);
     return arg;
+}
+
+std::vector<String> AGSWin32::GetKnownGoodAudioDrivers()
+{
+    return {"wasapi", "directsound", "winmm"};
 }
 
 AGSPlatformDriver* AGSPlatformDriver::CreateDriver()

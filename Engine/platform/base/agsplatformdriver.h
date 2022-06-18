@@ -102,6 +102,8 @@ public:
     virtual eScriptSystemOSID GetSystemOSID() = 0;
     virtual void GetSystemTime(ScriptDateTime*);
     virtual SetupReturnValue RunSetup(const Common::ConfigTree &cfg_in, Common::ConfigTree &cfg_out);
+
+    virtual std::vector<String> GetKnownGoodAudioDrivers() { return {}; }
     // Formats message and writes to standard platform's output;
     // Always adds trailing '\n' after formatted string
     virtual void WriteStdOut(const char *fmt, ...);
