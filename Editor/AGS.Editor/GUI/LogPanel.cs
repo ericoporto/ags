@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using AGS.Editor;
 using AGS.Types.Enums;
+using AGS.Types;
 
 namespace AGS.Editor
 {
@@ -24,6 +25,11 @@ namespace AGS.Editor
             comboBox_Script_LogLevel.SelectedIndex = 6;
             _logBuffer.ValueChanged += new System.EventHandler(this.BufferChanged);
             timerLogBufferSync.Start();
+        }
+
+        void SetGame(Game game)
+        {
+            propertyGridLog.SelectedObject = game.DebugLog;
         }
 
         delegate void SetTextCallback(string text);
