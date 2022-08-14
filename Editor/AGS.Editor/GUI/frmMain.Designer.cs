@@ -49,7 +49,6 @@ namespace AGS.Editor
             this.pnlCallStack = new AGS.Editor.CallStackPanel();
             this.pnlFindResults = new AGS.Editor.FindResultsPanel();
             this.pnlOutput = new AGS.Editor.OutputPanel();
-            this.pnlEngineLog = new AGS.Editor.LogPanel();
             this.projectPanel = new AGS.Editor.ProjectPanel();
             this.propertiesPanel = new AGS.Editor.PropertiesPanel();
             this.mainMenu = new MenuStripExtended();
@@ -202,26 +201,6 @@ namespace AGS.Editor
             this.pnlOutput.ShowHint = WeifenLuo.WinFormsUI.Docking.DockState.DockBottom;
             this.pnlOutput.Visible = true;
             this.pnlOutput.VisibleState = WeifenLuo.WinFormsUI.Docking.DockState.DockBottom;
-            //
-            // pnlEngineLog
-            // 
-            this.pnlEngineLog.ClientSize = new System.Drawing.Size(489, 65);
-            this.pnlEngineLog.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlEngineLog.DockPanel = this.mainContainer;
-            this.pnlEngineLog.DockState = WeifenLuo.WinFormsUI.Docking.DockState.Unknown;
-            this.pnlEngineLog.FloatPane = null;
-            this.pnlEngineLog.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.pnlEngineLog.IsFloat = false;
-            this.pnlEngineLog.IsHidden = true;
-            this.pnlEngineLog.HideOnClose = true;
-            this.pnlEngineLog.Location = new System.Drawing.Point(0, 0);
-            this.pnlEngineLog.Name = "pnlEngineLog";
-            this.pnlEngineLog.Text = "Engine Log";
-            this.pnlEngineLog.Pane = null;
-            this.pnlEngineLog.PanelPane = null;
-            this.pnlEngineLog.ShowHint = WeifenLuo.WinFormsUI.Docking.DockState.DockBottom;
-            this.pnlEngineLog.Visible = true;
-            this.pnlEngineLog.VisibleState = WeifenLuo.WinFormsUI.Docking.DockState.DockBottom;
             // 
             // projectPanel
             // 
@@ -328,7 +307,6 @@ namespace AGS.Editor
         private AGS.Editor.TabbedDocumentManager tabbedDocumentContainer1;
         internal ToolStripExtended toolStrip;
         internal OutputPanel pnlOutput;
-        internal LogPanel pnlEngineLog;
         private System.Windows.Forms.StatusStrip statusStrip;
         internal System.Windows.Forms.ToolStripStatusLabel statusLabel;
         internal CallStackPanel pnlCallStack;

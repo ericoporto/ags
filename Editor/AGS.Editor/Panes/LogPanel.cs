@@ -14,22 +14,17 @@ using AGS.Types;
 
 namespace AGS.Editor
 {
-    public partial class LogPanel : DockContent
+    public partial class LogPanel : EditorContentPanel
     {
         private LogBuffer _logBuffer = new LogBuffer();
         private bool _bufferNeedsSync = false;
-        public LogPanel()
+        public LogPanel(GUIController guiController)
         {
             InitializeComponent();
             comboBox_Game_LogLevel.SelectedIndex = 6;
             comboBox_Script_LogLevel.SelectedIndex = 6;
             _logBuffer.ValueChanged += new System.EventHandler(this.BufferChanged);
             timerLogBufferSync.Start();
-        }
-
-        void SetGame(Game game)
-        {
-            propertyGridLog.SelectedObject = game.DebugLog;
         }
 
         delegate void SetTextCallback(string text);
@@ -51,6 +46,11 @@ namespace AGS.Editor
                 this.logTextBox.ScrollToCaret();
                 Show();
             }
+        }
+
+        protected override string OnGetHelpKeyword()
+        {
+            return "Starting off";
         }
 
         private void BufferChanged(object sender, EventArgs e)
@@ -88,5 +88,6 @@ namespace AGS.Editor
             _logBuffer.SetLogLevel(LogGroup.Script, level);
             _bufferNeedsSync = true;
         }
+
     }
 }

@@ -51,6 +51,7 @@ namespace AGS.Editor
         private delegate void ShowFindSymbolResultsDelegate(List<ScriptTokenReference> results);
 
         private frmMain _mainForm;
+        private LogPanel _pnlEngineLog;
         private Dictionary<string, IEditorComponent> _menuItems;
         private ImageList _imageList = new ImageList();
         private ProjectTree _treeManager;
@@ -332,14 +333,19 @@ namespace AGS.Editor
             }
         }
 
+        public void SetLogPanel(LogPanel pnlEngineLog)
+        {
+            _pnlEngineLog = pnlEngineLog;
+        }
+
         public void ClearEngineLogMessages()
         {
-            _mainForm.pnlEngineLog.Clear();
+            _pnlEngineLog.Clear();
         }
 
         public void ShowEngineLogPanel(string message, LogGroup group, LogLevel level)
         {
-            _mainForm.pnlEngineLog.WriteLogMessage(message, group, level);
+            _pnlEngineLog.WriteLogMessage(message, group, level);
         }
 
         public void ShowOutputPanel(string[] messages, string imageKey = "BuildIcon")

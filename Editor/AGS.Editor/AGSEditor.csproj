@@ -110,6 +110,7 @@
     <Compile Include="Components\CharacterRoomChangedEventArgs.cs" />
     <Compile Include="Components\CharactersComponent.cs" />
     <Compile Include="Components\CursorsComponent.cs" />
+    <Compile Include="Components\DebugLogComponent.cs" />
     <Compile Include="Components\DialogsComponent.cs" />
     <Compile Include="Components\FileCommandsComponent.cs" />
     <Compile Include="Components\FontsComponent.cs" />
@@ -159,10 +160,10 @@
     <Compile Include="GUI\ImportTTFDialog.Designer.cs">
       <DependentUpon>ImportTTFDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\LogPanel.cs">
-      <SubType>Form</SubType>
+    <Compile Include="Panes\LogPanel.cs">
+      <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GUI\LogPanel.Designer.cs">
+    <Compile Include="Panes\LogPanel.Designer.cs">
       <DependentUpon>LogPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\NumberEntryWithInfoDialog.cs">
@@ -374,7 +375,7 @@
     <EmbeddedResource Include="GUI\ImportTTFDialog.resx">
       <DependentUpon>ImportTTFDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\LogPanel.resx">
+    <EmbeddedResource Include="Panes\LogPanel.resx">
       <DependentUpon>LogPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\NumberEntryWithInfoDialog.resx">
@@ -615,6 +616,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="agsico-1.ico" />
+    <EmbeddedResource Include="Resources\debug_log.ico" />
     <EmbeddedResource Include="Resources\LayoutDefault.xml" />
     <EmbeddedResource Include="GUI\AboutDialog.resx">
       <SubType>Designer</SubType>
