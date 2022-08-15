@@ -21,8 +21,6 @@ namespace AGS.Editor
         public LogPanel(GUIController guiController)
         {
             InitializeComponent();
-            comboBox_Game_LogLevel.SelectedIndex = 6;
-            comboBox_Script_LogLevel.SelectedIndex = 6;
             _logBuffer.ValueChanged += new System.EventHandler(this.BufferChanged);
             timerLogBufferSync.Start();
         }
@@ -67,11 +65,14 @@ namespace AGS.Editor
             _logBuffer.Append(message, group, level);
         }
 
-        private void comboBox_Game_LogLevel_SelectionChangeCommitted(object sender, EventArgs e)
+        public void ApplyFilters(DebugLog debugLog)
         {
-            LogLevel level = (LogLevel)comboBox_Game_LogLevel.SelectedIndex;
-            _logBuffer.SetLogLevel(LogGroup.Game, level);
-            _bufferNeedsSync = true;
+            for(int i=0; i<(int)LogGroup.NumGroups; i++)
+            {
+                LogGroup group = (LogGroup)i;
+                _logBuffer.SetLogLevel(group, debugLog.GetGroupLogFilter(group));
+                _bufferNeedsSync = true;
+            }
         }
 
         private void timerLogBufferSync_Tick(object sender, EventArgs e)
@@ -81,13 +82,5 @@ namespace AGS.Editor
             SetText(_logBuffer.ToString());
             _bufferNeedsSync = false;
         }
-
-        private void comboBox_Script_LogLevel_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-            LogLevel level = (LogLevel)comboBox_Script_LogLevel.SelectedIndex;
-            _logBuffer.SetLogLevel(LogGroup.Script, level);
-            _bufferNeedsSync = true;
-        }
-
     }
 }

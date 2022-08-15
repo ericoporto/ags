@@ -34,6 +34,14 @@ namespace AGS.Editor.Components
             _menuCommands.Commands.Add(new MenuCommand(SHOW_DEBUG_LOG_COMMAND, "Show Debug Log", ICON_KEY));
             _guiController.AddMenuItems(this, _menuCommands);
             _guiController.SetLogPanel(_logPanel);
+
+            _logPanel.ApplyFilters(_logConfig);
+            _logConfig.PropertyChanged += _logConfig_PropertyChanged;
+        }
+
+        private void _logConfig_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            _logPanel.ApplyFilters(_logConfig);
         }
 
         public override string ComponentID
