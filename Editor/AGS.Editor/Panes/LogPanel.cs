@@ -50,7 +50,7 @@ namespace AGS.Editor
 
         protected override string OnGetHelpKeyword()
         {
-            return "Starting off";
+            return "Logging";
         }
 
         private void BufferChanged(object sender, EventArgs e)

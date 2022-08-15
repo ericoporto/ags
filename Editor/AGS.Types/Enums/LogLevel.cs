@@ -20,6 +20,7 @@ namespace AGS.Types.Enums
         Info,
         [Description("6 - Debug")]
         Debug,
+        [Browsable(false)]
         NumLevels
     }
 }

@@ -23,6 +23,22 @@ namespace AGS.Types
         LogLevel _logfilter_manobj = LogLevel.None;
         LogLevel _logfilter_sdl = LogLevel.None;
 
+        public void SetDefaults()
+        {
+            _loglevel_main = LogLevel.Error;
+            _loglevel_game = LogLevel.Error;
+            _loglevel_script = LogLevel.Info;
+            _loglevel_sprcache = LogLevel.None;
+            _loglevel_manobj = LogLevel.None;
+            _loglevel_sdl = LogLevel.None;
+
+            _logfilter_main = LogLevel.Error;
+            _logfilter_game = LogLevel.Error;
+            _logfilter_script = LogLevel.Info;
+            _logfilter_sprcache = LogLevel.None;
+            _logfilter_manobj = LogLevel.None;
+            _logfilter_sdl = LogLevel.None;
+        }
 
         // Main log group
         [DisplayName("Main")]
@@ -195,6 +211,15 @@ namespace AGS.Types
             return LogLevel.None;
         }
 
+        public void FromXml(XmlNode node)
+        {
+            SerializeUtils.DeserializeFromXML(this, node);
+        }
+
+        public void ToXml(XmlTextWriter writer)
+        {
+            SerializeUtils.SerializeToXML(this, writer);
+        }
 
         #region ICustomTypeDescriptor Members
         public AttributeCollection GetAttributes()

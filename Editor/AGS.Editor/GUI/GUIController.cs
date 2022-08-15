@@ -14,6 +14,7 @@ using AGS.Types.Interfaces;
 using AGS.Editor.Preferences;
 using System.Drawing.Text;
 using System.Linq;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace AGS.Editor
 {

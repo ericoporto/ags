@@ -49,7 +49,6 @@ namespace AGS.Types
         private Settings _settings;
         private RuntimeSetup _defaultSetup;
         private WorkspaceState _workspaceState;
-        private DebugLog _debugLog;
         private PaletteEntry[] _palette;
         private SpriteFolder _sprites;
         private ViewFolders _views;
@@ -86,7 +85,6 @@ namespace AGS.Types
             _settings = new Settings();
             _defaultSetup = new RuntimeSetup(_settings);
             _workspaceState = new WorkspaceState();
-            _debugLog = new DebugLog();
             _palette = new PaletteEntry[PALETTE_SIZE];
             _sprites = new SpriteFolder("Main");
             _views = new ViewFolders("Main");
@@ -203,15 +201,6 @@ namespace AGS.Types
         public WorkspaceState WorkspaceState
         {
             get { return _workspaceState; }
-        }
-
-        /// <summary>
-        /// Particular settings on logging from the game when
-        /// running the game in debug mode in the Editor
-        /// </summary>
-        public DebugLog DebugLog
-        {
-            get { return _debugLog; }
         }
 
         public PaletteEntry[] Palette
