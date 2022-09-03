@@ -84,6 +84,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Action.cs" />
     <Compile Include="Attributes\AGSNoSerializeAttribute.cs" />
     <Compile Include="Attributes\AGSSerializeClassAttribute.cs" />
     <Compile Include="Attributes\ScriptFunctionParametersAttribute.cs" />
