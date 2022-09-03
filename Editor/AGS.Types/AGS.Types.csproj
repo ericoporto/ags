@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Action.cs" />
+    <Compile Include="ActionFolder.cs" />
     <Compile Include="Attributes\AGSNoSerializeAttribute.cs" />
     <Compile Include="Attributes\AGSSerializeClassAttribute.cs" />
     <Compile Include="Attributes\ScriptFunctionParametersAttribute.cs" />
@@ -163,6 +164,8 @@
     <Compile Include="GlobalVariables.cs" />
     <Compile Include="GUIControlGroup.cs" />
     <Compile Include="HelperTypes\SpriteInfo.cs" />
+    <Compile Include="Input.cs" />
+    <Compile Include="InputCollection.cs" />
     <Compile Include="Interfaces\IRePopulatableComponent.cs" />
     <Compile Include="Interfaces\ILoadedRoom.cs" />
     <Compile Include="InteractionSchema.cs" />
