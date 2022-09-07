@@ -13,6 +13,7 @@
 //=============================================================================
 #include <cstdio>
 #include <deque>
+#include <utility>
 #include <string.h>
 #include "ac/common.h"
 #include "ac/dynobj/cc_dynamicarray.h"
@@ -220,19 +221,19 @@ unsigned ccInstance::_maxWhileLoops = 0u;
 
 ccInstance *ccInstance::GetCurrentInstance()
 {
-    return InstThreads.size() > 0 ? InstThreads.back() : nullptr;
+    return !InstThreads.empty() ? InstThreads.back() : nullptr;
 }
 
 ccInstance *ccInstance::CreateFromScript(PScript scri)
 {
-    return CreateEx(scri, nullptr);
+    return CreateEx(std::move(scri), nullptr);
 }
 
 ccInstance *ccInstance::CreateEx(PScript scri, ccInstance * joined)
 {
     // allocate and copy all the memory with data, code and strings across
     ccInstance *cinst = new ccInstance();
-    if (!cinst->_Create(scri, joined))
+    if (!cinst->_Create(std::move(scri), joined))
     {
         delete cinst;
         return nullptr;
@@ -304,14 +305,14 @@ void ccInstance::AbortAndDestroy()
 }
 
 #define ASSERT_STACK_SPACE_AVAILABLE(N) \
-    if (registers[SREG_SP].RValue + N - &stack[0] >= CC_STACK_SIZE) \
+    if (registers[SREG_SP].RValue + (N) - &stack[0] >= CC_STACK_SIZE) \
     { \
         cc_error("stack overflow"); \
         return -1; \
     }
 
 #define ASSERT_STACK_SIZE(N) \
-    if (registers[SREG_SP].RValue - N < &stack[0]) \
+    if (registers[SREG_SP].RValue - (N) < &stack[0]) \
     { \
         cc_error("stack underflow"); \
         return -1; \
@@ -1768,7 +1769,7 @@ bool ccInstance::CreateGlobalVars(const ccScript *scri)
     return true;
 }
 
-bool ccInstance::AddGlobalVar(const ScriptVariable &glvar)
+bool ccInstance::AddGlobalVar(const ScriptVariable &glvar) const
 {
     // NOTE:
     // We suppress the error here, because unfortunately at least one existing
@@ -1786,7 +1787,7 @@ bool ccInstance::AddGlobalVar(const ScriptVariable &glvar)
     return true;
 }
 
-ScriptVariable *ccInstance::FindGlobalVar(int32_t var_addr)
+ScriptVariable *ccInstance::FindGlobalVar(int32_t var_addr) const
 {
     // NOTE: see comment for AddGlobalVar()
     if (var_addr < 0 || var_addr >= globaldatasize)
@@ -1873,7 +1874,7 @@ bool ccInstance::CreateRuntimeCodeFixups(const ccScript *scri)
     return true;
 }
 
-bool ccInstance::ResolveImportFixups(const ccScript *scri)
+bool ccInstance::ResolveImportFixups(const ccScript *scri) const
 {
     for (int fixup_idx = 0; fixup_idx < scri->numfixups; ++fixup_idx)
     {
@@ -2053,7 +2054,7 @@ void ccInstance::PopDataFromStack(int32_t num_bytes)
     }
 }
 
-RuntimeScriptValue ccInstance::GetStackPtrOffsetFw(int32_t fw_offset)
+RuntimeScriptValue ccInstance::GetStackPtrOffsetFw(int32_t fw_offset) const
 {
     int32_t total_off = 0;
     RuntimeScriptValue *stack_entry = &stack[0];

@@ -181,7 +181,7 @@ public:
 
     // Using resolved_imports[], resolve the IMPORT fixups
     // Also change CALLEXT op-codes to CALLAS when they pertain to a script instance 
-    bool    ResolveImportFixups(const ccScript *scri);
+    bool    ResolveImportFixups(const ccScript *scri) const;
 
 private:
     bool    _Create(PScript scri, ccInstance * joined);
@@ -189,8 +189,8 @@ private:
     void    Free();
 
     bool    CreateGlobalVars(const ccScript *scri);
-    bool    AddGlobalVar(const ScriptVariable &glvar);
-    ScriptVariable *FindGlobalVar(int32_t var_addr);
+    bool    AddGlobalVar(const ScriptVariable &glvar) const;
+    ScriptVariable *FindGlobalVar(int32_t var_addr) const;
     bool    CreateRuntimeCodeFixups(const ccScript *scri);
 	//bool    ReadOperation(ScriptOperation &op, int32_t at_pc);
 
@@ -212,14 +212,14 @@ private:
     void    PopDataFromStack(int32_t num_bytes);
     // Return stack ptr at given offset from stack head;
     // Offset is in data bytes; program stack ptr is __not__ changed
-    RuntimeScriptValue GetStackPtrOffsetFw(int32_t fw_offset);
+    RuntimeScriptValue GetStackPtrOffsetFw(int32_t fw_offset) const;
     // Return stack ptr at given offset from stack tail;
     // Offset is in data bytes; program stack ptr is __not__ changed
     RuntimeScriptValue GetStackPtrOffsetRw(int32_t rw_offset);
 
     // Function call stack processing
-    void    PushToFuncCallStack(FunctionCallStack &func_callstack, const RuntimeScriptValue &rval);
-    void    PopFromFuncCallStack(FunctionCallStack &func_callstack, int32_t num_entries);
+    static void    PushToFuncCallStack(FunctionCallStack &func_callstack, const RuntimeScriptValue &rval);
+    static void    PopFromFuncCallStack(FunctionCallStack &func_callstack, int32_t num_entries);
 
     // Minimal timeout: how much time may pass without any engine update
     // before we want to check on the situation and do system poll
