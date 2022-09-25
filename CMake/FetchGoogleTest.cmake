@@ -34,7 +34,7 @@ if(NOT googletest_content_POPULATED)
     FetchContent_Populate(googletest_content)
     # For Windows: Prevent overriding the parent project's compiler/linker settings
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    add_subdirectory(${googletest_content_SOURCE_DIR} ${googletest_content_BINARY_DIR} EXCLUDE_FROM_ALL)
+    add_subdirectory("${googletest_content_SOURCE_DIR}" "${googletest_content_BINARY_DIR}" EXCLUDE_FROM_ALL)
 endif()
 
 if(LINUX_OLD_GCC)

@@ -194,7 +194,7 @@ if(EMSCRIPTEN)
 
     add_compile_options(-fexceptions)
 
-    include_directories(${CMAKE_SOURCE_DIR}/include ${SDL2_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} ${VORBIS_INCLUDE_DIRS} ${OGG_INCLUDE_DIRS})
+    include_directories("${CMAKE_SOURCE_DIR}"/include "${SDL2_INCLUDE_DIRS}" "${FREETYPE_INCLUDE_DIRS}" "${VORBIS_INCLUDE_DIRS}" "${OGG_INCLUDE_DIRS}")
 
     message( "Emscripten configured\nCMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}\nCMAKE_C_FLAGS: ${CMAKE_C_FLAGS}\nCMAKE_EXE_LINKER_FLAGS: ${CMAKE_EXE_LINKER_FLAGS}\n" )
 endif(EMSCRIPTEN)
@@ -342,5 +342,5 @@ endif()
 
 if(AGS_BUILD_ENGINE)
     add_subdirectory(Engine)
-    set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ags)
+    set_property(DIRECTORY "${PROJECT_SOURCE_DIR}" PROPERTY VS_STARTUP_PROJECT ags)
 endif()

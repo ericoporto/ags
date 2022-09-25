@@ -220,7 +220,7 @@ if(AGS_DEBUG_SPRITECACHE)
 endif()
 
 get_target_property(COMMON_SOURCES common SOURCES)
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "Source Files" FILES ${COMMON_SOURCES})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" PREFIX "Source Files" FILES ${COMMON_SOURCES})
 
 add_library(AGS::Common ALIAS common)
 

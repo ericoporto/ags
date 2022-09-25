@@ -582,7 +582,7 @@ endif()
 
 get_target_property(ENGINE_SOURCES engine SOURCES)
 # Set ROOT to parent directory to include Plugins/
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/.. PREFIX "Source Files" FILES ${ENGINE_SOURCES})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/.." PREFIX "Source Files" FILES ${ENGINE_SOURCES})
 
 # Standalone exe
 # -----------------------------------------------------------------------------
@@ -608,7 +608,7 @@ target_sources(ags
     main/main_sdl2.cpp
 )
 
-target_link_libraries(ags PRIVATE engine ${SDL2MAIN_LIBRARY})
+target_link_libraries(ags PRIVATE engine "${SDL2MAIN_LIBRARY}")
 
 if (LINUX)
     # We may override `allegro_icon` and `load_midi_pf` depending on the version
@@ -617,7 +617,7 @@ endif ()
 
 set_target_properties(ags PROPERTIES
     RUNTIME_OUTPUT_NAME ags
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
 )
 
 if (WIN32)
