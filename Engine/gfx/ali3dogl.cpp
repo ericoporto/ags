@@ -765,7 +765,7 @@ bool OGLGraphicsDriver::SetDisplayMode(const DisplayMode &mode)
       if(!FirstTimeInit()) return false;
     InitGlParams(mode);
   }
-  catch (Ali3DException exception)
+  catch (Ali3DException& exception)
   {
     SDL_SetError("%s", exception.Message.GetCStr());
     return false;

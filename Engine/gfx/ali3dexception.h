@@ -18,6 +18,8 @@
 #ifndef __AGS_EE_GFX__ALI3DEXCEPTION_H
 #define __AGS_EE_GFX__ALI3DEXCEPTION_H
 
+#include <exception>
+#include <utility>
 #include "util/string.h"
 
 namespace AGS
@@ -25,12 +27,11 @@ namespace AGS
 namespace Engine
 {
 
-class Ali3DException
-{
+class Ali3DException : public std::exception {
 public:
-    Ali3DException(const AGS::Common::String &message)
-        : Message(message)
-    {
+    explicit Ali3DException(AGS::Common::String message) : Message(std::move(message)) {}
+    AGS::Common::String  what () {
+        return Message;
     }
 
     const AGS::Common::String Message;

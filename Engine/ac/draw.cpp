@@ -504,7 +504,7 @@ void create_blank_image(int coldepth)
         blankSidebarImage = gfxDriver->CreateDDBFromBitmap(blank, false, true);
         delete blank;
     }
-    catch (Ali3DException gfxException)
+    catch (Ali3DException& gfxException)
     {
         quit(gfxException.Message.GetCStr());
     }
@@ -928,7 +928,7 @@ void render_to_screen()
             gfxDriver->Render(0, play.shake_screen_yoff, (GraphicFlip)play.screen_flipped);
             succeeded = true;
         }
-        catch (Ali3DFullscreenLostException e) 
+        catch (Ali3DFullscreenLostException& e)
         {
             Debug::Printf("Renderer exception: %s", e.Message.GetCStr());
             while (game_update_suspend && (!want_exit) && (!abort_engine))
