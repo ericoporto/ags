@@ -917,22 +917,28 @@ void render_to_screen()
     gfxDriver->SetVsync((scsystem.vsync > 0) && (!scsystem.windowed));
 
     bool succeeded = false;
+    Debug::Printf("render_to_screen: will while (!succeeded<%d> && !want_exit<%d> && !abort_engine<%d>)", succeeded, want_exit, abort_engine);
     while (!succeeded && !want_exit && !abort_engine)
     {
         try
         {
             // For software renderer, need to blacken upper part of the game frame when shaking screen moves image down
             const Rect &viewport = play.GetMainViewport();
-            if (play.shake_screen_yoff > 0 && !gfxDriver->RequiresFullRedrawEachFrame())
+            if (play.shake_screen_yoff > 0 && !gfxDriver->RequiresFullRedrawEachFrame()) {
+                Debug::Printf("render_to_screen: gfxDriver->ClearRectangle()");
                 gfxDriver->ClearRectangle(viewport.Left, viewport.Top, viewport.GetWidth() - 1, play.shake_screen_yoff, nullptr);
+            }
+            Debug::Printf("render_to_screen: gfxDriver->Render()");
             gfxDriver->Render(0, play.shake_screen_yoff, (GraphicFlip)play.screen_flipped);
             succeeded = true;
         }
         catch (Ali3DFullscreenLostException e) 
         {
             Debug::Printf("Renderer exception: %s", e.Message.GetCStr());
+            Debug::Printf("render_to_screen: will while (game_update_suspend<%d> && !want_exit<%d> && !abort_engine<%d>)", game_update_suspend, want_exit, abort_engine);
             while (game_update_suspend && (!want_exit) && (!abort_engine))
             {
+                Debug::Printf("render_to_screen: sys_evt_process_pending()");
                 sys_evt_process_pending();
                 platform->Delay(300);
             }
