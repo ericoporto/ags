@@ -409,25 +409,34 @@ void D3DGraphicsDriver::SetGamma(int newGamma)
 void D3DGraphicsDriver::ResetDeviceIfNecessary()
 {
   HRESULT hr = direct3ddevice->TestCooperativeLevel();
+
+  Debug::Printf("ResetDeviceIfNecessary: %x = direct3ddevice->TestCooperativeLevel()", hr);
   if (hr == D3DERR_DEVICELOST)
   {
+    Debug::Printf("ResetDeviceIfNecessary: throw Ali3DFullscreenLostException()");
     throw Ali3DFullscreenLostException();
   }
 
   if (hr == D3DERR_DEVICENOTRESET)
   {
     hr = ResetD3DDevice();
+    Debug::Printf("ResetDeviceIfNecessary: after %x (0x%08X) = ResetD3DDevice()", hr, hr);
     if (hr != D3D_OK)
     {
+      Debug::Printf("ResetDeviceIfNecessary: throw Ali3DException()");
+      Debug::Printf("threw IDirect3DDevice9::Reset: failed: error code: 0x%08X", hr);
       throw Ali3DException(String::FromFormat("IDirect3DDevice9::Reset: failed: error code: 0x%08X", hr));
     }
 
+    Debug::Printf("ResetDeviceIfNecessary: InitializeD3DState()");
     InitializeD3DState();
+    Debug::Printf("ResetDeviceIfNecessary: CreateVirtualScreen()");
     CreateVirtualScreen();
     direct3ddevice->SetGammaRamp(0, D3DSGR_NO_CALIBRATION, &currentgammaramp);
   }
   else if (hr != D3D_OK)
   {
+    Debug::Printf("threw IDirect3DDevice9::TestCooperativeLevel: failed: error code: 0x%08X", hr);
     throw Ali3DException(String::FromFormat("IDirect3DDevice9::TestCooperativeLevel: failed: error code: 0x%08X", hr));
   }
 }
