@@ -1330,6 +1330,7 @@ void display_switch_in_resume()
             ch->resume();
         }
     }
+    Debug::Printf("display_switch_in_resume: video_resume()");
     video_resume();
 
     // release render targets if switching back to the full screen mode;
@@ -1337,12 +1338,16 @@ void display_switch_in_resume()
     if (gfxDriver && gfxDriver->GetDisplayMode().IsRealFullscreen())
         release_drawobj_rendertargets();
     // clear the screen if necessary
-    if (gfxDriver && gfxDriver->UsesMemoryBackBuffer())
+    if (gfxDriver && gfxDriver->UsesMemoryBackBuffer()) {
+        Debug::Printf("display_switch_in_resume: before gfxDriver->ClearRectangle(0, 0, %d, %d)", game.GetGameRes().Width - 1, game.GetGameRes().Height - 1);
         gfxDriver->ClearRectangle(0, 0, game.GetGameRes().Width - 1, game.GetGameRes().Height - 1, nullptr);
+        Debug::Printf("display_switch_in_resume: after gfxDriver->ClearRectangle(0, 0, %d, %d)", game.GetGameRes().Width - 1, game.GetGameRes().Height - 1);
+    }
 
     // TODO: find out if anything has to be done here for SDL backend
 
     platform->ResumeApplication();
+    Debug::Printf("display_switch_in_resume: game_update_suspend = false");
     game_update_suspend = false;
 }
 
