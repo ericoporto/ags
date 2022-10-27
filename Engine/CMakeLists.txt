@@ -525,6 +525,9 @@ if (AGS_BUILTIN_PLUGINS)
         ../Plugins/agspalrender/ags_palrender.cpp
         ../Plugins/agspalrender/raycast.cpp
         ../Plugins/agspalrender/raycast.h
+
+        ../Plugins/agswaves/agswaves.cpp
+        ../Plugins/agswaves/agswaves.h
     )
 endif()
 

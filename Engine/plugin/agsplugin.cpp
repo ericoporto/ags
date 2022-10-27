@@ -80,6 +80,7 @@ using namespace AGS::Engine;
 #include "../Plugins/ags_parallax/ags_parallax.h"
 #include "../Plugins/agspalrender/agspalrender.h"
 #include "../Plugins/AGSSpriteFont/AGSSpriteFont/AGSSpriteFont.h"
+#include "../Plugins/agswaves/agswaves.h"
 #if AGS_PLATFORM_OS_IOS
 #include "../Plugins/agstouch/agstouch.h"
 #endif // AGS_PLATFORM_OS_IOS
@@ -979,6 +980,15 @@ bool pl_use_builtin_plugin(EnginePlugin* apl)
         apl->engineStartup = agsspritefont::AGS_EngineStartup;
         apl->engineShutdown = agsspritefont::AGS_EngineShutdown;
         apl->onEvent = agsspritefont::AGS_EngineOnEvent;
+        apl->available = true;
+        apl->builtin = true;
+        return true;
+    }
+    else if (apl->filename.CompareNoCase("agswaves") == 0)
+    {
+        apl->engineStartup = agswaves::AGS_EngineStartup;
+        apl->engineShutdown = agswaves::AGS_EngineShutdown;
+        apl->onEvent = agswaves::AGS_EngineOnEvent;
         apl->available = true;
         apl->builtin = true;
         return true;
