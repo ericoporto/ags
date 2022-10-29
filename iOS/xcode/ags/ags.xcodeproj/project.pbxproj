@@ -165,7 +165,6 @@
 		20A7BAEA28FC469B004B893D /* unicode.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6E228FC4692004B893D /* unicode.c */; };
 		20A7BAEB28FC469B004B893D /* blit.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6E328FC4692004B893D /* blit.c */; };
 		20A7BAEC28FC469B004B893D /* math.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6E428FC4692004B893D /* math.c */; };
-		20A7BAED28FC469B004B893D /* pcx.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6E528FC4692004B893D /* pcx.c */; };
 		20A7BAEE28FC469B004B893D /* fli.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6E628FC4692004B893D /* fli.c */; };
 		20A7BAEF28FC469B004B893D /* rotate.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6E728FC4692004B893D /* rotate.c */; };
 		20A7BAF028FC469B004B893D /* flood.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6E828FC4692004B893D /* flood.c */; };
@@ -179,12 +178,10 @@
 		20A7BAFA28FC469B004B893D /* quantize.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6F428FC4692004B893D /* quantize.c */; };
 		20A7BAFB28FC469B004B893D /* colblend.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6F528FC4692004B893D /* colblend.c */; };
 		20A7BAFC28FC469B004B893D /* dither.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6F628FC4692004B893D /* dither.c */; };
-		20A7BAFD28FC469B004B893D /* dataregi.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6F728FC4692004B893D /* dataregi.c */; };
 		20A7BAFE28FC469B004B893D /* allegro.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6F828FC4692004B893D /* allegro.c */; };
 		20A7BAFF28FC469B004B893D /* vtable15.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6F928FC4692004B893D /* vtable15.c */; };
 		20A7BB0028FC469B004B893D /* readbmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6FA28FC4692004B893D /* readbmp.c */; };
 		20A7BB0128FC469B004B893D /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6FB28FC4692004B893D /* file.c */; };
-		20A7BB0228FC469B004B893D /* bmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6FC28FC4692004B893D /* bmp.c */; };
 		20A7BB0328FC469B004B893D /* vtable8.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B6FD28FC4692004B893D /* vtable8.c */; };
 		20A7BB0428FC469B004B893D /* cspr8.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B70028FC4692004B893D /* cspr8.c */; };
 		20A7BB0528FC469B004B893D /* cspr16.c in Sources */ = {isa = PBXBuildFile; fileRef = 20A7B70128FC4692004B893D /* cspr16.c */; };
@@ -836,7 +833,6 @@
 		20A7B47428FC4689004B893D /* decint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = decint.h; sourceTree = "<group>"; };
 		20A7B47528FC4689004B893D /* dequant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dequant.h; sourceTree = "<group>"; };
 		20A7B6C128FC4691004B893D /* allegro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allegro.h; sourceTree = "<group>"; };
-		20A7B6C328FC4691004B893D /* datafile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = datafile.h; sourceTree = "<group>"; };
 		20A7B6C428FC4691004B893D /* debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = debug.h; sourceTree = "<group>"; };
 		20A7B6C528FC4691004B893D /* fixed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fixed.h; sourceTree = "<group>"; };
 		20A7B6C628FC4691004B893D /* file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = file.h; sourceTree = "<group>"; };
@@ -862,7 +858,6 @@
 		20A7B6E228FC4692004B893D /* unicode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unicode.c; sourceTree = "<group>"; };
 		20A7B6E328FC4692004B893D /* blit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = blit.c; sourceTree = "<group>"; };
 		20A7B6E428FC4692004B893D /* math.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = math.c; sourceTree = "<group>"; };
-		20A7B6E528FC4692004B893D /* pcx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pcx.c; sourceTree = "<group>"; };
 		20A7B6E628FC4692004B893D /* fli.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fli.c; sourceTree = "<group>"; };
 		20A7B6E728FC4692004B893D /* rotate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rotate.c; sourceTree = "<group>"; };
 		20A7B6E828FC4692004B893D /* flood.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flood.c; sourceTree = "<group>"; };
@@ -876,12 +871,10 @@
 		20A7B6F428FC4692004B893D /* quantize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = quantize.c; sourceTree = "<group>"; };
 		20A7B6F528FC4692004B893D /* colblend.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = colblend.c; sourceTree = "<group>"; };
 		20A7B6F628FC4692004B893D /* dither.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dither.c; sourceTree = "<group>"; };
-		20A7B6F728FC4692004B893D /* dataregi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dataregi.c; sourceTree = "<group>"; };
 		20A7B6F828FC4692004B893D /* allegro.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = allegro.c; sourceTree = "<group>"; };
 		20A7B6F928FC4692004B893D /* vtable15.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vtable15.c; sourceTree = "<group>"; };
 		20A7B6FA28FC4692004B893D /* readbmp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = readbmp.c; sourceTree = "<group>"; };
 		20A7B6FB28FC4692004B893D /* file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = file.c; sourceTree = "<group>"; };
-		20A7B6FC28FC4692004B893D /* bmp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bmp.c; sourceTree = "<group>"; };
 		20A7B6FD28FC4692004B893D /* vtable8.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vtable8.c; sourceTree = "<group>"; };
 		20A7B6FF28FC4692004B893D /* cblit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cblit.h; sourceTree = "<group>"; };
 		20A7B70028FC4692004B893D /* cspr8.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cspr8.c; sourceTree = "<group>"; };
@@ -2184,7 +2177,6 @@
 		20A7B6C228FC4691004B893D /* allegro */ = {
 			isa = PBXGroup;
 			children = (
-				20A7B6C328FC4691004B893D /* datafile.h */,
 				20A7B6C428FC4691004B893D /* debug.h */,
 				20A7B6C528FC4691004B893D /* fixed.h */,
 				20A7B6C628FC4691004B893D /* file.h */,
@@ -2241,7 +2233,6 @@
 				20A7B6E228FC4692004B893D /* unicode.c */,
 				20A7B6E328FC4692004B893D /* blit.c */,
 				20A7B6E428FC4692004B893D /* math.c */,
-				20A7B6E528FC4692004B893D /* pcx.c */,
 				20A7B6E628FC4692004B893D /* fli.c */,
 				20A7B6E728FC4692004B893D /* rotate.c */,
 				20A7B6E828FC4692004B893D /* flood.c */,
@@ -2255,12 +2246,10 @@
 				20A7B6F428FC4692004B893D /* quantize.c */,
 				20A7B6F528FC4692004B893D /* colblend.c */,
 				20A7B6F628FC4692004B893D /* dither.c */,
-				20A7B6F728FC4692004B893D /* dataregi.c */,
 				20A7B6F828FC4692004B893D /* allegro.c */,
 				20A7B6F928FC4692004B893D /* vtable15.c */,
 				20A7B6FA28FC4692004B893D /* readbmp.c */,
 				20A7B6FB28FC4692004B893D /* file.c */,
-				20A7B6FC28FC4692004B893D /* bmp.c */,
 				20A7B6FD28FC4692004B893D /* vtable8.c */,
 				20A7B6FE28FC4692004B893D /* c */,
 				20A7B71728FC4692004B893D /* vtable24.c */,
@@ -3541,7 +3530,6 @@
 				20A7B7A628FC4694004B893D /* bitwise.c in Sources */,
 				526F20FC1D3B513400EF4E1F /* agsplugin.cpp in Sources */,
 				20A7B94528FC4697004B893D /* sndfile.c in Sources */,
-				20A7BAFD28FC469B004B893D /* dataregi.c in Sources */,
 				526F20061D3B513400EF4E1F /* global_region.cpp in Sources */,
 				20A7B0FE28FB7DF5004B893D /* stdio_compat.c in Sources */,
 				20A7B9DB28FC4698004B893D /* huffdec.c in Sources */,
@@ -3562,7 +3550,6 @@
 				526F20CF1D3B513400EF4E1F /* engine.cpp in Sources */,
 				1D3623260D0F684500981E51 /* agsAppDelegate.mm in Sources */,
 				20A7AD5228FB7BC5004B893D /* roomstruct.cpp in Sources */,
-				20A7BAED28FC469B004B893D /* pcx.c in Sources */,
 				526F20DA1D3B513400EF4E1F /* ambientsound.cpp in Sources */,
 				20A7B10228FB7DF5004B893D /* aasset_stream.cpp in Sources */,
 				20A7B0C228FB7C7A004B893D /* ftbase.c in Sources */,
@@ -3590,7 +3577,6 @@
 				28EC4C5911D54ECE0027AA9F /* agsViewController.mm in Sources */,
 				526F20491D3B513400EF4E1F /* color_engine.cpp in Sources */,
 				20A7BAF028FC469B004B893D /* flood.c in Sources */,
-				20A7BB0228FC469B004B893D /* bmp.c in Sources */,
 				526F20101D3B513400EF4E1F /* global_viewport.cpp in Sources */,
 				526F20551D3B513400EF4E1F /* gui_engine.cpp in Sources */,
 				526F1C741D3B50B900EF4E1F /* guitextbox.cpp in Sources */,
