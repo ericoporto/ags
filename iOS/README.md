@@ -21,7 +21,7 @@ The SDL2 Framework for iOS is not yet provided as release artifacts, so you have
 1. Download **SDL** and extract it to a directory of your choice
 2. Start **Xcode** and open the SDL project in `Xcode/SDL/SDL.xcodeproj`
 3. In the Xcode title menu, go in **Product**, **Scheme**, **Choose Scheme** and  select **Framework-iOS**
-4. Still in **Product**, go in **Destination** and select **Any iOS Device (arm64)** or select **Any Mac (Mac Catalyst, Apple Silicon, Intel)** if you are still going to test in a simulator.
+4. Still in **Product**, go in **Destination** and select **Any iOS Device (arm64)** or select one of the **iOS Simulators** target (e.g. iPhone 14) if you are still going to test in a simulator.
 5. Now in **Product**, **Archive** should be available, hit it to build the xcFramework
 6. Wait for the build to finish, when it's done, in the window that appears, make sure the selected archive is the one you just build and click **Distribute Content**
 7. Now click in **Built Products** and save it somewhere you remember.
