@@ -95,10 +95,6 @@ OGLGraphicsDriver::OGLGraphicsDriver()
 {
   device_screen_physical_width  = 0;
   device_screen_physical_height = 0;
-#if AGS_PLATFORM_OS_IOS
-  device_screen_physical_width  = ios_screen_physical_width;
-  device_screen_physical_height = ios_screen_physical_height;
-#endif
 
   _firstTimeInit = false;
   _backbuffer = 0;
@@ -273,7 +269,7 @@ void OGLGraphicsDriver::InitGlParams(const DisplayMode &mode)
   if (mode.Vsync && !_capsVsync)
     Debug::Printf(kDbgMsg_Warn, "OGL: SetVsync (%d) failed: %s", mode.Vsync, SDL_GetError());
 
-#if AGS_PLATFORM_OS_IOS
+#if 0
   // Setup library mouse to have 1:1 coordinate transformation.
   // NOTE: cannot move this call to general mouse handling mode. Unfortunately, much of the setup and rendering
   // is duplicated in the Android/iOS ports' Allegro library patches, and is run when the Software renderer
@@ -1227,11 +1223,7 @@ void OGLGraphicsDriver::_render(bool clearDrawListAfterwards)
     glUniform1f(program.Alpha, 1.0f);
 
     // Texture is ready, now create rectangle in the world space and draw texture upon it
-#if AGS_PLATFORM_OS_IOS
-    ios_select_buffer();
-#else
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-#endif
 
     glViewport(_viewportRect.Left, _viewportRect.Top, _viewportRect.GetWidth(), _viewportRect.GetHeight());
 
