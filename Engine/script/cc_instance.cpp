@@ -591,6 +591,17 @@ int ccInstance::Run(int32_t curpc)
           if (new_line_hook)
               new_line_hook(this, currentline);
           break;
+      case SCMD_LITTOREG:
+          reg1 = arg2;
+          break;
+      case SCMD_MEMREAD:
+          // Take the data address from reg[MAR] and copy int32_t to reg[arg1]
+          reg1 = registers[SREG_MAR].ReadValue();
+          break;
+      case SCMD_MEMWRITE:
+          // Take the data address from reg[MAR] and copy there int32_t from reg[arg1]
+          registers[SREG_MAR].WriteValue(reg1);
+          break;
       case SCMD_ADD:
           // If the the register is SREG_SP, we are allocating new variable on the stack
           if (arg1.IValue == SREG_SP)
@@ -688,17 +699,6 @@ int ccInstance::Run(int32_t curpc)
           POP_CALL_STACK;
           continue; // continue so that the PC doesn't get overwritten
           }
-      case SCMD_LITTOREG:
-          reg1 = arg2;
-          break;
-      case SCMD_MEMREAD:
-          // Take the data address from reg[MAR] and copy int32_t to reg[arg1]
-          reg1 = registers[SREG_MAR].ReadValue();
-          break;
-      case SCMD_MEMWRITE:
-          // Take the data address from reg[MAR] and copy there int32_t from reg[arg1]
-          registers[SREG_MAR].WriteValue(reg1);
-          break;
       case SCMD_LOADSPOFFS:
           registers[SREG_MAR] = GetStackPtrOffsetRw(arg1.IValue);
           if (cc_has_error())
