@@ -30,10 +30,7 @@ void ccSetOption(int optbit, int onoroff)
 
 int ccGetOption(int optbit)
 {
-    if (ccCompOptions & optbit)
-        return 1;
-
-    return 0;
+    return (ccCompOptions & optbit) ? 1 : 0;
 }
 
 // Returns current running script callstack as a human-readable text
@@ -74,7 +71,7 @@ void cc_error(const char *descr, ...)
     // we have to use project-dependent function to format the final message
     ccError.ErrorString = cc_format_error(displbuf);
     ccError.CallStack = cc_get_callstack();
-    ccError.HasError = 1;
+    ccError.HasError = true;
     ccError.Line = currentline;
 }
 
