@@ -257,9 +257,8 @@ int create_global_script() {
     }
 
     // Resolve the script imports after all the scripts have been loaded 
-    for (size_t instance_idx = 0; instance_idx < instances_for_resolving.size(); instance_idx++)
+    for (auto inst : instances_for_resolving)
     {
-        auto inst = instances_for_resolving[instance_idx];
         if (!inst->ResolveScriptImports(inst->instanceof.get()))
             return kscript_create_error;
         if (!inst->ResolveImportFixups(inst->instanceof.get()))
@@ -662,9 +661,9 @@ InteractionVariable *FindGraphicalVariable(const char *varName) {
         if (globalvars[ii].Name.CompareNoCase(varName) == 0)
             return &globalvars[ii];
     }
-    for (size_t i = 0; i < thisroom.LocalVariables.size(); ++i) {
-        if (thisroom.LocalVariables[i].Name.CompareNoCase(varName) == 0)
-            return &thisroom.LocalVariables[i];
+    for (auto & LocalVariable : thisroom.LocalVariables) {
+        if (LocalVariable.Name.CompareNoCase(varName) == 0)
+            return &LocalVariable;
     }
     return nullptr;
 }
