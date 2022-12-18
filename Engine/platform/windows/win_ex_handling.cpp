@@ -24,6 +24,7 @@
 #include "platform/base/sys_main.h"
 #include "platform/windows/windows.h"
 #include "script/cc_common.h"
+#include <Psapi.h>
 
 #if !AGS_PLATFORM_DEBUG
 #define USE_CUSTOM_EXCEPTION_HANDLER
@@ -36,7 +37,7 @@ extern int eip_guinum;
 extern int eip_guiobj;
 extern int proper_exit;
 
-char tempmsg[100];
+char tempmsg[2048] = "";
 #define PRINT_WORKSPACE_SIZE (7000u)
 char *printfworkingspace;
 
@@ -81,11 +82,24 @@ int initialize_engine_with_exception_handling(
 
 int malloc_fail_handler(size_t amountwanted)
 {
+    char *cur = tempmsg, * const end = tempmsg + sizeof tempmsg;
 #ifdef USE_CUSTOM_EXCEPTION_HANDLER
     CreateMiniDump(NULL);
 #endif
     free(printfworkingspace);
-    snprintf(tempmsg, sizeof(tempmsg), "Out of memory: failed to allocate %ld bytes (at PP=%d)", amountwanted, our_eip);
+    PROCESS_MEMORY_COUNTERS pmc;
+    BOOL result = GetProcessMemoryInfo(GetCurrentProcess(),
+                                       &pmc,
+                                       sizeof( pmc ));
+    cur += snprintf(cur, end-cur, "Out of memory: failed to allocate %zu bytes (at PP=%d)", amountwanted, our_eip);
+    cur += snprintf(cur, end-cur, "\tWorkingSetSize: %lu kB (0x%08lX)\n", pmc.WorkingSetSize / 1024, pmc.WorkingSetSize);
+    cur += snprintf(cur, end-cur, "\tQuotaPeakPagedPoolUsage: %lu kB (0x%08lX)\n", pmc.QuotaPeakPagedPoolUsage / 1024, pmc.QuotaPeakPagedPoolUsage);
+    cur += snprintf(cur, end-cur, "\tQuotaPagedPoolUsage: %lu kB (0x%08lX)\n", pmc.QuotaPagedPoolUsage / 1024, pmc.QuotaPagedPoolUsage);
+    cur += snprintf(cur, end-cur, "\tQuotaPeakNonPagedPoolUsage: %lu kB (0x%08lX)\n", pmc.QuotaPeakNonPagedPoolUsage / 1024, pmc.QuotaPeakNonPagedPoolUsage);
+    cur += snprintf(cur, end-cur, "\tQuotaNonPagedPoolUsage: %lu kB (0x%08lX)\n", pmc.QuotaNonPagedPoolUsage / 1024, pmc.QuotaNonPagedPoolUsage);
+    cur += snprintf(cur, end-cur, "\tPagefileUsage: %lu kB (0x%08lX)\n", pmc.PagefileUsage  / 1024, pmc.PagefileUsage);
+    cur += snprintf(cur, end-cur, "\tPeakPagefileUsage: %lu kB (0x%08lX)\n", pmc.PeakPagefileUsage / 1024, pmc.PeakPagefileUsage);
+    cur += snprintf(cur, end-cur, "\tcb: 0x%08lX - %lu\n", pmc.cb , pmc.cb / 1024);
     quit(tempmsg);
     return 0;
 }
