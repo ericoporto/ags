@@ -220,7 +220,7 @@ unsigned ccInstance::_maxWhileLoops = 0u;
 
 ccInstance *ccInstance::GetCurrentInstance()
 {
-    return InstThreads.size() > 0 ? InstThreads.back() : nullptr;
+    return !InstThreads.empty() ? InstThreads.back() : nullptr;
 }
 
 ccInstance *ccInstance::CreateFromScript(PScript scri)
@@ -1786,7 +1786,7 @@ bool ccInstance::AddGlobalVar(const ScriptVariable &glvar)
     return true;
 }
 
-ScriptVariable *ccInstance::FindGlobalVar(int32_t var_addr)
+ScriptVariable *ccInstance::FindGlobalVar(int32_t var_addr) const
 {
     // NOTE: see comment for AddGlobalVar()
     if (var_addr < 0 || var_addr >= globaldatasize)
@@ -2053,7 +2053,7 @@ void ccInstance::PopDataFromStack(int32_t num_bytes)
     }
 }
 
-RuntimeScriptValue ccInstance::GetStackPtrOffsetFw(int32_t fw_offset)
+RuntimeScriptValue ccInstance::GetStackPtrOffsetFw(int32_t fw_offset) const
 {
     int32_t total_off = 0;
     RuntimeScriptValue *stack_entry = &stack[0];
@@ -2068,7 +2068,7 @@ RuntimeScriptValue ccInstance::GetStackPtrOffsetFw(int32_t fw_offset)
     if (total_off < fw_offset)
     {
         cc_error("accessing address beyond stack's tail");
-        return RuntimeScriptValue();
+        return {};
     }
     RuntimeScriptValue stack_ptr;
     stack_ptr.SetStackPtr(stack_entry);
@@ -2092,7 +2092,7 @@ RuntimeScriptValue ccInstance::GetStackPtrOffsetRw(int32_t rw_offset)
     if (total_off < rw_offset)
     {
         cc_error("accessing address before stack's head");
-        return RuntimeScriptValue();
+        return {};
     }
     RuntimeScriptValue stack_ptr;
     stack_ptr.SetStackPtr(stack_entry);

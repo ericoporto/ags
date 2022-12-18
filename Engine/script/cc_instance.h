@@ -135,9 +135,9 @@ public:
     int  returnValue;
 
     int  callStackSize;
-    int32_t callStackLineNumber[MAX_CALL_STACK];
-    int32_t callStackAddr[MAX_CALL_STACK];
-    ccInstance *callStackCodeInst[MAX_CALL_STACK];
+    int32_t callStackLineNumber[MAX_CALL_STACK]{};
+    int32_t callStackAddr[MAX_CALL_STACK]{};
+    ccInstance *callStackCodeInst[MAX_CALL_STACK]{};
 
     // array of real import indexes used in script
     uint32_t *resolved_imports;
@@ -190,7 +190,7 @@ private:
 
     bool    CreateGlobalVars(const ccScript *scri);
     bool    AddGlobalVar(const ScriptVariable &glvar);
-    ScriptVariable *FindGlobalVar(int32_t var_addr);
+    ScriptVariable *FindGlobalVar(int32_t var_addr) const;
     bool    CreateRuntimeCodeFixups(const ccScript *scri);
 	//bool    ReadOperation(ScriptOperation &op, int32_t at_pc);
 
@@ -212,7 +212,7 @@ private:
     void    PopDataFromStack(int32_t num_bytes);
     // Return stack ptr at given offset from stack head;
     // Offset is in data bytes; program stack ptr is __not__ changed
-    RuntimeScriptValue GetStackPtrOffsetFw(int32_t fw_offset);
+    RuntimeScriptValue GetStackPtrOffsetFw(int32_t fw_offset) const;
     // Return stack ptr at given offset from stack tail;
     // Offset is in data bytes; program stack ptr is __not__ changed
     RuntimeScriptValue GetStackPtrOffsetRw(int32_t rw_offset);
