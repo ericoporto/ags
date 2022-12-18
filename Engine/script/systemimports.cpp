@@ -45,7 +45,7 @@ uint32_t SystemImports::add(const String &name, const RuntimeScriptValue &value,
 
     btree[name] = ixof;
     if (ixof == imports.size())
-        imports.push_back(ScriptImport());
+        imports.emplace_back();
     imports[ixof].Name          = name;
     imports[ixof].Value         = value;
     imports[ixof].InstancePtr   = anotherscr;
@@ -115,7 +115,7 @@ String SystemImports::findName(const RuntimeScriptValue &value)
             return import.Name;
         }
     }
-    return String();
+    return {};
 }
 
 void SystemImports::RemoveScriptExports(ccInstance *inst)
