@@ -431,6 +431,60 @@ int ccInstance::CallScriptFunction(const char *funcname, int32_t numargs, const 
     return cc_has_error();
 }
 
+inline bool do_fixups(size_t pc_at, ScriptOperation &codeOp, ccInstance *codeInst, ccInstance &c_this)
+{
+    for (size_t i = 0; i < codeOp.ArgCount; ++i, ++pc_at)
+    {
+        char fixup = codeInst->code_fixups[pc_at];
+        switch (fixup)
+        {
+        case 0:
+            // should be a numeric literal (int32 or float)
+            codeOp.Args[i].SetInt32( (int32_t)codeInst->code[pc_at] );
+            continue;
+
+        case FIXUP_GLOBALDATA:
+            {
+                ScriptVariable *gl_var = (ScriptVariable*)codeInst->code[pc_at];
+                codeOp.Args[i].SetGlobalVar(&gl_var->RValue);
+            }
+            break;
+        case FIXUP_FUNCTION:
+            // originally commented -- CHECKME: could this be used in very old versions of AGS?
+            //      code[fixup] += (long)&code[0];
+            // This is a program counter value, presumably will be used as SCMD_CALL argument
+            codeOp.Args[i].SetInt32((int32_t)codeInst->code[pc_at]);
+            break;
+        case FIXUP_STRING:
+            codeOp.Args[i].SetStringLiteral(&codeInst->strings[0] + codeInst->code[pc_at]);
+            break;
+        case FIXUP_IMPORT:
+            {
+                const ScriptImport *import = simp.getByIndex(static_cast<uint32_t>(codeInst->code[pc_at]));
+                if (import)
+                {
+                    codeOp.Args[i] = import->Value;
+                }
+                else
+                {
+                    cc_error("cannot resolve import, key = %ld", codeInst->code[pc_at]);
+                    return true;
+                }
+            }
+            break;
+        case FIXUP_STACK:
+            codeOp.Args[i] = c_this.GetStackPtrOffsetFw((int32_t)codeInst->code[pc_at]);
+            break;
+        default:
+            cc_error("internal fixup type error: %d", fixup);
+            return true;
+        }
+        /* End FixupArgument */
+        //=====================================================================
+    }
+    return false;
+}
+
 // Macros to maintain the call stack
 #define PUSH_CALL_STACK \
     if (callStackSize >= MAX_CALL_STACK) { \
@@ -493,82 +547,23 @@ int ccInstance::Run(int32_t curpc)
         codeOp.Instruction.Code			= codeInst->code[pc];
         codeOp.Instruction.InstanceId	= (codeOp.Instruction.Code >> INSTANCE_ID_SHIFT) & INSTANCE_ID_MASK;
         codeOp.Instruction.Code		   &= INSTANCE_ID_REMOVEMASK; // now this is pure instruction code
-
+#ifdef DEBUG
         if (codeOp.Instruction.Code < 0 || codeOp.Instruction.Code >= CC_NUM_SCCMDS)
         {
             cc_error("invalid instruction %d found in code stream", codeOp.Instruction.Code);
             return -1;
         }
-
+#endif
         codeOp.ArgCount = sccmd_info[codeOp.Instruction.Code].ArgCount;
+#ifdef DEBUG
         if (pc + codeOp.ArgCount >= codeInst->codesize)
         {
             cc_error("unexpected end of code data (%d; %d)", pc + codeOp.ArgCount, codeInst->codesize);
             return -1;
         }
+#endif
 
-        int pc_at = pc + 1;
-        for (int i = 0; i < codeOp.ArgCount; ++i, ++pc_at)
-        {
-            char fixup = codeInst->code_fixups[pc_at];
-            if (fixup > 0)
-            {
-                // could be relative pointer or import address
-                /*
-                if (!FixupArgument(code[pc], fixup, codeOp.Args[i]))
-                {
-                    return -1;
-                }
-                */
-                /* FixupArgument */
-                //=====================================================================
-                switch (fixup)
-                {
-                case FIXUP_GLOBALDATA:
-                    {
-                        ScriptVariable *gl_var = (ScriptVariable*)codeInst->code[pc_at];
-                        codeOp.Args[i].SetGlobalVar(&gl_var->RValue);
-                    }
-                    break;
-                case FIXUP_FUNCTION:
-                    // originally commented -- CHECKME: could this be used in very old versions of AGS?
-                    //      code[fixup] += (long)&code[0];
-                    // This is a program counter value, presumably will be used as SCMD_CALL argument
-                    codeOp.Args[i].SetInt32((int32_t)codeInst->code[pc_at]);
-                    break;
-                case FIXUP_STRING:
-                    codeOp.Args[i].SetStringLiteral(&codeInst->strings[0] + codeInst->code[pc_at]);
-                    break;
-                case FIXUP_IMPORT:
-                    {
-                        const ScriptImport *import = simp.getByIndex(static_cast<uint32_t>(codeInst->code[pc_at]));
-                        if (import)
-                        {
-                            codeOp.Args[i] = import->Value;
-                        }
-                        else
-                        {
-                            cc_error("cannot resolve import, key = %ld", codeInst->code[pc_at]);
-                            return -1;
-                        }
-                    }
-                    break;
-                case FIXUP_STACK:
-                    codeOp.Args[i] = GetStackPtrOffsetFw((int32_t)codeInst->code[pc_at]);
-                    break;
-                default:
-                    cc_error("internal fixup type error: %d", fixup);
-                    return -1;
-                }
-                /* End FixupArgument */
-                //=====================================================================
-            }
-            else
-            {
-                // should be a numeric literal (int32 or float)
-                codeOp.Args[i].SetInt32( (int32_t)codeInst->code[pc_at] );
-            }
-        }
+        if(do_fixups(pc + 1, codeOp, codeInst, *this)) return -1;
         /* End ReadOperation */
         //=====================================================================
 

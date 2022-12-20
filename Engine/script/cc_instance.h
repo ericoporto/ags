@@ -102,6 +102,10 @@ struct ScriptPosition
 // Running instance of the script
 struct ccInstance
 {
+// Return stack ptr at given offset from stack head;
+// Offset is in data bytes; program stack ptr is __not__ changed
+RuntimeScriptValue GetStackPtrOffsetFw(int32_t fw_offset);
+
 public:
     typedef std::unordered_map<int32_t, ScriptVariable> ScVarMap;
     typedef std::shared_ptr<ScVarMap>                   PScVarMap;
@@ -210,9 +214,7 @@ private:
     // helper function to pop & dump several values
     void    PopValuesFromStack(int32_t num_entries);
     void    PopDataFromStack(int32_t num_bytes);
-    // Return stack ptr at given offset from stack head;
-    // Offset is in data bytes; program stack ptr is __not__ changed
-    RuntimeScriptValue GetStackPtrOffsetFw(int32_t fw_offset);
+
     // Return stack ptr at given offset from stack tail;
     // Offset is in data bytes; program stack ptr is __not__ changed
     RuntimeScriptValue GetStackPtrOffsetRw(int32_t rw_offset);
