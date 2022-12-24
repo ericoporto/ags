@@ -164,11 +164,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
+    <OutDir>$(SolutionDir)\.lib\$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(Configuration)\$(Platform)\</IntDir>
     <_ProjectFileVersion>14.0.25431.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)\.lib\$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
     <TargetName>Common_d</TargetName>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
@@ -181,8 +181,6 @@
     <CodeAnalysisRuleAssemblies />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_XP|Win32'">
-    <OutDir>$(SolutionDir)\.lib\$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
     <TargetName>Common_d</TargetName>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
@@ -195,8 +193,6 @@
     <CodeAnalysisRuleAssemblies />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)\.lib\$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
     <TargetName>Common</TargetName>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
@@ -209,8 +205,6 @@
     <CodeAnalysisRuleAssemblies />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_XP|Win32'">
-    <OutDir>$(SolutionDir)\.lib\$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
     <TargetName>Common</TargetName>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
@@ -223,8 +217,6 @@
     <CodeAnalysisRuleAssemblies />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_MD|Win32'">
-    <OutDir>$(SolutionDir)\.lib\$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
     <TargetName>Common_md</TargetName>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
@@ -237,8 +229,6 @@
     <CodeAnalysisRuleAssemblies />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_MD|Win32'">
-    <OutDir>$(SolutionDir)\.lib\$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
     <TargetName>Common_md_d</TargetName>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
