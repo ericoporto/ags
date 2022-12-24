@@ -22,12 +22,12 @@ build_windows_task:
     cd Solutions &&
     msbuild Tools.sln /p:PlatformToolset=v140 /p:Configuration=%BUILD_CONFIG% /p:Platform=x86 /maxcpucount /nologo
   engine_pdb_artifacts:
-    path: Solutions/.build/*/acwin.pdb
+    path: Solutions/.build/*/*/acwin.pdb
   delete_engine_pdb_script: >
     cd Solutions/.build &&
     del /s *.pdb *.map *.ilk *.iobj *.ipdb
   binaries_artifacts:
-    path: Solutions/.build/*/*
+    path: Solutions/.build/*/*/*
 
 build_linux_cmake_task:
   only_if: $CIRRUS_RELEASE == ''
@@ -296,7 +296,7 @@ windows_packaging_task:
   get_windows_engine_script: >
     mkdir Windows\Installer\Source\Engine &&
     curl -fLSso Windows\Installer\Source\Engine\acwin.exe
-    "https://api.cirrus-ci.com/v1/artifact/build/%CIRRUS_BUILD_ID%/build_windows/binaries/Solutions/.build/Release/acwin.exe"
+    "https://api.cirrus-ci.com/v1/artifact/build/%CIRRUS_BUILD_ID%/build_windows/binaries/Solutions/.build/Release/Win32/acwin.exe"
   get_sdl2_dll_script: >
     copy %AGS_SDL_LIB%\SDL2.dll Windows\Installer\Source\Engine
   get_manual_script: >
@@ -384,13 +384,13 @@ ags_windows_tests_task:
     "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86 &&
     cd Solutions &&
     msbuild Compiler.Lib.sln /p:PlatformToolset=v140 /p:Configuration=%BUILD_CONFIG% /p:Platform=Win32 /maxcpucount /nologo
-  run_compiler_tests_script: Solutions\.test\Release\Compiler.Lib.Test.exe
+  run_compiler_tests_script: Solutions\.test\Release\Win32\Compiler.Lib.Test.exe
   build_ags_test_runner_script: >
     "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86 &&
     cd Solutions &&
     msbuild Tests.sln /p:PlatformToolset=v140 /p:Configuration=%BUILD_CONFIG% /p:Platform=Win32 /maxcpucount /nologo
-  run_common_tests_script: Solutions\.test\Release\Common.Lib.Test.exe
-  run_engine_tests_script: Solutions\.test\Release\Engine.App.Test.exe
+  run_common_tests_script: Solutions\.test\Release\Win32\Common.Lib.Test.exe
+  run_engine_tests_script: Solutions\.test\Release\Win32\Engine.App.Test.exe
 
 make_release_task:
   depends_on:
