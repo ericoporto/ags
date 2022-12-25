@@ -158,7 +158,15 @@
     <LinkIncremental>true</LinkIncremental>
     <TargetName>acwin</TargetName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>acwin</TargetName>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_XP|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>acwin</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_XP|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>acwin</TargetName>
   </PropertyGroup>
@@ -174,7 +182,15 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>acwin</TargetName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>acwin</TargetName>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_XP|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>acwin</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_XP|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>acwin</TargetName>
   </PropertyGroup>
