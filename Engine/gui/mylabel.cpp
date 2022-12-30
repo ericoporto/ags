@@ -22,6 +22,7 @@
 #include "gui/guidialoginternaldefs.h"
 
 using namespace Common;
+using AGS::Common::String;
 
 extern int acdialog_font;
 
@@ -54,7 +55,7 @@ int MyLabel::pressedon(int /*mx*/, int /*my*/)
     return 0;
 }
 
-int MyLabel::processmessage(int /*mcode*/, int /*wParam*/, long /*lParam*/)
+int MyLabel::processmessage(int /*mcode*/, int /*wParam*/, String& /*lParam*/)
 {
     return -1;                  // doesn't support messages
 }

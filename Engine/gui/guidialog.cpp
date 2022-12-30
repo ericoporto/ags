@@ -27,6 +27,7 @@
 #include "gfx/graphicsdriver.h"
 #include "debug/debug_log.h"
 #include "util/path.h"
+#include "util/string.h"
 
 using namespace AGS::Common;
 using namespace AGS::Engine;
@@ -43,22 +44,23 @@ IDriverDependantBitmap *dialogDDB;
 
 #undef MAXSAVEGAMES
 #define MAXSAVEGAMES 20
-char *lpTemp, *lpTemp2;
-char bufTemp[260], buffer2[260];
+String *lpTemp, *lpTemp2;
+String bufTemp, buffer2;
 int numsaves = 0, toomanygames;
 int filenumbers[MAXSAVEGAMES];
 unsigned long filedates[MAXSAVEGAMES];
+String nstr = "";
 
 CSCIMessage smes;
 
-char buff[200];
+String buff;
 int myscrnwid = 320, myscrnhit = 200;
 
 }
 
-char *get_gui_dialog_buffer()
+const char *get_gui_dialog_buffer()
 {
-  return buffer2;
+  return buffer2.GetCStr();
 }
 
 //
@@ -119,7 +121,7 @@ int loadgamedialog()
                       get_global_message(MSG_CANCEL));
   int ctrllist = CSCICreateControl(CNT_LISTBOX, 10, 30, 120, 80, nullptr);
   int ctrltex1 = CSCICreateControl(CNT_LABEL, 10, 5, 120, 0, get_global_message(MSG_SELECTLOAD));
-  CSCISendControlMessage(ctrllist, CLB_CLEAR, 0, 0);
+  CSCISendControlMessage(ctrllist, CLB_CLEAR, 0, nstr);
 
   preparesavegamelist(ctrllist);
   CSCIMessage mes;
@@ -129,14 +131,14 @@ int loadgamedialog()
     CSCIWaitMessage(&mes);      //printf("mess: %d, id %d ",mes.code,mes.id);
     if (mes.code == CM_COMMAND) {
       if (mes.id == ctrlok) {
-        int cursel = CSCISendControlMessage(ctrllist, CLB_GETCURSEL, 0, 0);
+        int cursel = CSCISendControlMessage(ctrllist, CLB_GETCURSEL, 0, nstr);
         if ((cursel >= numsaves) | (cursel < 0))
           lpTemp = nullptr;
         else {
           toret = filenumbers[cursel];
           String path = get_save_game_path(toret);
-          strcpy(bufTemp, path.GetCStr());
-          lpTemp = &bufTemp[0];
+          bufTemp = path.GetCStr();
+          lpTemp = &bufTemp;
         }
       } else if (mes.id == ctrlcancel) {
         lpTemp = nullptr;
@@ -174,7 +176,7 @@ int savegamedialog()
   int ctrllist = CSCICreateControl(CNT_LISTBOX, 10, 40, 120, 80, nullptr);
   int ctrltbox = 0;
 
-  CSCISendControlMessage(ctrllist, CLB_CLEAR, 0, 0);    // clear the list box
+  CSCISendControlMessage(ctrllist, CLB_CLEAR, 0, nstr);    // clear the list box
   preparesavegamelist(ctrllist);
   if (toomanygames) {
     strcpy(okbuttontext, get_global_message(MSG_REPLACE));
@@ -189,33 +191,33 @@ int savegamedialog()
 
   lpTemp = nullptr;
   if (numsaves > 0)
-    CSCISendControlMessage(ctrllist, CLB_GETTEXT, 0, (long)&buffer2[0]);
+      CSCISendControlMessage(ctrllist, CLB_GETTEXT, 0, buffer2);
   else
-    buffer2[0] = 0;
+      buffer2 = "";
 
-  CSCISendControlMessage(ctrltbox, CTB_SETTEXT, 0, (long)&buffer2[0]);
+  CSCISendControlMessage(ctrltbox, CTB_SETTEXT, 0, buffer2);
 
   int toret = -1;
   while (1) {
     CSCIWaitMessage(&mes);      //printf("mess: %d, id %d ",mes.code,mes.id);
     if (mes.code == CM_COMMAND) {
       if (mes.id == ctrlok) {
-        int cursell = CSCISendControlMessage(ctrllist, CLB_GETCURSEL, 0, 0);
-        CSCISendControlMessage(ctrltbox, CTB_GETTEXT, 0, (long)&buffer2[0]);
+        int cursell = CSCISendControlMessage(ctrllist, CLB_GETCURSEL, 0, nstr);
+        CSCISendControlMessage(ctrltbox, CTB_GETTEXT, 0, buffer2);
 
         if (numsaves > 0)
-          CSCISendControlMessage(ctrllist, CLB_GETTEXT, cursell, (long)&bufTemp[0]);
+          CSCISendControlMessage(ctrllist, CLB_GETTEXT, cursell, bufTemp);
         else
-          strcpy(bufTemp, "_NOSAVEGAMENAME");
+          bufTemp = "_NOSAVEGAMENAME";
 
         if (toomanygames) {
           int nwhand = CSCIDrawWindow(boxleft + 5, boxtop + 20, 190, 65);
           int lbl1 =
             CSCICreateControl(CNT_LABEL, 15, 5, 160, 0, get_global_message(MSG_REPLACEWITH1));
-          int lbl2 = CSCICreateControl(CNT_LABEL, 25, 14, 160, 0, bufTemp);
+          int lbl2 = CSCICreateControl(CNT_LABEL, 25, 14, 160, 0, bufTemp.GetCStr());
           int lbl3 =
             CSCICreateControl(CNT_LABEL, 15, 25, 160, 0, get_global_message(MSG_REPLACEWITH2));
-          int txt1 = CSCICreateControl(CNT_TEXTBOX, 15, 35, 160, 0, bufTemp);
+          int txt1 = CSCICreateControl(CNT_TEXTBOX, 15, 35, 160, 0, bufTemp.GetCStr());
           int btnOk =
             CSCICreateControl(CNT_PUSHBUTTON | CNF_DEFAULT, 25, 50, 60, 10,
                               get_global_message(MSG_REPLACE));
@@ -228,7 +230,7 @@ int savegamedialog()
             CSCIWaitMessage(&cmes);
           } while (cmes.code != CM_COMMAND);
 
-          CSCISendControlMessage(txt1, CTB_GETTEXT, 0, (long)&buffer2[0]);
+          CSCISendControlMessage(txt1, CTB_GETTEXT, 0, buffer2);
           CSCIDeleteControl(btnCancel);
           CSCIDeleteControl(btnOk);
           CSCIDeleteControl(txt1);
@@ -236,7 +238,7 @@ int savegamedialog()
           CSCIDeleteControl(lbl2);
           CSCIDeleteControl(lbl1);
           CSCIEraseWindow(nwhand);
-          bufTemp[0] = 0;
+          bufTemp = "";
 
           if (cmes.id == btnCancel) {
             lpTemp = nullptr;
@@ -245,7 +247,7 @@ int savegamedialog()
             toret = filenumbers[cursell];
 
         } 
-        else if (strcmp(buffer2, bufTemp) != 0) {     // create a new game (description different)
+        else if (buffer2 != bufTemp) {     // create a new game (description different)
           int highestnum = 0;
           for (int pp = 0; pp < numsaves; pp++) {
             if (filenumbers[pp] > highestnum)
@@ -257,30 +259,30 @@ int savegamedialog()
 
           toret = highestnum + 1;
           String path = get_save_game_path(toret);
-          strcpy(bufTemp, path.GetCStr());
+          bufTemp = path.GetCStr();
         } 
         else {
           toret = filenumbers[cursell];
-          bufTemp[0] = 0;
+          bufTemp = "";
         }
 
         if (bufTemp[0] == 0)
         {
           String path = get_save_game_path(toret);
-          strcpy(bufTemp, path.GetCStr());
+          bufTemp = path.GetCStr();
         }
 
-        lpTemp = &bufTemp[0];
-        lpTemp2 = &buffer2[0];
+        lpTemp = &bufTemp;
+        lpTemp2 = &buffer2;
       } else if (mes.id == ctrlcancel) {
         lpTemp = nullptr;
       }
       break;
     } else if (mes.code == CM_SELCHANGE) {
-      int cursel = CSCISendControlMessage(ctrllist, CLB_GETCURSEL, 0, 0);
+      int cursel = CSCISendControlMessage(ctrllist, CLB_GETCURSEL, 0, nstr);
       if (cursel >= 0) {
-        CSCISendControlMessage(ctrllist, CLB_GETTEXT, cursel, (long)&buffer2[0]);
-        CSCISendControlMessage(ctrltbox, CTB_SETTEXT, 0, (long)&buffer2[0]);
+        CSCISendControlMessage(ctrllist, CLB_GETTEXT, cursel, buffer2);
+        CSCISendControlMessage(ctrltbox, CTB_SETTEXT, 0, buffer2);
       }
     }
   }
@@ -304,13 +306,13 @@ void preparesavegamelist(int ctrllist)
   // fill in the list box and global savegameindex[] array for backward compatibilty
   for (numsaves = 0; (size_t)numsaves < saves.size(); ++numsaves)
   {
-      CSCISendControlMessage(ctrllist, CLB_ADDITEM, 0, (long)saves[numsaves].Description.GetCStr());
+      CSCISendControlMessage(ctrllist, CLB_ADDITEM, 0, saves[numsaves].Description);
       filenumbers[numsaves] = saves[numsaves].Slot;
       filedates[numsaves] = (long int)saves[numsaves].FileTime;
   }
   toomanygames = (numsaves >= MAXSAVEGAMES) ? 1 : 0;
   // Select the first item
-  CSCISendControlMessage(ctrllist, CLB_SETCURSEL, 0, 0);
+  CSCISendControlMessage(ctrllist, CLB_SETCURSEL, 0, nstr);
 }
 
 void enterstringwindow(const char *prompttext, char *stouse)
@@ -337,9 +339,9 @@ void enterstringwindow(const char *prompttext, char *stouse)
     CSCIWaitMessage(&mes);
     if (mes.code == CM_COMMAND) {
       if (mes.id == ctrlcancel)
-        buffer2[0] = 0;
+        buffer2 = "";
       else
-        CSCISendControlMessage(ctrltbox, CTB_GETTEXT, 0, (long)&buffer2[0]);
+        CSCISendControlMessage(ctrltbox, CTB_GETTEXT, 0, buffer2);
       break;
     }
   }
@@ -350,7 +352,7 @@ void enterstringwindow(const char *prompttext, char *stouse)
   if (wantCancel)
     CSCIDeleteControl(ctrlcancel);
   CSCIEraseWindow(handl);
-  strcpy(stouse, buffer2);
+  strcpy(stouse, buffer2.GetCStr());
 }
 
 int enternumberwindow(char *prompttext)
@@ -378,14 +380,14 @@ int roomSelectorWindow(int currentRoom, int numRooms,
   int ctrlcancel =
     CSCICreateControl(CNT_PUSHBUTTON | CNF_CANCEL, 80, 145, 60, 10, "Cancel");
 
-  CSCISendControlMessage(ctrllist, CLB_CLEAR, 0, 0);    // clear the list box
+  CSCISendControlMessage(ctrllist, CLB_CLEAR, 0, nstr);    // clear the list box
   for (int aa = 0; aa < numRooms; aa++)
   {
-    snprintf(buff, sizeof(buff), "%3d %s", roomNumbers[aa], roomNames[aa].GetCStr());
-    CSCISendControlMessage(ctrllist, CLB_ADDITEM, 0, (long)&buff[0]);
+    buff.Format("%3d %s", roomNumbers[aa], roomNames[aa].GetCStr());
+    CSCISendControlMessage(ctrllist, CLB_ADDITEM, 0, buff);
     if (roomNumbers[aa] == currentRoom)
     {
-      CSCISendControlMessage(ctrllist, CLB_SETCURSEL, aa, 0);
+      CSCISendControlMessage(ctrllist, CLB_SETCURSEL, aa, nstr);
     }
   }
 
@@ -394,10 +396,10 @@ int roomSelectorWindow(int currentRoom, int numRooms,
   CSCIMessage mes;
 
   lpTemp = nullptr;
-  buffer2[0] = 0;
+  buffer2 = "";
 
   int ctrltbox = CSCICreateControl(CNT_TEXTBOX, 10, 29, 120, 0, nullptr);
-  CSCISendControlMessage(ctrltbox, CTB_SETTEXT, 0, (long)&buffer2[0]);
+  CSCISendControlMessage(ctrltbox, CTB_SETTEXT, 0, buffer2);
 
   int toret = -1;
   while (1) {
@@ -406,10 +408,10 @@ int roomSelectorWindow(int currentRoom, int numRooms,
     {
       if (mes.id == ctrlok) 
       {
-        CSCISendControlMessage(ctrltbox, CTB_GETTEXT, 0, (long)&buffer2[0]);
+        CSCISendControlMessage(ctrltbox, CTB_GETTEXT, 0, buffer2);
         if (isdigit(buffer2[0]))
         {
-          toret = atoi(buffer2);
+          toret = atoi(buffer2.GetCStr());
         }
       } 
       else if (mes.id == ctrlcancel) 
@@ -419,11 +421,11 @@ int roomSelectorWindow(int currentRoom, int numRooms,
     } 
     else if (mes.code == CM_SELCHANGE) 
     {
-      int cursel = CSCISendControlMessage(ctrllist, CLB_GETCURSEL, 0, 0);
+      int cursel = CSCISendControlMessage(ctrllist, CLB_GETCURSEL, 0, nstr);
       if (cursel >= 0) 
       {
-        snprintf(buffer2, sizeof(buffer2), "%d", roomNumbers[cursel]);
-        CSCISendControlMessage(ctrltbox, CTB_SETTEXT, 0, (long)&buffer2[0]);
+        buffer2.Format("%d", roomNumbers[cursel]);
+        CSCISendControlMessage(ctrltbox, CTB_SETTEXT, 0, buffer2);
       }
     }
   }

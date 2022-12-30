@@ -30,8 +30,8 @@ struct MyListBox:public NewControl
 
   void draw(Common::Bitmap *ds) override;
   int pressedon(int mx, int my) override;
-  void additem(char *texx);
-  int processmessage(int mcode, int wParam, long lParam) override;
+  void additem(const char *texx);
+  int processmessage(int mcode, int wParam, AGS::Common::String &lParam) override;
 };
 
 #endif // __AC_MYLISTBOX_H

@@ -18,22 +18,20 @@
 #include "gui/mytextbox.h"
 #include "gui/guidialoginternaldefs.h"
 #include "gfx/bitmap.h"
+#include "util/string.h"
 
 using AGS::Common::Bitmap;
+using AGS::Common::String;
 
 extern int windowbackgroundcolor;
 extern int cbuttfont;
 
-MyTextBox::MyTextBox(int xx, int yy, int wii, const char *tee)
+MyTextBox::MyTextBox(int xx, int yy, int wii, String tee)
 {
     x = xx;
     y = yy;
     wid = wii;
-    if (tee != nullptr)
-        strcpy(text, tee);
-    else
-        text[0] = 0;
-
+    text = tee;
     hit = TEXT_HT + 1;
 }
 
@@ -44,10 +42,10 @@ void MyTextBox::draw(Bitmap *ds)
     draw_color = ds->GetCompatibleColor(0);
     ds->DrawRect(Rect(x, y, x + wid, y + hit), draw_color);
     color_t text_color = ds->GetCompatibleColor(0);
-    wouttextxy(ds, x + 2, y + 1, cbuttfont, text_color, text);
+    wouttextxy(ds, x + 2, y + 1, cbuttfont, text_color, text.GetCStr());
 
     char tbu[2] = "_";
-    wouttextxy(ds, x + 2 + get_text_width(text, cbuttfont), y + 1, cbuttfont, text_color, tbu);
+    wouttextxy(ds, x + 2 + get_text_width(text.GetCStr(), cbuttfont), y + 1, cbuttfont, text_color, tbu);
 }
 
 int MyTextBox::pressedon(int /*mx*/, int /*my*/)
@@ -55,21 +53,23 @@ int MyTextBox::pressedon(int /*mx*/, int /*my*/)
     return 0;
 }
 
-int MyTextBox::processmessage(int mcode, int wParam, long lParam)
+int MyTextBox::processmessage(int mcode, int wParam, String& lParam)
 {
     if (mcode == CTB_SETTEXT) {
-        snprintf(text, sizeof(text), "%s", (const char*)lParam);
+        text = lParam;
         needredraw = 1;
-    } else if (mcode == CTB_GETTEXT)
-        strcpy((char *)lParam, text); // FIXME! dangerous
+    }
+    else if (mcode == CTB_GETTEXT) {
+        lParam = text; // FIXME! dangerous
+    } 
     else if (mcode == CTB_KEYPRESS) {
         // NOTE: this deprecated control does not support UTF-8
         int key = wParam;
-        int uchar = lParam;
-        size_t len = strlen(text);
+        int uchar = lParam.GetAt(0);
+        size_t len = text.GetLength();
         if (key == eAGSKeyCodeBackspace) {
             if (len > 0)
-                text[len - 1] = 0;
+                text.ClipRight(1);
             drawandmouse();
             return 0;
         }
@@ -80,10 +80,9 @@ int MyTextBox::processmessage(int mcode, int wParam, long lParam)
             return 0; // not a textual event
         if ((uchar >= 128) && (!font_supports_extended_characters(cbuttfont)))
             return 0; // unsupported letter
-        if (get_text_width(text, cbuttfont) >= wid - 5)
+        if (get_text_width(text.GetCStr(), cbuttfont) >= wid - 5)
             return 0; // not enough control space
-        text[len] = uchar;
-        text[len + 1] = 0;
+        text.AppendChar(uchar);
         drawandmouse();
     } else
         return -1;

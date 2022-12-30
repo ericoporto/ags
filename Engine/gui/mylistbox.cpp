@@ -20,8 +20,10 @@
 #include "gui/guidialog.h"
 #include "gui/guidialoginternaldefs.h"
 #include "gui/mylistbox.h"
+#include "util/string.h"
 
 using AGS::Common::Bitmap;
+using AGS::Common::String;
 
 extern int numcurso, hotx, hoty;
 
@@ -124,7 +126,7 @@ extern int smcode;
     return 0;
   }
 
-  void MyListBox::additem(char *texx)
+  void MyListBox::additem(const char *texx)
   {
     if (items >= MAXLISTITEM)
       quit("!CSCIUSER16: Too many items added to listbox");
@@ -134,10 +136,10 @@ extern int smcode;
     needredraw = 1;
   }
 
-  int MyListBox::processmessage(int mcode, int wParam, long lParam)
+  int MyListBox::processmessage(int mcode, int wParam, String& lParam)
   {
     if (mcode == CLB_ADDITEM) {
-      additem((char *)lParam);
+      additem(lParam.GetCStr());
     } else if (mcode == CLB_CLEAR)
       clearlist();
     else if (mcode == CLB_GETCURSEL)
@@ -152,13 +154,14 @@ extern int smcode;
       if (topitem + numonscreen <= selected)
         topitem = (selected + 1) - numonscreen;
     }
-    else if (mcode == CLB_GETTEXT)
-      strcpy((char *)lParam, itemnames[wParam]);
+    else if (mcode == CLB_GETTEXT) {
+        lParam = itemnames[wParam];
+    }
     else if (mcode == CLB_SETTEXT) {
       if (wParam < items)
         free(itemnames[wParam]);
 
-      char *newstri = (char *)lParam;
+      char *newstri = (char *)lParam.GetCStr();
       itemnames[wParam] = (char *)malloc(strlen(newstri) + 2);
       strcpy(itemnames[wParam], newstri);
 

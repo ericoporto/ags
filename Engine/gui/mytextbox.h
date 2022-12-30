@@ -20,11 +20,11 @@
 #define TEXTBOX_MAXLEN 49
 struct MyTextBox:public NewControl
 {
-  char text[TEXTBOX_MAXLEN + 1];
-  MyTextBox(int xx, int yy, int wii, const char *tee);
+  AGS::Common::String text;
+  MyTextBox(int xx, int yy, int wii, AGS::Common::String tee);
   void draw(Common::Bitmap *ds) override;
   int pressedon(int mx, int my) override;
-  int processmessage(int mcode, int wParam, long lParam) override;
+  int processmessage(int mcode, int wParam, AGS::Common::String& lParam) override;
 };
 
 #endif // __AC_MYTEXTBOX_H

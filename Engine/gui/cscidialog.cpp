@@ -161,10 +161,14 @@ int CSCIWaitMessage(CSCIMessage * cscim)
                 cscim->id = finddefaultcontrol(CNF_CANCEL);
                 cscim->code = CM_COMMAND;
             } else if ((uchar == 0) && (keywas < eAGSKeyCodeSpace) && (keywas != eAGSKeyCodeBackspace)) ;
-            else if ((keywas >= eAGSKeyCodeUpArrow) & (keywas <= eAGSKeyCodePageDown) & (finddefaultcontrol(CNT_LISTBOX) >= 0))
-                vobjs[finddefaultcontrol(CNT_LISTBOX)]->processmessage(CTB_KEYPRESS, keywas, 0);
-            else if (finddefaultcontrol(CNT_TEXTBOX) >= 0)
-                vobjs[finddefaultcontrol(CNT_TEXTBOX)]->processmessage(CTB_KEYPRESS, keywas, uchar);
+            else if ((keywas >= eAGSKeyCodeUpArrow) & (keywas <= eAGSKeyCodePageDown) & (finddefaultcontrol(CNT_LISTBOX) >= 0)) {
+                vobjs[finddefaultcontrol(CNT_LISTBOX)]->processmessage(CTB_KEYPRESS, keywas, String());
+            }
+            else if (finddefaultcontrol(CNT_TEXTBOX) >= 0) {
+                String sch = "";
+                sch.AppendChar(uchar);
+                vobjs[finddefaultcontrol(CNT_TEXTBOX)]->processmessage(CTB_KEYPRESS, keywas, sch);
+            }
 
             if (cscim->id < 0) {
                 cscim->code = CM_KEYPRESS;
@@ -237,7 +241,7 @@ void CSCIDeleteControl(int haa)
     vobjs[haa] = nullptr;
 }
 
-int CSCISendControlMessage(int haa, int mess, int wPar, long lPar)
+int CSCISendControlMessage(int haa, int mess, int wPar, String &lPar)
 {
     if (vobjs[haa] == nullptr)
         return -1;

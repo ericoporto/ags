@@ -26,7 +26,7 @@ struct MyLabel:public NewControl
 
   int pressedon(int mx, int my) override;
 
-  int processmessage(int mcode, int wParam, long lParam) override;
+  int processmessage(int mcode, int wParam, AGS::Common::String &lParam) override;
 };
 
 #endif // __AC_MYLABEL_H
