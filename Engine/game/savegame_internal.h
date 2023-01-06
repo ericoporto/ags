@@ -72,7 +72,7 @@ struct RestoredData
     // Scripts global data
     struct ScriptData
     {
-        std::shared_ptr<char> Data;
+        std::shared_ptr<std::vector<char>> Data;
         size_t              Len;
 
         ScriptData();

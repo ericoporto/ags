@@ -18,6 +18,7 @@
 // Perhaps the optimal solution would be to have a savegame converter instead.
 //
 //=============================================================================
+#include <array>
 #include <vector>
 #include "core/types.h"
 #include "ac/button.h"
@@ -98,7 +99,7 @@ static HSaveError restore_game_scripts(Stream *in, const PreservedParams &pp, Re
         return new SavegameError(kSvgErr_GameContentAssertion, "Mismatching size of global script data.");
     }
     r_data.GlobalScript.Len = gdatasize;
-    r_data.GlobalScript.Data.reset(new char[gdatasize]);
+    r_data.GlobalScript.Data.reset(new std::vector<char>(gdatasize));
     in->Read(r_data.GlobalScript.Data.get(), gdatasize);
 
     if ((uint32_t)in->ReadInt32() != numScriptModules)
@@ -114,7 +115,7 @@ static HSaveError restore_game_scripts(Stream *in, const PreservedParams &pp, Re
             return new SavegameError(kSvgErr_GameContentAssertion, String::FromFormat("Mismatching size of script module data, module %d.", i));
         }
         r_data.ScriptModules[i].Len = module_size;
-        r_data.ScriptModules[i].Data.reset(new char[module_size]);
+        r_data.ScriptModules[i].Data.reset(new std::vector<char>(module_size));
         in->Read(r_data.ScriptModules[i].Data.get(), module_size);
     }
     return HSaveError::None();
