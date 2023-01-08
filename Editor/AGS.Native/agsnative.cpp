@@ -3609,7 +3609,7 @@ void convert_room_from_native(const RoomStruct &rs, Room ^room, System::Text::En
 		if (rs.DataVersion < kRoomVersion_300a)
 		{
 			char scriptFuncPrefix[100];
-			sprintf(scriptFuncPrefix, "object%d_", i);
+			sprintf(scriptFuncPrefix, "object%zd_", i);
 			ConvertInteractions(obj->Interactions, rs.Objects[i].Interaction.get(), gcnew String(scriptFuncPrefix), nullptr, 2);
 		}
 		else 
@@ -3632,7 +3632,7 @@ void convert_room_from_native(const RoomStruct &rs, Room ^room, System::Text::En
 		if (rs.DataVersion < kRoomVersion_300a)
 		{
 			char scriptFuncPrefix[100];
-			sprintf(scriptFuncPrefix, "hotspot%d_", i);
+			sprintf(scriptFuncPrefix, "hotspot%zd_", i);
 			ConvertInteractions(hotspot->Interactions, rs.Hotspots[i].Interaction.get(), gcnew String(scriptFuncPrefix), nullptr, 1);
 		}
 		else 
@@ -3689,7 +3689,7 @@ void convert_room_from_native(const RoomStruct &rs, Room ^room, System::Text::En
 		if (rs.DataVersion < kRoomVersion_300a)
 		{
 			char scriptFuncPrefix[100];
-			sprintf(scriptFuncPrefix, "region%d_", i);
+			sprintf(scriptFuncPrefix, "region%zd_", i);
 			ConvertInteractions(area->Interactions, rs.Regions[i].Interaction.get(), gcnew String(scriptFuncPrefix), nullptr, 0);
 		}
 		else 
