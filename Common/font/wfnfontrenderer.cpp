@@ -112,7 +112,7 @@ static int RenderChar(Bitmap *ds, const int at_x, const int at_y, Rect clip,
   {
     for (int w = sw, x = sx; w < width && x < ex; ++w, x += scale)
     {
-      if (((actdata[h * bytewid + (w / 8)] & (0x80 >> (w % 8))) != 0))
+      if ((actdata[h * bytewid + (w / 8)] & (0x80 >> (w % 8))) != 0)
       {
         if (scale > 1)
         {

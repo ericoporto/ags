@@ -150,7 +150,7 @@ const char* File_ReadRawLineBack(sc_File *fil) {
   {
     done = File_ReadRawLineImpl(fil, readbuffer, MAX_MAXSTRLEN);
     sbuf.Append(readbuffer);
-  };
+  }
   return CreateNewScriptString(sbuf.GetCStr());
 }
 

@@ -320,7 +320,7 @@ bool OGLGraphicsDriver::CreateWindowAndGlContext(const DisplayMode &mode)
   }
 
   SDL_GLContext sdlgl_ctx = SDL_GL_CreateContext(sdl_window);
-  if (sdlgl_ctx == NULL) {
+  if (sdlgl_ctx == nullptr) {
     Debug::Printf(kDbgMsg_Error, "Error creating OpenGL context: %s", SDL_GetError());
     sys_window_destroy();
     return false;
@@ -691,7 +691,7 @@ void OutputShaderError(GLuint obj_id, const String &obj_name, bool is_shader)
   }
 
   Debug::Printf(kDbgMsg_Error, "ERROR: OpenGL: %s %s:", obj_name.GetCStr(), is_shader ? "failed to compile" : "failed to link");
-  if (errorLog.size() > 0)
+  if (!errorLog.empty())
   {
     Debug::Printf(kDbgMsg_Error, "----------------------------------------");
     Debug::Printf(kDbgMsg_Error, "%s", &errorLog[0]);
@@ -853,7 +853,7 @@ IGfxModeList *OGLGraphicsDriver::GetSupportedModeList(int color_depth)
 {
     std::vector<DisplayMode> modes {};
     sys_get_desktop_modes(modes, color_depth);
-    if ((modes.size() == 0) && color_depth == 32)
+    if ((modes.empty()) && color_depth == 32)
     {
         // Pretend that 24-bit are 32-bit
         sys_get_desktop_modes(modes, 24);
@@ -989,7 +989,7 @@ void OGLGraphicsDriver::_renderSprite(const OGLDrawListEntry *drawListEntry,
     const glm::mat4 &projection, const glm::mat4 &matGlobal,
     const SpriteColorTransform &color, const Size &surface_size)
 {
-  OGLBitmap *bmpToDraw = drawListEntry->ddb;
+  OGLBitmap const *bmpToDraw = drawListEntry->ddb;
 
   const int alpha = (color.Alpha * bmpToDraw->_alpha) / 255;
 
@@ -1352,7 +1352,7 @@ void OGLGraphicsDriver::RenderSpriteBatches(const glm::mat4 &projection)
         if ((cur_rt.second != back_buffer) && (cur_spr == _spriteBatchRange[cur_rt.first].second))
         {
             // Finish render to a separate texture, return to one render buffer back
-            assert((cur_rt.second > 0) && (render_fbos.size() > 0));
+            assert((cur_rt.second > 0) && (!render_fbos.empty()));
             cur_rt = render_fbos.top();
             render_fbos.pop();
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, cur_rt.second);
@@ -1514,7 +1514,7 @@ void OGLGraphicsDriver::RestoreDrawLists()
 
 void OGLGraphicsDriver::DrawSprite(int x, int y, IDriverDependantBitmap* ddb)
 {
-    _spriteList.push_back(OGLDrawListEntry((OGLBitmap*)ddb, _actSpriteBatch, x, y));
+    _spriteList.emplace_back((OGLBitmap *) ddb, _actSpriteBatch, x, y);
 }
 
 void OGLGraphicsDriver::DestroyDDBImpl(IDriverDependantBitmap* ddb)
@@ -1880,7 +1880,7 @@ void OGLGraphicsDriver::do_fade(bool fadingOut, int speed, int targetColourRed, 
   d3db->SetStretch(_srcRect.GetWidth(), _srcRect.GetHeight(), false);
   this->DrawSprite(0, 0, d3db);
   EndSpriteBatch();
-  if (_drawPostScreenCallback != NULL)
+  if (_drawPostScreenCallback != nullptr)
       _drawPostScreenCallback();
 
   if (speed <= 0) speed = 16;
@@ -1943,7 +1943,7 @@ void OGLGraphicsDriver::BoxOutEffect(bool blackingOut, int speed, int delay)
   std::vector<OGLDrawListEntry> &drawList = _spriteList;
   const size_t last = drawList.size() - 1;
 
-  if (_drawPostScreenCallback != NULL)
+  if (_drawPostScreenCallback != nullptr)
     _drawPostScreenCallback();
 
   int yspeed = _srcRect.GetHeight() / (_srcRect.GetWidth() / speed);
@@ -1988,7 +1988,7 @@ void OGLGraphicsDriver::SetScreenFade(int red, int green, int blue)
     ddb->SetStretch(_spriteBatches[_actSpriteBatch].Viewport.GetWidth(),
         _spriteBatches[_actSpriteBatch].Viewport.GetHeight(), false);
     ddb->SetAlpha(255);
-    _spriteList.push_back(OGLDrawListEntry(ddb, _actSpriteBatch, 0, 0));
+    _spriteList.emplace_back(ddb, _actSpriteBatch, 0, 0);
 }
 
 void OGLGraphicsDriver::SetScreenTint(int red, int green, int blue)
@@ -1998,7 +1998,7 @@ void OGLGraphicsDriver::SetScreenTint(int red, int green, int blue)
     ddb->SetStretch(_spriteBatches[_actSpriteBatch].Viewport.GetWidth(),
         _spriteBatches[_actSpriteBatch].Viewport.GetHeight(), false);
     ddb->SetAlpha(128);
-    _spriteList.push_back(OGLDrawListEntry(ddb, _actSpriteBatch, 0, 0));
+    _spriteList.emplace_back(ddb, _actSpriteBatch, 0, 0);
 }
 
 

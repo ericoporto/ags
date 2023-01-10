@@ -258,7 +258,7 @@ void invalidate_all_camera_rects(int view_index)
 
 void invalidate_rect_on_surf(int x1, int y1, int x2, int y2, DirtyRects &rects)
 {
-    if (rects.DirtyRows.size() == 0)
+    if (rects.DirtyRows.empty())
         return;
     if (rects.NumDirtyRegions >= MAXDIRTYREGIONS) {
         // too many invalid rectangles, just mark the whole thing dirty
@@ -504,7 +504,7 @@ void update_black_invreg_and_reset(Bitmap *ds)
 
 void update_room_invreg_and_reset(int view_index, Bitmap *ds, Bitmap *src, bool no_transform)
 {
-    if (view_index < 0 || RoomCamRects.size() == 0)
+    if (view_index < 0 || RoomCamRects.empty())
         return;
     
     update_invalid_region(ds, src, RoomCamRects[view_index], no_transform);

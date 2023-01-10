@@ -650,14 +650,14 @@ ScriptViewFrame* Game_GetViewFrame(int viewNumber, int loopNumber, int frame) {
 
 int Game_DoOnceOnly(const char *token)
 {
-    for (int i = 0; i < (int)play.do_once_tokens.size(); i++)
+    for (const auto & do_once_token : play.do_once_tokens)
     {
-        if (play.do_once_tokens[i] == token)
+        if (do_once_token == token)
         {
             return 0;
         }
     }
-    play.do_once_tokens.push_back(token);
+    play.do_once_tokens.emplace_back(token);
     return 1;
 }
 

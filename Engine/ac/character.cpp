@@ -382,7 +382,7 @@ void FaceDirectionalLoop(CharacterInfo *char1, int direction, int blockingStyle)
         {
             const int no_diagonal = useDiagonal (char1);
             const int highestLoopForTurning = no_diagonal != 1 ? kDirLoop_Last : kDirLoop_LastOrthogonal;
-            if ((char1->loop <= highestLoopForTurning))
+            if (char1->loop <= highestLoopForTurning)
             {
                 // Turn to face new direction
                 Character_StopMoving(char1);

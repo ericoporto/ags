@@ -613,9 +613,9 @@ void clear_drawobj_cache()
         cc = ObjectCache();
     }
     // clear the object cache
-    for (int i = 0; i < MAX_ROOM_OBJECTS; ++i)
+    for (auto & oc : objcache)
     {
-        objcache[i] = ObjectCache();
+        oc = ObjectCache();
     }
     // room overlays cache
     screenovercache.clear();
@@ -640,7 +640,7 @@ void clear_drawobj_cache()
 
 void release_drawobj_rendertargets()
 {
-    if ((gui_render_tex.size() == 0) ||
+    if (gui_render_tex.empty() ||
         !gfxDriver->ShouldReleaseRenderTargets())
         return;
 
@@ -802,8 +802,8 @@ void on_roomcamera_changed(Camera *cam)
         return;
     if (cam->HasChangedSize())
     {
-        auto viewrefs = cam->GetLinkedViewports();
-        for (auto vr : viewrefs)
+        auto const& viewrefs = cam->GetLinkedViewports();
+        for (const auto& vr : viewrefs)
         {
             PViewport vp = vr.lock();
             if (vp)
@@ -2271,7 +2271,7 @@ static void draw_gui_controls_batch(int gui_id)
     const int draw_index = guiobjddbref[gui_id];
     for (const auto &obj_id : gui.GetControlsDrawOrder())
     {
-        GUIObject *obj = gui.GetControl(obj_id);
+        GUIObject const *obj = gui.GetControl(obj_id);
         if (!obj->IsVisible() ||
             (obj->Width <= 0 || obj->Height <= 0) ||
             (!obj->IsEnabled() && (GUI::Options.DisabledStyle == kGuiDis_Blackout)))
@@ -2451,7 +2451,7 @@ bool GfxDriverSpriteEvtCallback(int evt, int data)
     if (displayed_room < 0)
     {
         // if no room loaded, various stuff won't be initialized yet
-        return 1;
+        return true;
     }
     return (pl_run_plugin_hooks(evt, data) != 0);
 }

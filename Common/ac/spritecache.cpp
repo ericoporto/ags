@@ -250,7 +250,7 @@ Bitmap *SpriteCache::operator [] (sprkey_t index)
 
 void SpriteCache::FreeMem(size_t space)
 {
-    for (int tries = 0; (_mru.size() > 0) && (_cacheSize >= (_maxCacheSize - space)); ++tries)
+    for (int tries = 0; (!_mru.empty()) && (_cacheSize >= (_maxCacheSize - space)); ++tries)
     {
         DisposeOldest();
         if (tries > 1000) // ???
@@ -263,8 +263,8 @@ void SpriteCache::FreeMem(size_t space)
 
 void SpriteCache::DisposeOldest()
 {
-    assert(_mru.size() > 0);
-    if (_mru.size() == 0) return;
+    assert(!_mru.empty());
+    if (_mru.empty()) return;
     auto it = std::prev(_mru.end());
     const auto sprnum = *it;
     // Safety check: must be a sprite from resources
@@ -291,13 +291,13 @@ void SpriteCache::DisposeOldest()
 
 void SpriteCache::DisposeAll()
 {
-    for (size_t i = 0; i < _spriteData.size(); ++i)
+    for (auto & spr : _spriteData)
     {
-        if (!_spriteData[i].IsLocked() && // not locked
-            _spriteData[i].IsAssetSprite()) // sprite from game resource
+        if (!spr.IsLocked() && // not locked
+            spr.IsAssetSprite()) // sprite from game resource
         {
-            delete _spriteData[i].Image;
-            _spriteData[i].Image = nullptr;
+            delete spr.Image;
+            spr.Image = nullptr;
         }
     }
     _cacheSize = _lockedSize;
@@ -407,7 +407,7 @@ int SpriteCache::SaveToFile(const String &filename, int store_flags, SpriteCompr
         // unfix that fix to save the data in a way that engine will expect.
         // TODO: perhaps adjust the editor to NOT need this?!
         pre_save_sprite(_spriteData[i].Image);
-        sprites.push_back(std::make_pair(DoesSpriteExist(i), _spriteData[i].Image));
+        sprites.emplace_back(DoesSpriteExist(i), _spriteData[i].Image);
     }
     return SaveSpriteFile(filename, sprites, &_file, store_flags, compress, index);
 }

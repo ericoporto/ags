@@ -449,10 +449,10 @@ std::vector<String> String::Split(char separator) const
     {
         const char *found_cstr = strchr(ptr, separator);
         if (!found_cstr) break;
-        result.push_back(String(ptr, found_cstr - ptr));
+        result.emplace_back(ptr, found_cstr - ptr);
         ptr = found_cstr + 1;
     }
-    result.push_back(String(ptr));
+    result.emplace_back(ptr);
     return result;
 }
 

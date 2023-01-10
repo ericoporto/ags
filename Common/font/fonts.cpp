@@ -500,7 +500,7 @@ void wouttextxy(Common::Bitmap *ds, int xxx, int yyy, size_t fontNumber, color_t
 
   if (fonts[fontNumber].Renderer != nullptr)
   {
-    fonts[fontNumber].Renderer->RenderText(texx, fontNumber, (BITMAP*)ds->GetAllegroBitmap(), xxx, yyy, text_color);
+    fonts[fontNumber].Renderer->RenderText(texx, fontNumber, ds->GetAllegroBitmap(), xxx, yyy, text_color);
   }
 }
 
