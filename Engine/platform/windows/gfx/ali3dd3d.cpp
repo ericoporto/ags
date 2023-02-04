@@ -731,22 +731,32 @@ void D3DGraphicsDriver::CreateVirtualScreen()
 
 HRESULT D3DGraphicsDriver::ResetD3DDevice()
 {
+  Debug::Printf("enters D3DGraphicsDriver::ResetD3DDevice()");
   // Direct3D documentation:
   // Before calling the IDirect3DDevice9::Reset method for a device,
   // an application should release any explicit render targets, depth stencil
   // surfaces, additional swap chains, state blocks, and D3DPOOL_DEFAULT
   // resources associated with the device.
+  Debug::Printf("pNativeSurface == %p", pNativeSurface);
   if (pNativeSurface != NULL)
   {
+    Debug::Printf("pNativeSurface->Release();");
     pNativeSurface->Release();
     pNativeSurface = NULL;
   }
+  Debug::Printf("pNativeTexture == %p", pNativeTexture);
   if (pNativeTexture != NULL)
   {
+      Debug::Printf("pNativeTexture->Release();");
       pNativeTexture->Release();
       pNativeTexture = NULL;
   }
-  return direct3ddevice->Reset(&d3dpp);
+
+   Debug::Printf("hr = direct3ddevice->Reset(&d3dpp)");
+   HRESULT hr = direct3ddevice->Reset(&d3dpp);
+   Debug::Printf("hr is %x", hr);
+   Debug::Printf("exit D3DGraphicsDriver::ResetD3DDevice()");
+   return hr;
 }
 
 bool D3DGraphicsDriver::SetNativeResolution(const GraphicResolution &native_res)
