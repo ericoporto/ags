@@ -23,6 +23,7 @@
 #include "gfx/bitmap.h"
 #include "gui/guidefines.h" // MAXLINE
 #include "util/string_utils.h"
+#include "debug/out.h"
 
 
 extern int get_fixed_pixel_size(int pixels);
@@ -79,7 +80,7 @@ void init_font_renderer()
 {
     /* Initialize the TTF library */
     if (TTF_Init() < 0) {
-        fprintf(stderr, "Couldn't initialize TTF: %s\n",SDL_GetError());
+        Debug::Printf("Couldn't initialize TTF: %s\n",SDL_GetError());
         SDL_ClearError();
         SDL_Quit();
         exit(2);

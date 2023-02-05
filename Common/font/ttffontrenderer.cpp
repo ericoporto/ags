@@ -137,7 +137,7 @@ int TTFFontRenderer::GetTextHeight(const char * text, int fontNumber)
 
 void TTFFontRenderer::RenderText(const char *text, int fontNumber, BITMAP *destination, int x, int y, int colour)
 {
-if (y > destination->cb)  // optimisation
+    if (y > destination->cb)  // optimisation
         return;
 
     SDL_Surface* glyph;
@@ -215,14 +215,14 @@ static TTF_Font *LoadTTF(const String &filename, int fontSize, int alfont_flags)
     SDL_RWops* pFontMem = SDL_RWFromConstMem(&buf.front(), lenof);
     if(!pFontMem)
     {
-        printf("Error when reading font from memory");
+        Debug::Printf("Error when reading font from memory");
         // Some error occurred while trying to read the data, act accordingly to that
     }
 
     // Load the font from the memory buffer
     TTF_Font* pFont = TTF_OpenFontRW(pFontMem, 1, fontSize);
     if(!pFont) {
-        printf("Error when loading font TTF_OpenFontRW");
+        Debug::Printf("Error when loading font TTF_OpenFontRW");
         return nullptr;
     }
 
@@ -233,7 +233,7 @@ static TTF_Font *LoadTTF(const String &filename, int fontSize, int alfont_flags)
 // Fill the FontMetrics struct from the given ALFONT
 static void FillMetrics(TTF_Font *fptr, FontMetrics *metrics)
 {
-    metrics->Height = TTF_FontAscent(fptr);
+    metrics->Height = TTF_FontHeight(fptr);
     metrics->RealHeight = TTF_FontHeight(fptr);
     metrics->CompatHeight = metrics->Height; // just set to default here
 }
