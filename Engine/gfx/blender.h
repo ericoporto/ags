@@ -62,4 +62,6 @@ void set_opaque_alpha_blender();
 // Sets argb2argb for 32-bit mode, and provides appropriate funcs for blending 32-bit onto 15/16/24-bit destination
 void set_argb2any_blender();
 
+void set_argb2argb_blender(int alpha);
+
 #endif // __AC_BLENDER_H

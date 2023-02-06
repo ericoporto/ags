@@ -14,6 +14,7 @@
 #include "core/platform.h"
 #include "font/ttffontrenderer.h"
 #include <SDL_ttf.h>
+//#include <gfx/blender.h>
 #include <debug/out.h>
 #include "allegro/gfx.h"
 #include "ac/game_version.h"
@@ -22,6 +23,7 @@
 #include "core/assetmanager.h"
 #include "font/fonts.h"
 #include "util/stream.h"
+#include "../../Engine/gfx/blender.h"
 
 using namespace AGS::Common;
 
@@ -123,15 +125,15 @@ void TTFFontRenderer::EnsureTextValidForFont(char * /*text*/, int /*fontNumber*/
 
 int TTFFontRenderer::GetTextWidth(const char *text, int fontNumber)
 {
-    int w;
-    TTF_SizeText(_fontData[fontNumber].Font , text, &w, nullptr);
+    int w = 0;
+    TTF_SizeUTF8(_fontData[fontNumber].Font , text, &w, nullptr);
     return w;
 }
 
 int TTFFontRenderer::GetTextHeight(const char * text, int fontNumber)
 {
-    int h;
-    TTF_SizeText(_fontData[fontNumber].Font , text, nullptr, &h);
+    int h = 0;
+    TTF_SizeUTF8(_fontData[fontNumber].Font , text, nullptr, &h);
     return h;
 }
 
@@ -140,6 +142,7 @@ void TTFFontRenderer::RenderText(const char *text, int fontNumber, BITMAP *desti
     if (y > destination->cb)  // optimisation
         return;
 
+    const int dest_depth = bitmap_color_depth(destination);
     SDL_Surface* glyph;
     SDL_Color sdlColor = {(Uint8) algetr32(colour),
                           (Uint8) algetg32(colour),
@@ -149,10 +152,15 @@ void TTFFontRenderer::RenderText(const char *text, int fontNumber, BITMAP *desti
     // Y - 1 because it seems to get drawn down a bit
     //x, y - 1, colour
     TTF_Font* font = _fontData[fontNumber].Font;
-    if ((ShouldAntiAliasText()) && (bitmap_color_depth(destination) > 8))
-        glyph = TTF_RenderText_Blended(font, text, sdlColor);
-    else
-        glyph = TTF_RenderText_Solid(font, text, sdlColor);
+    if ((ShouldAntiAliasText()) && (dest_depth> 8))
+        glyph = TTF_RenderUTF8_Blended(font, text, sdlColor);
+    else if (dest_depth > 8){
+        SDL_Surface * surface = TTF_RenderUTF8_Solid(font, text, sdlColor);
+        glyph = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_ARGB8888, 0);
+        SDL_FreeSurface(surface);
+    } else {
+        glyph = TTF_RenderUTF8_Solid(font, text, sdlColor);
+    }
 
     if(!glyph) {
         const char *errormsg = TTF_GetError();
@@ -160,19 +168,18 @@ void TTFFontRenderer::RenderText(const char *text, int fontNumber, BITMAP *desti
         return;
     }
 
-    SDL_Surface * surface = SDL_CreateRGBSurfaceWithFormat(0, glyph->w,glyph->h, 32, SDL_PIXELFORMAT_RGBA8888);
-    SDL_BlitSurface(glyph, nullptr, surface, nullptr);
+    BITMAP *sourcebmp = wrap_bitmap_sdl_surface(glyph, dest_depth);
 
-    Bitmap *dest = BitmapHelper::CreateRawBitmapWrapper(destination);
-
-    BITMAP *sourcebmp = wrap_bitmap_sdl_surface(surface);
-    Bitmap *source = BitmapHelper::CreateRawBitmapWrapper(sourcebmp);
-
-    set_preservedalpha_trans_blender(0,0,0,255);
-    dest->TransBlendBlt(source, x, y);
+    if(glyph->format->format == SDL_PIXELFORMAT_ARGB8888) {
+        set_argb2argb_blender(255);
+        draw_trans_sprite(destination, sourcebmp, x, y);
+    } else if(glyph->format->palette != nullptr) {
+        set_additive_alpha_blender();
+        draw_trans_sprite(destination, sourcebmp, x, y);
+    }
 
     SDL_FreeSurface(glyph);
-    SDL_FreeSurface(surface);
+    delete sourcebmp;
 }
 
 bool TTFFontRenderer::LoadFromDisk(int fontNumber, int fontSize)

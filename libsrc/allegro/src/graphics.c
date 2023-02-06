@@ -333,17 +333,18 @@ BITMAP *create_bitmap_ex(int color_depth, int width, int height)
    return bitmap;
 }
 
-BITMAP *wrap_bitmap_sdl_surface(void* surface)
+BITMAP *wrap_bitmap_sdl_surface(void* surface, int col_depth)
 {
     GFX_VTABLE *vtable;
     BITMAP *bitmap;
     int nr_pointers;
     int padding;
     int i;
+    SDL_Surface* surf = (SDL_Surface*) surface;
 
-    int color_depth = 32;
-    int width = ((SDL_Surface*) surface)->w;
-    int height = ((SDL_Surface*) surface)->h;
+    int color_depth = col_depth;
+    int width = surf->w;
+    int height = surf->h;
     ASSERT(width >= 0);
     ASSERT(height > 0);
 
@@ -360,13 +361,7 @@ BITMAP *wrap_bitmap_sdl_surface(void* surface)
     if (!bitmap)
         return NULL;
 
-    /* This avoids a crash for assembler code accessing the last pixel, as it
-     * read 4 bytes instead of 3.
-     */
-    padding = (color_depth == 24) ? 1 : 0;
-
-    bitmap->dat = ((SDL_Surface*) surface)->pixels;
-
+    bitmap->dat = surf->pixels;
 
     bitmap->w = bitmap->cr = width;
     bitmap->h = bitmap->cb = height;
@@ -382,7 +377,7 @@ BITMAP *wrap_bitmap_sdl_surface(void* surface)
     if (height > 0) {
         bitmap->line[0] = bitmap->dat;
         for (i=1; i<height; i++)
-            bitmap->line[i] = bitmap->line[i-1] + width * BYTES_PER_PIXEL(color_depth);
+            bitmap->line[i] = bitmap->line[i-1] + surf->pitch; // width * BYTES_PER_PIXEL(color_depth);
     }
 
     return bitmap;
