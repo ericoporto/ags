@@ -143,9 +143,12 @@ namespace AGS.Editor
             imageLookup = new List<string>();
 
             foreach (string filename in filenames)
-            {
-                imageLookup.Add(filename);
-                cmbFilenames.Items.Add(Path.GetFileName(filename));
+            {    
+                if (File.Exists(filename))
+                {
+                    imageLookup.Add(filename);
+                    cmbFilenames.Items.Add(Path.GetFileName(filename));
+                }
             }
 
             cmbFilenames.SelectedIndex = 0;
@@ -198,8 +201,11 @@ namespace AGS.Editor
 
             foreach (string filename in filenames)
             {
-                imageLookup.Add(filename);
-                cmbFilenames.Items.Add(Path.GetFileName(filename));
+                if (File.Exists(filename))
+                {
+                    imageLookup.Add(filename);
+                    cmbFilenames.Items.Add(Path.GetFileName(filename));
+                }
             }
 
             cmbFilenames.SelectedIndex = 0;
@@ -634,6 +640,15 @@ namespace AGS.Editor
         private void InvalidateOn_ValueChanged(object sender, EventArgs e)
         {
             previewPanel.Invalidate();
+        }
+
+        private void SpriteImportWindow_Load(object sender, EventArgs e)
+        {
+            if(imageLookup.Count == 0 && image == null)
+            {
+                this.DialogResult = DialogResult.Cancel;
+                this.Close();
+            }
         }
     }
 }
