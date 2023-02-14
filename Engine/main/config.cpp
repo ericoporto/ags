@@ -420,5 +420,8 @@ void save_config_file()
 
     String cfg_file = PreparePathForWriting(GetGameUserConfigDir(), DefaultConfigFileName);
     if (!cfg_file.IsEmpty())
+    {
         IniUtil::Merge(cfg_file, cfg);
+        platform->PostSaveConfigFile();
+    }
 }

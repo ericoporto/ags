@@ -18,6 +18,7 @@
 
 // ********* EMSCRIPTEN PLACEHOLDER DRIVER *********
 
+#include <emscripten.h>
 #include <stdio.h>
 #include <allegro.h>
 #include "SDL.h"
@@ -34,6 +35,7 @@ using AGS::Common::String;
 
 FSLocation CommonDataDirectory;
 FSLocation UserDataDirectory;
+FSLocation SavedGamesDirectory;
 
 struct AGSEmscripten : AGSPlatformDriver {
 
@@ -44,6 +46,8 @@ struct AGSEmscripten : AGSPlatformDriver {
   FSLocation GetUserConfigDirectory() override;
   FSLocation GetUserGlobalConfigDirectory() override;
   FSLocation GetAppOutputDirectory() override;
+  void PostSaveGame() override;
+  void PostSaveConfigFile() override;
   unsigned long GetDiskFreeSpaceMB() override;
   const char* GetBackendFailUserHint() override;
   eScriptSystemOSID GetSystemOSID() override;
@@ -81,8 +85,23 @@ static void DetermineDataDirectories()
     if (UserDataDirectory.IsValid())
         return;
 
+    SavedGamesDirectory = FSLocation("/home/web_user").Concat("saved_games");
     UserDataDirectory = FSLocation("/home/web_user").Concat("ags");
     CommonDataDirectory = FSLocation("/home/web_user").Concat("common");
+}
+
+static void SyncEmscriptenFS()
+{
+    // Sync files
+    EM_ASM(
+        FS.syncfs(false, function (err) {
+          if (err) {
+            console.error("ERROR: IDBFS syncfs failed with" + err + "(errno:" + err.errno + ")");
+          } else {
+            console.log('INFO: IDBFS synced game files.');
+          }
+        });
+    );
 }
 
 FSLocation AGSEmscripten::GetAllUsersDataDirectory()
@@ -94,7 +113,7 @@ FSLocation AGSEmscripten::GetAllUsersDataDirectory()
 FSLocation AGSEmscripten::GetUserSavedgamesDirectory()
 {
     DetermineDataDirectories();
-    return UserDataDirectory;
+    return SavedGamesDirectory;
 }
 
 FSLocation AGSEmscripten::GetUserConfigDirectory()
@@ -111,6 +130,16 @@ FSLocation AGSEmscripten::GetAppOutputDirectory()
 {
     DetermineDataDirectories();
     return UserDataDirectory;
+}
+
+void AGSEmscripten::PostSaveGame()
+{
+    SyncEmscriptenFS();
+}
+
+void AGSEmscripten::PostSaveConfigFile()
+{
+    SyncEmscriptenFS();
 }
 
 unsigned long AGSEmscripten::GetDiskFreeSpaceMB() 

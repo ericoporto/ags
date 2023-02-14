@@ -74,6 +74,10 @@ public:
     virtual void PreBackendExit() { };
     // Called right after the backend is deinitialized
     virtual void PostBackendExit() { };
+    // Called right after a config file is written
+    virtual void PostSaveConfigFile() { };
+    // Called right after sava is written to a save slot
+    virtual void PostSaveGame() { };
 
     virtual void Delay(int millis);
     virtual void DisplayAlert(const char*, ...) = 0;

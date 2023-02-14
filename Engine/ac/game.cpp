@@ -964,6 +964,7 @@ void save_game(int slotn, const char*descript) {
 
     // Save dynamic game data
     SaveGameState(out.get());
+    platform->PostSaveGame();
 }
 
 int gameHasBeenRestored = 0;
