@@ -22,7 +22,10 @@
 #include <stdio.h>
 #include <allegro.h>
 #include "SDL.h"
+#include "main/graphics_mode.h"
+#include "main/engine.h"
 #include "ac/runtime_defines.h"
+#include "ac/system.h"
 #include "gfx/gfxdefines.h"
 #include "platform/base/agsplatformdriver.h"
 #include "plugin/agsplugin.h"
@@ -36,6 +39,20 @@ using AGS::Common::String;
 FSLocation CommonDataDirectory;
 FSLocation UserDataDirectory;
 FSLocation SavedGamesDirectory;
+
+// We need this to export for Emscripten due to C++ name mangling
+extern "C" 
+{
+  int ext_get_windowed(void)
+  {
+    return System_GetWindowed();
+  }
+
+  int ext_toggle_fullscreen(void)
+  {
+    return engine_try_switch_windowed_gfxmode() ? 1 : 0;
+  }
+} // END of Extern "C"
 
 struct AGSEmscripten : AGSPlatformDriver {
 
