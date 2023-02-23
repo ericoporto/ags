@@ -163,7 +163,7 @@ SDL_Window *sys_window_create(const char *window_title, int w, int h, WindowMode
     case kWnd_FullDesktop: flags |= SDL_WINDOW_FULLSCREEN_DESKTOP; break;
     }
     flags |= ex_flags;
-#if(AGS_PLATFORM_MOBILE)
+#if (AGS_PLATFORM_MOBILE || AGS_PLATFORM_OS_EMSCRIPTEN)
     flags |= SDL_WINDOW_RESIZABLE;
 #endif
     window = SDL_CreateWindow(
