@@ -170,6 +170,7 @@ if(EMSCRIPTEN)
         -s ALLOW_TABLE_GROWTH=1 \
         -s WASM=1 \
         -s INVOKE_RUN=0 \
+        -sMIN_SAFARI_VERSION=120000 \
 		-s EXIT_RUNTIME=1  \
 		-s EMULATE_FUNCTION_POINTER_CASTS=1 ")
 
