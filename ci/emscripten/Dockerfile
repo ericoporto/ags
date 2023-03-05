@@ -1,5 +1,5 @@
 # The current used version of emsdk
-FROM emscripten/emsdk:3.1.28
+FROM emscripten/emsdk:3.1.27
 
 #fix TZ docker hang
 ENV TZ=Europe/London
