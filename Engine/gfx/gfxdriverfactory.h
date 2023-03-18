@@ -69,7 +69,7 @@ public:
 // Query the available graphics factory names
 void GetGfxDriverFactoryNames(StringV &ids);
 // Acquire the graphics factory singleton object by its id
-IGfxDriverFactory *GetGfxDriverFactory(const String id);
+IGfxDriverFactory *GetGfxDriverFactory(const String& id);
 
 } // namespace Engine
 } // namespace AGS

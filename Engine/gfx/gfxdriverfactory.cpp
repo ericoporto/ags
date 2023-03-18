@@ -45,7 +45,7 @@ void GetGfxDriverFactoryNames(StringV &ids)
     ids.push_back("Software");
 }
 
-IGfxDriverFactory *GetGfxDriverFactory(const String id)
+IGfxDriverFactory *GetGfxDriverFactory(const String& id)
 {
 #if AGS_HAS_DIRECT3D
     if (id.CompareNoCase("D3D9") == 0)
