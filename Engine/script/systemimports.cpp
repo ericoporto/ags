@@ -45,7 +45,7 @@ uint32_t SystemImports::add(const String &name, const RuntimeScriptValue &value,
 
     btree[name] = ixof;
     if (ixof == imports.size())
-        imports.push_back(ScriptImport());
+        imports.emplace_back();
     imports[ixof].Name          = name;
     imports[ixof].Value         = value;
     imports[ixof].InstancePtr   = anotherscr;
@@ -108,14 +108,14 @@ uint32_t SystemImports::get_index_of(const String &name)
 
 String SystemImports::findName(const RuntimeScriptValue &value)
 {
-    for (const auto &import : imports)
-    {
-        if (import.Value == value)
-        {
-            return import.Name;
-        }
+    auto result = std::find_if(imports.begin(), imports.end(),[&value](ScriptImport const& scriptImport){
+        return scriptImport.Value == value;
+    });
+
+    if(result != imports.end()) {
+        return result->Name;
     }
-    return String();
+    return {};
 }
 
 void SystemImports::RemoveScriptExports(ccInstance *inst)
@@ -125,17 +125,17 @@ void SystemImports::RemoveScriptExports(ccInstance *inst)
         return;
     }
 
-    for (auto &import : imports)
+    for (auto &scriptImport : imports)
     {
-        if (import.Name == nullptr)
+        if (scriptImport.Name == nullptr)
             continue;
 
-        if (import.InstancePtr == inst)
+        if (scriptImport.InstancePtr == inst)
         {
-            btree.erase(import.Name);
-            import.Name = nullptr;
-            import.Value.Invalidate();
-            import.InstancePtr = nullptr;
+            btree.erase(scriptImport.Name);
+            scriptImport.Name = nullptr;
+            scriptImport.Value.Invalidate();
+            scriptImport.InstancePtr = nullptr;
         }
     }
 }
