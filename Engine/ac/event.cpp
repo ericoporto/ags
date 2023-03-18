@@ -59,7 +59,7 @@ int evblocknum;
 int inside_processevent=0;
 int eventClaimed = EVENT_NONE;
 
-const char *tsnames[TS_NUM] = { nullptr, REP_EXEC_NAME, "on_key_press", "on_mouse_click", "on_text_input" };
+const char * const tsnames[TS_NUM] = { nullptr, REP_EXEC_NAME, "on_key_press", "on_mouse_click", "on_text_input" };
 
 
 int run_claimable_event(const char *tsname, bool includeRoom, int numParams, const RuntimeScriptValue *params, bool *eventWasClaimed) {
@@ -97,7 +97,7 @@ int run_claimable_event(const char *tsname, bool includeRoom, int numParams, con
 }
 
 // runs the global script on_event function
-void run_on_event(int evtype, RuntimeScriptValue &wparam)
+void run_on_event(int evtype, const RuntimeScriptValue &wparam)
 {
     RuntimeScriptValue params[]{ evtype , wparam };
     QueueScriptFunction(kScInstGame, "on_event", 2, params);

@@ -110,7 +110,7 @@ extern int evblocknum;
 
 extern int eventClaimed;
 
-extern const char*tsnames[TS_NUM];
+extern const char* const tsnames[TS_NUM];
 
 #endif // __AGS_EE_AC__EVENT_H
 
