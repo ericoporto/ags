@@ -259,7 +259,7 @@ int getAvailableTranslations(char* translations)
 }
 */
 
-extern void ios_show_message_box(char* buffer);
+//extern void ios_show_message_box(char* buffer);
 volatile int ios_wait_for_ui = 0;
 
 
@@ -325,10 +325,10 @@ void AGSIOS::DisplayAlert(const char *text, ...) {
   vsprintf(displbuf, text, ap);
   va_end(ap);
   printf("%s", displbuf);
-  ios_show_message_box(displbuf);
+//  ios_show_message_box(displbuf);
   
-  while (ios_wait_for_ui)
-    usleep(200);
+  //while (ios_wait_for_ui)
+  //  usleep(200);
 }
 
 void AGSIOS::Delay(int millis) {
@@ -354,7 +354,8 @@ void AGSIOS::ShutdownCDPlayer() {
 
 FSLocation AGSIOS::GetAppOutputDirectory()
 {
-  return FSLocation(ios_document_directory);
+    //return FSLocation(ios_document_directory);
+    return FSLocation();
 }
 
 AGSPlatformDriver* AGSPlatformDriver::CreateDriver()
