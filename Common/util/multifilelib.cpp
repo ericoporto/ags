@@ -147,17 +147,17 @@ MFLUtil::MFLError MFLUtil::ReadSigsAndVersion(Stream *in, MFLVersion *p_lib_vers
         soff_t abs_offset_32 = in->ReadInt32();
 
         // test for header signature again, with 64-bit and 32-bit offsets if necessary
-        if (abs_offset > 0 && abs_offset < (tail_abs_offset - HeadSig.GetLength())) 
+        if (abs_offset > 0 && abs_offset < (tail_abs_offset - HeadSig.GetLength()))
         {
             in->Seek(abs_offset, kSeekBegin);
             sig.ReadCount(in, HeadSig.GetLength());
         }
 
         // try again with 32-bit offset
-        if (HeadSig.Compare(sig) != 0) 
+        if (HeadSig.Compare(sig) != 0)
         {
             abs_offset = abs_offset_32;
-            if (abs_offset > 0 && abs_offset < (tail_abs_offset - HeadSig.GetLength())) 
+            if (abs_offset > 0 && abs_offset < (tail_abs_offset - HeadSig.GetLength()))
             {
                 in->Seek(abs_offset, kSeekBegin);
                 sig.ReadCount(in, HeadSig.GetLength());
@@ -188,10 +188,10 @@ MFLUtil::MFLError MFLUtil::ReadSigsAndVersion(Stream *in, MFLVersion *p_lib_vers
 
 MFLUtil::MFLError MFLUtil::ReadSingleFileLib(AssetLibInfo &lib, Stream *in)
 {
-    char passwmodifier = in->ReadInt8();
+    const char passwmodifier = in->ReadInt8();
     in->ReadInt8(); // unused byte
     lib.LibFileNames.resize(1); // only one library part
-    size_t asset_count = (uint16_t)in->ReadInt16();
+    const size_t asset_count = static_cast<uint16_t>(in->ReadInt16());
     lib.AssetInfos.resize(asset_count);
 
     in->Seek(SingleFilePswLen, kSeekCurrent); // skip password dooberry
@@ -208,7 +208,7 @@ MFLUtil::MFLError MFLUtil::ReadSingleFileLib(AssetLibInfo &lib, Stream *in)
     }
     for (size_t i = 0; i < asset_count; ++i)
     {
-        lib.AssetInfos[i].Size = (uint32_t)in->ReadInt32();
+        lib.AssetInfos[i].Size = static_cast<uint32_t>(in->ReadInt32());
     }
     in->Seek(2 * asset_count, kSeekCurrent); // skip flags & ratio
     lib.AssetInfos[0].Offset = in->GetPosition();
@@ -231,7 +231,7 @@ MFLUtil::MFLError MFLUtil::ReadMultiFileLib(AssetLibInfo &lib, Stream *in, MFLVe
         // read new clib format with 64-bit files support
         return ReadV30(lib, in, lib_version);
     }
-    if (lib_version >= kMFLVersion_MultiV21)
+    else if (lib_version >= kMFLVersion_MultiV21)
     {
         // read new clib format with encoding support (versions 21+)
         return ReadV21(lib, in);
