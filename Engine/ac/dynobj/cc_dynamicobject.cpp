@@ -33,22 +33,22 @@ void ccSetStringClassImpl(ICCStringClass *theClass) {
 // register a memory handle for the object and allow script
 // pointers to point to it
 int32_t ccRegisterManagedObject(const void *object, ICCDynamicObject *callback, bool plugin_object) {
-    int32_t handl = pool.AddObject((const char*)object, callback, plugin_object);
+    int32_t handl = pool.AddObject(static_cast<const char*>(object), callback, plugin_object);
 
     ManagedObjectLog("Register managed object type '%s' handle=%d addr=%08X",
-        ((callback == NULL) ? "(unknown)" : callback->GetType()), handl, object);
+        ((callback == nullptr) ? "(unknown)" : callback->GetType()), handl, object);
 
     return handl;
 }
 
 // register a de-serialized object
 int32_t ccRegisterUnserializedObject(int index, const void *object, ICCDynamicObject *callback, bool plugin_object) {
-    return pool.AddUnserializedObject((const char*)object, callback, plugin_object, index);
+    return pool.AddUnserializedObject(static_cast<const char*>(object), callback, plugin_object, index);
 }
 
 // unregister a particular object
 int ccUnRegisterManagedObject(const void *object) {
-    return pool.RemoveObject((const char*)object);
+    return pool.RemoveObject(static_cast<const char*>(object));
 }
 
 // remove all registered objects
@@ -77,7 +77,7 @@ int32_t ccGetObjectHandleFromAddress(const void *address) {
     if (address == nullptr)
         return 0;
 
-    int32_t handl = pool.AddressToHandle((const char*)address);
+    int32_t handl = pool.AddressToHandle(static_cast<const char*>(address));
 
     ManagedObjectLog("Line %d WritePtr: %08X to %d", currentline, address, handl);
 
