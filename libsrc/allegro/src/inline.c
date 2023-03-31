@@ -16,7 +16,7 @@
  *      See readme.txt for copyright information.
  */
 
-
+#if defined(_DEBUG)
 #define AL_INLINE(type, name, args, code)    type name args code
 
 #include "allegro.h"
@@ -25,4 +25,4 @@
 #ifdef ALLEGRO_INTERNAL_HEADER
    #include ALLEGRO_INTERNAL_HEADER
 #endif
-
+#endif
