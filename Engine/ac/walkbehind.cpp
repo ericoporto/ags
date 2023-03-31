@@ -71,14 +71,14 @@ void walkbehinds_generate_sprites()
                     switch (coldepth)
                     {
                     case 8:
-                        dst_line[(x - sx)] = src_line[x];
+                        dst_line[x - sx] = src_line[x];
                         break;
                     case 16:
-                        reinterpret_cast<uint16_t*>(dst_line)[(x - sx)] =
+                        reinterpret_cast<uint16_t*>(dst_line)[x - sx] =
                             reinterpret_cast<const uint16_t*>(src_line)[x];
                         break;
                     case 32:
-                        reinterpret_cast<uint32_t*>(dst_line)[(x - sx)] =
+                        reinterpret_cast<uint32_t*>(dst_line)[x - sx] =
                             reinterpret_cast<const uint32_t*>(src_line)[x];
                         break;
                     default: assert(0); break;
@@ -177,10 +177,11 @@ void walkbehinds_recalc()
                 }
                 wbcol.Y2 = y + 1; // +1 to allow bottom line of screen to work (CHECKME??)
                 // resize the bounding rect
-                walkBehindAABB[wb].Left = std::min(col, walkBehindAABB[wb].Left);
-                walkBehindAABB[wb].Top = std::min(y, walkBehindAABB[wb].Top);
-                walkBehindAABB[wb].Right = std::max(col, walkBehindAABB[wb].Right);
-                walkBehindAABB[wb].Bottom = std::max(y, walkBehindAABB[wb].Bottom);
+                auto& wbRect = walkBehindAABB[wb];
+                wbRect.Left = std::min(col, wbRect.Left);
+                wbRect.Top = std::min(y, wbRect.Top);
+                wbRect.Right = std::max(col, wbRect.Right);
+                wbRect.Bottom = std::max(y, wbRect.Bottom);
             }
         }
     }
