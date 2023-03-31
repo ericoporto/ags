@@ -118,6 +118,21 @@ float Math_Tanh(float value)
     return tanh(value);
 }
 
+float Math_ArcCosh(float value)
+{
+    return acosh(value);
+}
+
+float Math_ArcSinh(float value)
+{
+    return asinh(value);
+}
+
+float Math_ArcTanh(float value)
+{
+    return atanh(value);
+}
+
 float Math_RaiseToPower(float base, float exp)
 {
     return ::pow(base, exp);
@@ -144,6 +159,21 @@ float Math_Sqrt(float value)
         quit("!Sqrt: cannot perform square root of negative number");
 
     return ::sqrt(value);
+}
+
+float Math_Clamp(float value, float min, float max)
+{
+    return (value < min) ? min : (value > max) ? max : value;
+}
+
+float Math_Lerp(float a, float b, float t)
+{
+    return (1 - t) * a + t * b;
+}
+
+float Math_Abs(float value)
+{
+    return fabs(value);
 }
 
 int __Rand(int upto)
