@@ -438,26 +438,25 @@ inline bool do_fixups(size_t pc_at, ScriptOperation &codeOp, ccInstance *codeIns
         char fixup = codeInst->code_fixups[pc_at];
         switch (fixup)
         {
-        case 0:
-            // should be a numeric literal (int32 or float)
-            codeOp.Args[i].SetInt32( (int32_t)codeInst->code[pc_at] );
-            continue;
+        case 0: // should be a numeric literal (int32 or float)
+            codeOp.Args[i].SetInt32(static_cast<int32_t>(codeInst->code[pc_at]));
+            break;
 
         case FIXUP_GLOBALDATA:
-            {
-                ScriptVariable *gl_var = (ScriptVariable*)codeInst->code[pc_at];
-                codeOp.Args[i].SetGlobalVar(&gl_var->RValue);
-            }
+            codeOp.Args[i].SetGlobalVar(&((ScriptVariable*)codeInst->code[pc_at])->RValue);
             break;
+
         case FIXUP_FUNCTION:
             // originally commented -- CHECKME: could this be used in very old versions of AGS?
             //      code[fixup] += (long)&code[0];
             // This is a program counter value, presumably will be used as SCMD_CALL argument
-            codeOp.Args[i].SetInt32((int32_t)codeInst->code[pc_at]);
+            codeOp.Args[i].SetInt32(static_cast<int32_t>(codeInst->code[pc_at]));
             break;
+
         case FIXUP_STRING:
             codeOp.Args[i].SetStringLiteral(&codeInst->strings[0] + codeInst->code[pc_at]);
             break;
+
         case FIXUP_IMPORT:
             {
                 const ScriptImport *import = simp.getByIndex(static_cast<uint32_t>(codeInst->code[pc_at]));
@@ -472,15 +471,15 @@ inline bool do_fixups(size_t pc_at, ScriptOperation &codeOp, ccInstance *codeIns
                 }
             }
             break;
+
         case FIXUP_STACK:
-            codeOp.Args[i] = c_this.GetStackPtrOffsetFw((int32_t)codeInst->code[pc_at]);
+            codeOp.Args[i] = c_this.GetStackPtrOffsetFw(static_cast<int32_t>(codeInst->code[pc_at]));
             break;
+
         default:
             cc_error("internal fixup type error: %d", fixup);
             return true;
         }
-        /* End FixupArgument */
-        //=====================================================================
     }
     return false;
 }
