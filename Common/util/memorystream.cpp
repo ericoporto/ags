@@ -106,7 +106,7 @@ size_t MemoryStream::Read(void *buffer, size_t size)
     assert(_len > _pos);
     size_t remain = _len - _pos;
     size_t read_sz = std::min(remain, size);
-    memcpy(buffer, _cbuf + _pos, read_sz);
+    std::copy_n(_cbuf + _pos, read_sz, static_cast<uint8_t*>(buffer));
     _pos += read_sz;
     return read_sz;
 }
@@ -138,7 +138,7 @@ size_t MemoryStream::Write(const void *buffer, size_t size)
 {
     if (!_buf || (_pos >= _buf_sz)) { return 0; }
     size = std::min(size, _buf_sz - _pos);
-    memcpy(_buf + _pos, buffer, size);
+    std::copy_n(static_cast<const uint8_t*>(buffer), size, _buf + _pos);
     _pos += size;
     // will increase len if writing after eos, otherwise = overwrite at pos
     _len = std::max(_len, _pos);
@@ -192,7 +192,7 @@ size_t VectorStream::Write(const void *buffer, size_t size)
         _vec->resize(_pos + size);
         _len = _pos + size;
     }
-    memcpy(_vec->data() + _pos, buffer, size);
+    std::copy_n(static_cast<const uint8_t*>(buffer), size, _vec->data() + _pos);
     _pos += size;
     return size;
 }
