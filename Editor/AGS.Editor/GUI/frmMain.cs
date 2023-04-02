@@ -31,10 +31,12 @@ namespace AGS.Editor
 		//private int _splitterYtoSet = 0;
 		private bool _suspendDrawing = false;
         private WindowsLayoutManager _layoutManager;
+        private Fullscreen _fullscreen;
 
         public frmMain()
         {
             InitializeComponent();
+            _fullscreen = new Fullscreen(this);
 
             _layoutManager = new WindowsLayoutManager(mainContainer, GetStartupPanes());            
             tabbedDocumentContainer1.ActiveDocumentChanged += new TabbedDocumentManager.ActiveDocumentChangeHandler(tabbedDocumentContainer1_ActiveDocumentChanged);
