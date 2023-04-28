@@ -538,7 +538,7 @@ int ccInstance::Run(int32_t curpc)
 
     /* Main bytecode execution loop */
     //=====================================================================
-    while ((flags & INSTF_ABORTED) == 0)
+    for (;(flags & INSTF_ABORTED) == 0; pc += codeOp.ArgCount + 1)
     {
         // WARNING: a time-critical code ahead;
         // trying to pick some of the code out to separate function(s)
@@ -575,16 +575,16 @@ int ccInstance::Run(int32_t curpc)
                         ScriptVariable *gl_var = (ScriptVariable*)codeInst->code[pc_at];
                         codeOp.Args[i].SetGlobalVar(&gl_var->RValue);
                     }
-                    break;
+                    continue;
                 case FIXUP_FUNCTION:
                     // originally commented -- CHECKME: could this be used in very old versions of AGS?
                     //      code[fixup] += (long)&code[0];
                     // This is a program counter value, presumably will be used as SCMD_CALL argument
                     codeOp.Args[i].SetInt32((int32_t)codeInst->code[pc_at]);
-                    break;
+                    continue;
                 case FIXUP_STRING:
                     codeOp.Args[i].SetStringLiteral(&codeInst->strings[0] + codeInst->code[pc_at]);
-                    break;
+                    continue;
                 case FIXUP_IMPORT:
                     {
                         const ScriptImport *import = simp.getByIndex(static_cast<uint32_t>(codeInst->code[pc_at]));
@@ -598,10 +598,10 @@ int ccInstance::Run(int32_t curpc)
                             return -1;
                         }
                     }
-                    break;
+                    continue;
                 case FIXUP_STACK:
                     codeOp.Args[i] = GetStackPtrOffsetFw((int32_t)codeInst->code[pc_at]);
-                    break;
+                    continue;
                 default:
                     cc_error("internal fixup type error: %d", fixup);
                     return -1;
@@ -632,7 +632,7 @@ int ccInstance::Run(int32_t curpc)
           currentline = line_number;
           if (new_line_hook)
               new_line_hook(this, currentline);
-          break;
+          continue;
       case SCMD_ADD:
       {
           const auto arg_reg = codeOp.Arg1i();
@@ -663,7 +663,7 @@ int ccInstance::Run(int32_t curpc)
           {
             reg1.IValue += arg_lit;
           }
-          break;
+          continue;
       }
       case SCMD_SUB:
       {
@@ -693,14 +693,14 @@ int ccInstance::Run(int32_t curpc)
           {
             reg1.IValue -= arg_lit;
           }
-          break;
+          continue;
       }
       case SCMD_REGTOREG:
       {
           const auto &reg1 = registers[codeOp.Arg1i()];
           auto       &reg2 = registers[codeOp.Arg2i()];
           reg2 = reg1;
-          break;
+          continue;
       }
       case SCMD_WRITELIT:
       {
@@ -716,19 +716,19 @@ int ccInstance::Run(int32_t curpc)
           {
           case sizeof(char):
               registers[SREG_MAR].WriteByte(arg_value.IValue);
-              break;
+              continue;
           case sizeof(int16_t):
               registers[SREG_MAR].WriteInt16(arg_value.IValue);
-              break;
+              continue;
           case sizeof(int32_t):
               // We do not know if this is math integer or some pointer, etc
               registers[SREG_MAR].WriteValue(arg_value);
-              break;
+              continue;
           default:
               cc_error("unexpected data size for WRITELIT op: %d", arg_size);
-              break;
+              continue;
           }
-          break;
+          continue;
       }
       case SCMD_RET:
           {
@@ -745,6 +745,7 @@ int ccInstance::Run(int32_t curpc)
               return 0;
           }
           POP_CALL_STACK;
+          pc -= codeOp.ArgCount + 1;
           continue; // continue so that the PC doesn't get overwritten
           }
       case SCMD_LITTOREG:
@@ -752,35 +753,35 @@ int ccInstance::Run(int32_t curpc)
           auto &reg1 = registers[codeOp.Arg1i()];
           const auto &arg_value = codeOp.Arg2();
           reg1 = arg_value;
-          break;
+          continue;
       }
       case SCMD_MEMREAD:
       {
           // Take the data address from reg[MAR] and copy int32_t to reg[arg1]
           auto &reg1 = registers[codeOp.Arg1i()];
           reg1 = registers[SREG_MAR].ReadValue();
-          break;
+          continue;
       }
       case SCMD_MEMWRITE:
       {
           // Take the data address from reg[MAR] and copy there int32_t from reg[arg1]
           const auto &reg1 = registers[codeOp.Arg1i()];
           registers[SREG_MAR].WriteValue(reg1);
-          break;
+          continue;
       }
       case SCMD_LOADSPOFFS:
       {
           const auto arg_off = codeOp.Arg1i();
           registers[SREG_MAR] = GetStackPtrOffsetRw(arg_off);
           ASSERT_CC_ERROR();
-          break;
+          continue;
       }
       case SCMD_MULREG:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetInt32(reg1.IValue * reg2.IValue);
-          break;
+          continue;
       }
       case SCMD_DIVREG:
       {
@@ -791,7 +792,7 @@ int ccInstance::Run(int32_t curpc)
               return -1;
           }
           reg1.SetInt32(reg1.IValue / reg2.IValue);
-          break;
+          continue;
       }
       case SCMD_ADDREG:
       {
@@ -799,7 +800,7 @@ int ccInstance::Run(int32_t curpc)
           const auto &reg2 = registers[codeOp.Arg2i()];
           // This may be pointer arithmetics, in which case IValue stores offset from base pointer
           reg1.IValue += reg2.IValue;
-          break;
+          continue;
       }
       case SCMD_SUBREG:
       {
@@ -807,84 +808,84 @@ int ccInstance::Run(int32_t curpc)
           const auto &reg2 = registers[codeOp.Arg2i()];
           // This may be pointer arithmetics, in which case IValue stores offset from base pointer
           reg1.IValue -= reg2.IValue;
-          break;
+          continue;
       }
       case SCMD_BITAND:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetInt32(reg1.IValue & reg2.IValue);
-          break;
+          continue;
       }
       case SCMD_BITOR:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetInt32(reg1.IValue | reg2.IValue);
-          break;
+          continue;
       }
       case SCMD_ISEQUAL:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetInt32AsBool(reg1 == reg2);
-          break;
+          continue;
       }
       case SCMD_NOTEQUAL:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetInt32AsBool(reg1 != reg2);
-          break;
+          continue;
       }
       case SCMD_GREATER:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetInt32AsBool(reg1.IValue > reg2.IValue);
-          break;
+          continue;
       }
       case SCMD_LESSTHAN:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetInt32AsBool(reg1.IValue < reg2.IValue);
-          break;
+          continue;
       }
       case SCMD_GTE:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetInt32AsBool(reg1.IValue >= reg2.IValue);
-          break;
+          continue;
       }
       case SCMD_LTE:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetInt32AsBool(reg1.IValue <= reg2.IValue);
-          break;
+          continue;
       }
       case SCMD_AND:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetInt32AsBool(reg1.IValue && reg2.IValue);
-          break;
+          continue;
       }
       case SCMD_OR:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetInt32AsBool(reg1.IValue || reg2.IValue);
-          break;
+          continue;
       }
       case SCMD_XORREG:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetInt32(reg1.IValue ^ reg2.IValue);
-          break;
+          continue;
       }
       case SCMD_MODREG:
       {
@@ -895,14 +896,14 @@ int ccInstance::Run(int32_t curpc)
               return -1;
           }
           reg1.SetInt32(reg1.IValue % reg2.IValue);
-          break;
+          continue;
       }
       case SCMD_NOTREG:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1 = !(reg1);
-          break;
+          continue;
       }
       case SCMD_CALL:
       {
@@ -934,6 +935,7 @@ int ccInstance::Run(int32_t curpc)
           curnest++;
           thisbase[curnest] = 0;
           funcstart[curnest] = pc;
+          pc -= codeOp.ArgCount + 1;
           continue; // continue so that the PC doesn't get overwritten
       }
       case SCMD_MEMREADB:
@@ -941,42 +943,42 @@ int ccInstance::Run(int32_t curpc)
           // Take the data address from reg[MAR] and copy byte to reg[arg1]
           auto &reg1 = registers[codeOp.Arg1i()];
           reg1.SetUInt8(registers[SREG_MAR].ReadByte());
-          break;
+          continue;
       }
       case SCMD_MEMREADW:
       {
           // Take the data address from reg[MAR] and copy int16_t to reg[arg1]
           auto &reg1 = registers[codeOp.Arg1i()];
           reg1.SetInt16(registers[SREG_MAR].ReadInt16());
-          break;
+          continue;
       }
       case SCMD_MEMWRITEB:
       {
           // Take the data address from reg[MAR] and copy there byte from reg[arg1]
           const auto &reg1 = registers[codeOp.Arg1i()];
           registers[SREG_MAR].WriteByte(reg1.IValue);
-          break;
+          continue;
       }
       case SCMD_MEMWRITEW:
       {
           // Take the data address from reg[MAR] and copy there int16_t from reg[arg1]
           const auto &reg1 = registers[codeOp.Arg1i()];
           registers[SREG_MAR].WriteInt16(reg1.IValue);
-          break;
+          continue;
       }
       case SCMD_JZ:
       {
           const auto arg_lit = codeOp.Arg1i();
           if (registers[SREG_AX].IsNull())
               pc += arg_lit;
-          break;
+          continue;
       }
       case SCMD_JNZ:
       {
           const auto arg_lit = codeOp.Arg1i();
           if (!registers[SREG_AX].IsNull())
               pc += arg_lit;
-          break;
+          continue;
       }
       case SCMD_PUSHREG:
       {
@@ -984,14 +986,14 @@ int ccInstance::Run(int32_t curpc)
           const auto &reg1 = registers[codeOp.Arg1i()];
           ASSERT_STACK_SPACE_VALS(1);
           PushValueToStack(reg1);
-          break;
+          continue;
       }
       case SCMD_POPREG:
       {
           auto &reg1 = registers[codeOp.Arg1i()];
           ASSERT_STACK_SIZE(1);
           reg1 = PopValueFromStack();
-          break;
+          continue;
       }
       case SCMD_JMP:
       {
@@ -1023,14 +1025,14 @@ int ccInstance::Run(int32_t curpc)
                   _lastAliveTs = AGS_FastClock::now();
               }
           }
-          break;
+          continue;
       }
       case SCMD_MUL:
       {
           auto &reg1 = registers[codeOp.Arg1i()];
           const auto arg_lit = codeOp.Arg2i();
           reg1.IValue *= arg_lit;
-          break;
+          continue;
       }
       case SCMD_CHECKBOUNDS:
       {
@@ -1041,7 +1043,7 @@ int ccInstance::Run(int32_t curpc)
                   cc_error("!Array index out of bounds (index: %d, bounds: 0..%d)", reg1.IValue, arg_lit - 1);
                   return -1;
           }
-          break;
+          continue;
       }
       case SCMD_DYNAMICBOUNDS:
           {
@@ -1064,7 +1066,7 @@ int ccInstance::Run(int32_t curpc)
                       }
                       return -1;
               }
-              break;
+              continue;
           }
 
           // 64 bit: Handles are always 32 bit values. They are not C pointer.
@@ -1080,7 +1082,7 @@ int ccInstance::Run(int32_t curpc)
           ScriptValueType obj_type = ccGetObjectAddressAndManagerFromHandle(handle, object, manager);
           reg1.SetDynamicObject(obj_type, object, manager);
           ASSERT_CC_ERROR();
-          break;
+          continue;
       }
       case SCMD_MEMWRITEPTR:
       {
@@ -1118,7 +1120,7 @@ int ccInstance::Run(int32_t curpc)
               ccAddObjectReference(newHandle);
               registers[SREG_MAR].WriteInt32(newHandle);
           }
-          break;
+          continue;
       }
       case SCMD_MEMINITPTR:
       { 
@@ -1153,13 +1155,13 @@ int ccInstance::Run(int32_t curpc)
 
           ccAddObjectReference(newHandle);
           registers[SREG_MAR].WriteInt32(newHandle);
-          break;
+          continue;
                             }
       case SCMD_MEMZEROPTR: {
           int32_t handle = registers[SREG_MAR].ReadInt32();
           ccReleaseObjectReference(handle);
           registers[SREG_MAR].WriteInt32(0);
-          break;
+          continue;
                             }
       case SCMD_MEMZEROPTRND: {
           int32_t handle = registers[SREG_MAR].ReadInt32();
@@ -1173,14 +1175,14 @@ int ccInstance::Run(int32_t curpc)
           ccReleaseObjectReference(handle);
           pool.disableDisposeForObject = nullptr;
           registers[SREG_MAR].WriteInt32(0);
-          break;
+          continue;
                               }
       case SCMD_CHECKNULL:
           if (registers[SREG_MAR].IsNull()) {
               cc_error("!Null pointer referenced");
               return -1;
           }
-          break;
+          continue;
       case SCMD_CHECKNULLREG:
       {
           const auto &reg1 = registers[codeOp.Arg1i()];
@@ -1188,13 +1190,13 @@ int ccInstance::Run(int32_t curpc)
               cc_error("!Null string referenced");
               return -1;
           }
-          break;
+          continue;
       }
       case SCMD_NUMFUNCARGS:
       {
           const auto arg_lit = codeOp.Arg1i();
           num_args_to_func = arg_lit;
-          break;
+          continue;
       }
       case SCMD_CALLAS:
       {
@@ -1252,7 +1254,7 @@ int ccInstance::Run(int32_t curpc)
           was_just_callas = func_callstack.Count;
           num_args_to_func = -1;
           POP_CALL_STACK;
-          break;
+          continue;
                        }
       case SCMD_CALLEXT: {
           // Call to a real 'C' code function
@@ -1332,13 +1334,13 @@ int ccInstance::Run(int32_t curpc)
           registers[SREG_AX] = return_value;
           next_call_needs_object = 0;
           num_args_to_func = -1;
-          break;
+          continue;
                          }
       case SCMD_PUSHREAL:
       {
           const auto &reg1 = registers[codeOp.Arg1i()];
           PushToFuncCallStack(func_callstack, reg1);
-          break;
+          continue;
       }
       case SCMD_SUBREALSTACK:
       {
@@ -1350,7 +1352,7 @@ int ccInstance::Run(int32_t curpc)
               PopValuesFromStack(arg_lit);
               was_just_callas = -1;
           }
-          break;
+          continue;
       }
       case SCMD_CALLOBJ:
       {
@@ -1388,27 +1390,27 @@ int ccInstance::Run(int32_t curpc)
               return -1;
           }
           next_call_needs_object = 1;
-          break;
+          continue;
       }
       case SCMD_SHIFTLEFT:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetInt32(reg1.IValue << reg2.IValue);
-          break;
+          continue;
       }
       case SCMD_SHIFTRIGHT:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetInt32(reg1.IValue >> reg2.IValue);
-          break;
+          continue;
       }
       case SCMD_THISBASE:
       {
           const auto arg_lit = codeOp.Arg1i();
           thisbase[curnest] = arg_lit;
-          break;
+          continue;
       }
       case SCMD_NEWARRAY:
           {
@@ -1423,7 +1425,7 @@ int ccInstance::Run(int32_t curpc)
               }
               DynObjectRef ref = globalDynamicArray.Create(numElements, arg_elsize, arg_managed);
               reg1.SetDynamicObject(ref.second, &globalDynamicArray);
-              break;
+              continue;
           }
       case SCMD_NEWUSEROBJECT:
           {
@@ -1436,28 +1438,28 @@ int ccInstance::Run(int32_t curpc)
               }
               ScriptUserObject *suo = ScriptUserObject::CreateManaged(arg_size);
               reg1.SetDynamicObject(suo, suo);
-              break;
+              continue;
           }
       case SCMD_FADD:
       {
           auto &reg1 = registers[codeOp.Arg1i()];
           const auto arg_lit = codeOp.Arg2i();
           reg1.SetFloat(reg1.FValue + arg_lit); // arg2 was used as int here originally
-          break;
+          continue;
       }
       case SCMD_FSUB:
       {
           auto &reg1 = registers[codeOp.Arg1i()];
           const auto arg_lit = codeOp.Arg2i();
           reg1.SetFloat(reg1.FValue - arg_lit); // arg2 was used as int here originally
-          break;
+          continue;
       }
       case SCMD_FMULREG:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetFloat(reg1.FValue * reg2.FValue);
-          break;
+          continue;
       }
       case SCMD_FDIVREG:
       {
@@ -1468,49 +1470,49 @@ int ccInstance::Run(int32_t curpc)
               return -1;
           }
           reg1.SetFloat(reg1.FValue / reg2.FValue);
-          break;
+          continue;
       }
       case SCMD_FADDREG:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetFloat(reg1.FValue + reg2.FValue);
-          break;
+          continue;
       }
       case SCMD_FSUBREG:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetFloat(reg1.FValue - reg2.FValue);
-          break;
+          continue;
       }
       case SCMD_FGREATER:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetFloatAsBool(reg1.FValue > reg2.FValue);
-          break;
+          continue;
       }
       case SCMD_FLESSTHAN:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetFloatAsBool(reg1.FValue < reg2.FValue);
-          break;
+          continue;
       }
       case SCMD_FGTE:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetFloatAsBool(reg1.FValue >= reg2.FValue);
-          break;
+          continue;
       }
       case SCMD_FLTE:
       {
           auto       &reg1 = registers[codeOp.Arg1i()];
           const auto &reg2 = registers[codeOp.Arg2i()];
           reg1.SetFloatAsBool(reg1.FValue <= reg2.FValue);
-          break;
+          continue;
       }
       case SCMD_ZEROMEMORY:
       {
@@ -1530,7 +1532,7 @@ int ccInstance::Run(int32_t curpc)
 				registers[SREG_MAR].Type);
             return -1;
           }
-          break;
+          continue;
       }
       case SCMD_CREATESTRING:
       {
@@ -1549,7 +1551,7 @@ int ccInstance::Run(int32_t curpc)
                   stringClassImpl->CreateString(ptr).second,
                   &myScriptStringImpl);
           }
-          break;
+          continue;
       }
       case SCMD_STRINGSEQUAL:
       {
@@ -1566,7 +1568,7 @@ int ccInstance::Run(int32_t curpc)
               const char *ptr2 = (const char*)reg2.GetDirectPtr();
               reg1.SetInt32AsBool(strcmp(ptr1, ptr2) == 0);
           }
-          break;
+          continue;
       }
       case SCMD_STRINGSNOTEQ:
       {
@@ -1583,18 +1585,16 @@ int ccInstance::Run(int32_t curpc)
               const char *ptr2 = (const char*)reg2.GetDirectPtr();
               reg1.SetInt32AsBool(strcmp(ptr1, ptr2) != 0);
           }
-          break;
+          continue;
       }
       case SCMD_LOOPCHECKOFF:
           if (loopIterationCheckDisabled == 0)
               loopIterationCheckDisabled++;
-          break;
+          continue;
       default:
           cc_error("instruction %d is not implemented", codeOp.Instruction.Code);
           return -1;
         }
-
-        pc += codeOp.ArgCount + 1;
     }
     return 0;
 }
