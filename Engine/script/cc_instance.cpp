@@ -504,6 +504,53 @@ int ccInstance::CallScriptFunction(const char *funcname, int32_t numargs, const 
     line_number = callStackLineNumber[callStackSize];\
     currentline = line_number
 
+inline bool FixupArgument(char fixup, ScriptOperation& codeOp, int argIndex, ccInstance* codeInst, ccInstance& c_this, int pc_at) {
+    switch (fixup) {
+        case FIXUP_GLOBALDATA:
+        {
+            ScriptVariable* gl_var = (ScriptVariable*)codeInst->code[pc_at];
+            codeOp.Args[argIndex].SetGlobalVar(&gl_var->RValue);
+            return false;
+        }
+        case FIXUP_FUNCTION:
+        {
+            codeOp.Args[argIndex].SetInt32((int32_t)codeInst->code[pc_at]);
+            return false;
+        }
+        case FIXUP_STRING:
+        {
+            codeOp.Args[argIndex].SetStringLiteral(&codeInst->strings[0] + codeInst->code[pc_at]);
+            return false;
+        }
+        case FIXUP_IMPORT:
+        {
+            const ScriptImport* import = simp.getByIndex(static_cast<uint32_t>(codeInst->code[pc_at]));
+            if (import) {
+                codeOp.Args[argIndex] = import->Value;
+            }
+            else {
+                cc_error("cannot resolve import, key = %ld", codeInst->code[pc_at]);
+                return true;
+            }
+            return false;
+        }
+        case FIXUP_DATADATA:
+        {
+            // Placeholder for FIXUP_DATADATA
+            return false;
+        }
+        case FIXUP_STACK:
+        {
+            codeOp.Args[argIndex] = c_this.GetStackPtrOffsetFw((int32_t)codeInst->code[pc_at]);
+            return false;
+        }
+        default:
+        {
+            cc_error("internal fixup type error: %d", fixup);
+            return true;
+        }
+    }
+}
 
 #define MAXNEST 50  // number of recursive function calls allowed
 int ccInstance::Run(int32_t curpc)
@@ -559,172 +606,45 @@ int ccInstance::Run(int32_t curpc)
         CC_ERROR_IF_RETCODE(pc + codeOp.ArgCount >= codeInst->codesize,
             "unexpected end of code data (%d; %d)", pc + codeOp.ArgCount, codeInst->codesize);
 
-        int pc_at = pc + 1;
-        if (codeOp.ArgCount == 2)
-        {
-            int pc_at2 = pc_at + 1;
-
-            char fixup = codeInst->code_fixups[pc_at];
-            if (fixup > 0)
-            {
-                /* FixupArgument */
-                //=====================================================================
-                // could be relative pointer or import address
-                switch (fixup)
-                {
-                case FIXUP_GLOBALDATA:
-                {
-                    ScriptVariable* gl_var = (ScriptVariable*)codeInst->code[pc_at];
-                    codeOp.Args[0].SetGlobalVar(&gl_var->RValue);
-                }
-                break;
-                case FIXUP_FUNCTION:
-                    // originally commented -- CHECKME: could this be used in very old versions of AGS?
-                    //      code[fixup] += (long)&code[0];
-                    // This is a program counter value, presumably will be used as SCMD_CALL argument
-                    codeOp.Args[0].SetInt32((int32_t)codeInst->code[pc_at]);
-                    break;
-                case FIXUP_STRING:
-                    codeOp.Args[0].SetStringLiteral(&codeInst->strings[0] + codeInst->code[pc_at]);
-                    break;
-                case FIXUP_IMPORT:
-                {
-                    const ScriptImport* import = simp.getByIndex(static_cast<uint32_t>(codeInst->code[pc_at]));
-                    if (import)
-                    {
-                        codeOp.Args[0] = import->Value;
-                    }
-                    else
-                    {
-                        cc_error("cannot resolve import, key = %ld", codeInst->code[pc_at]);
-                        return -1;
-                    }
-                }
-                break;
-                case FIXUP_STACK:
-                    codeOp.Args[0] = GetStackPtrOffsetFw((int32_t)codeInst->code[pc_at]);
-                    break;
-                default:
-                    cc_error("internal fixup type error: %d", fixup);
-                    return -1;
-                }
-                /* End FixupArgument */
-                //=====================================================================
-            }
-            else
-            {
-                // should be a numeric literal (int32 or float)
-                codeOp.Args[0].SetInt32((int32_t)codeInst->code[pc_at]);
-            }
-
-            char fixup2 = codeInst->code_fixups[pc_at2];
-            if (fixup2 > 0)
-            {
-                /* FixupArgument */
-                //=====================================================================
-                // could be relative pointer or import address
-                switch (fixup2)
-                {
-                case FIXUP_GLOBALDATA:
-                {
-                    ScriptVariable* gl_var = (ScriptVariable*)codeInst->code[pc_at2];
-                    codeOp.Args[1].SetGlobalVar(&gl_var->RValue);
-                }
-                break;
-                case FIXUP_FUNCTION:
-                    // originally commented -- CHECKME: could this be used in very old versions of AGS?
-                    //      code[fixup] += (long)&code[0];
-                    // This is a program counter value, presumably will be used as SCMD_CALL argument
-                    codeOp.Args[1].SetInt32((int32_t)codeInst->code[pc_at2]);
-                    break;
-                case FIXUP_STRING:
-                    codeOp.Args[1].SetStringLiteral(&codeInst->strings[0] + codeInst->code[pc_at2]);
-                    break;
-                case FIXUP_IMPORT:
-                {
-                    const ScriptImport* import = simp.getByIndex(static_cast<uint32_t>(codeInst->code[pc_at2]));
-                    if (import)
-                    {
-                        codeOp.Args[1] = import->Value;
-                    }
-                    else
-                    {
-                        cc_error("cannot resolve import, key = %ld", codeInst->code[pc_at2]);
-                        return -1;
-                    }
-                }
-                break;
-                case FIXUP_STACK:
-                    codeOp.Args[1] = GetStackPtrOffsetFw((int32_t)codeInst->code[pc_at2]);
-                    break;
-                default:
-                    cc_error("internal fixup type error: %d", fixup2);
-                    return -1;
-                }
-                /* End FixupArgument */
-                //=====================================================================
-            }
-            else
-            {
-                // should be a numeric literal (int32 or float)
-                codeOp.Args[1].SetInt32((int32_t)codeInst->code[pc_at2]);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < codeOp.ArgCount; ++i, ++pc_at)
-            {
+        
+        switch (codeOp.ArgCount) {
+            case 3: {
+                int pc_at = pc + 3;
                 char fixup = codeInst->code_fixups[pc_at];
                 if (fixup > 0)
                 {
-                    /* FixupArgument */
-                    //=====================================================================
-                    // could be relative pointer or import address
-                    switch (fixup)
-                    {
-                    case FIXUP_GLOBALDATA:
-                    {
-                        ScriptVariable* gl_var = (ScriptVariable*)codeInst->code[pc_at];
-                        codeOp.Args[i].SetGlobalVar(&gl_var->RValue);
-                    }
-                    continue;
-                    case FIXUP_FUNCTION:
-                        // originally commented -- CHECKME: could this be used in very old versions of AGS?
-                        //      code[fixup] += (long)&code[0];
-                        // This is a program counter value, presumably will be used as SCMD_CALL argument
-                        codeOp.Args[i].SetInt32((int32_t)codeInst->code[pc_at]);
-                        continue;
-                    case FIXUP_STRING:
-                        codeOp.Args[i].SetStringLiteral(&codeInst->strings[0] + codeInst->code[pc_at]);
-                        continue;
-                    case FIXUP_IMPORT:
-                    {
-                        const ScriptImport* import = simp.getByIndex(static_cast<uint32_t>(codeInst->code[pc_at]));
-                        if (import)
-                        {
-                            codeOp.Args[i] = import->Value;
-                        }
-                        else
-                        {
-                            cc_error("cannot resolve import, key = %ld", codeInst->code[pc_at]);
-                            return -1;
-                        }
-                    }
-                    continue;
-                    case FIXUP_STACK:
-                        codeOp.Args[i] = GetStackPtrOffsetFw((int32_t)codeInst->code[pc_at]);
-                        continue;
-                    default:
-                        cc_error("internal fixup type error: %d", fixup);
-                        return -1;
-                    }
-                    /* End FixupArgument */
-                    //=====================================================================
+                    if(FixupArgument(fixup, codeOp, 2, codeInst, *this, pc_at)) return -1;
                 }
                 else
                 {
                     // should be a numeric literal (int32 or float)
-                    codeOp.Args[i].SetInt32((int32_t)codeInst->code[pc_at]);
+                    codeOp.Args[2].SetInt32((int32_t)codeInst->code[pc_at]);
+                }
+            }
+            case 2: {
+                int pc_at = pc + 2;
+                char fixup = codeInst->code_fixups[pc_at];
+                if (fixup > 0)
+                {
+                    if (FixupArgument(fixup, codeOp, 1, codeInst, *this, pc_at)) return -1;
+                }
+                else
+                {
+                    // should be a numeric literal (int32 or float)
+                    codeOp.Args[1].SetInt32((int32_t)codeInst->code[pc_at]);
+                }
+            }
+            case 1: {
+                int pc_at = pc + 1;
+                char fixup = codeInst->code_fixups[pc_at];
+                if (fixup > 0)
+                {
+                    if (FixupArgument(fixup, codeOp, 0, codeInst, *this, pc_at)) return -1;
+                }
+                else
+                {
+                    // should be a numeric literal (int32 or float)
+                    codeOp.Args[0].SetInt32((int32_t)codeInst->code[pc_at]);
                 }
             }
         }
