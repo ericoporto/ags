@@ -1046,7 +1046,7 @@ int ccInstance::Run(int32_t curpc)
                   cc_error("!Script appears to be hung (a while loop ran %d times). The problem may be in a calling function; check the call stack.", loopIterations);
                   return -1;
               }
-              else if ((loopIterations % 1000) == 0 &&
+              else if ((loopIterations % 1024) == 0 &&
                   (std::chrono::duration_cast<std::chrono::milliseconds>(
                       AGS_FastClock::now() - _lastAliveTs) > timeout))
               { // minimal timeout occured
