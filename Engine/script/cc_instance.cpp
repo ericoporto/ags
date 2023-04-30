@@ -623,7 +623,7 @@ int ccInstance::Run(int32_t curpc)
         CC_ERROR_IF_RETCODE((codeOp.Instruction.Code < 0 || codeOp.Instruction.Code >= CC_NUM_SCCMDS),
             "invalid instruction %d found in code stream", codeOp.Instruction.Code);
 
-        codeOp.ArgCount = sccmd_info[codeOp.Instruction.Code].ArgCount & 0x3;
+        codeOp.ArgCount = sccmd_info[codeOp.Instruction.Code].ArgCount;
 
         CC_ERROR_IF_RETCODE(pc + codeOp.ArgCount >= codeInst->codesize,
             "unexpected end of code data (%d; %d)", pc + codeOp.ArgCount, codeInst->codesize);
