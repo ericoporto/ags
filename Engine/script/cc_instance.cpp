@@ -1098,7 +1098,7 @@ int ccInstance::Run(int32_t curpc)
               if ((reg1.IValue < 0) ||
                   (static_cast<uint32_t>(reg1.IValue) >= hdr.TotalSize))
               {
-                      int elem_count = hdr.ElemCount & (~ARRAY_MANAGED_TYPE_FLAG);
+                      int elem_count = hdr.ElemCount;
                       if (elem_count <= 0)
                       {
                           cc_error("!Array has an invalid size (%d) and cannot be accessed", elem_count);
