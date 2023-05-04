@@ -22,8 +22,18 @@
 #include "core/types.h"
 
 
-// A pair of managed handle and abstract object pointer
-typedef std::pair<int32_t, void*> DynObjectRef;
+struct ICCDynamicObject;
+
+struct DynObjectRef
+{
+    const int Handle = 0;
+    void * const Obj = nullptr;
+    ICCDynamicObject * const Mgr = nullptr;
+
+    DynObjectRef() = default;
+    DynObjectRef(int handle, void *obj, ICCDynamicObject *mgr)
+        : Handle(handle), Obj(obj), Mgr(mgr) {}
+};
 
 
 // OBJECT-BASED SCRIPTING RUNTIME FUNCTIONS

@@ -1089,12 +1089,12 @@ int ccInstance::Run(int32_t curpc)
       }
       case SCMD_DYNAMICBOUNDS:
           {
-          const auto &reg1 = registers[codeOp.Arg1i()];
-              // TODO: test reg[MAR] type here;
-              // That might be dynamic object, but also a non-managed dynamic array, "allocated"
-              // on global or local memspace (buffer)
+              const auto &reg1 = registers[codeOp.Arg1i()];
               const char *arr_ptr = registers[SREG_MAR].GetPtrWithOffset();
-              const auto &hdr = CCDynamicArray::GetHeader(arr_ptr);
+              // OK THIS IS UGLY :/ but... what else? we have to assume this is dynarray anyway
+              auto *mgr = (CCDynamicArray*)registers[SREG_MAR].DynMgr;
+              
+              const auto &hdr = mgr->GetHeader(arr_ptr);
               if ((reg1.IValue < 0) ||
                   (static_cast<uint32_t>(reg1.IValue) >= hdr.TotalSize))
               {
@@ -1466,8 +1466,8 @@ int ccInstance::Run(int32_t curpc)
                   cc_error("invalid size for dynamic array; requested: %d, range: 1..%d", numElements, INT32_MAX);
                   return -1;
               }
-              DynObjectRef ref = globalDynamicArray.Create(numElements, arg_elsize, arg_managed);
-              reg1.SetDynamicObject(ref.second, &globalDynamicArray);
+              DynObjectRef ref = CCDynamicArray::Create(numElements, arg_elsize, arg_managed);
+              reg1.SetDynamicObject(ref.Obj, ref.Mgr);
               break;
           }
       case SCMD_NEWUSEROBJECT:
@@ -1591,7 +1591,7 @@ int ccInstance::Run(int32_t curpc)
           {
               const char *ptr = (const char*)reg1.GetDirectPtr();
               reg1.SetDynamicObject(
-                  stringClassImpl->CreateString(ptr).second,
+                  stringClassImpl->CreateString(ptr).Obj,
                   &myScriptStringImpl);
           }
           break;
