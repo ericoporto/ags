@@ -32,6 +32,8 @@
 #include "gfx/gfx_def.h"
 #include "gfx/gfx_util.h"
 
+#include "ac/dynobj/cc_dynamicarray.h"
+
 using namespace AGS::Common;
 using namespace AGS::Engine;
 
@@ -435,6 +437,22 @@ int DrawingSurface_GetPixel(ScriptDrawingSurface *sds, int x, int y) {
     return rawPixel;
 }
 
+DynObjectRef DrawingSurface_GetPixelArray(ScriptDrawingSurface *sds)
+{
+    Bitmap *bmp = sds->GetBitmapSurface();
+    auto ref = CCDynamicArray::Create(bmp->GetDataForWriting(), bmp->GetWidth() * bmp->GetHeight() * bmp->GetBPP(), 1, false);
+    sds->modified = true;
+    return ref;
+}
+
+DynObjectRef DrawingSurface_GetPixelArray32(ScriptDrawingSurface *sds)
+{
+    Bitmap *bmp = sds->GetBitmapSurface();
+    auto ref = CCDynamicArray::Create(bmp->GetDataForWriting(), bmp->GetWidth() * bmp->GetHeight(), 4, false);
+    sds->modified = true;
+    return ref;
+}
+
 //=============================================================================
 //
 // Script API Functions
@@ -589,6 +607,20 @@ RuntimeScriptValue Sc_DrawingSurface_GetWidth(void *self, const RuntimeScriptVal
     API_OBJCALL_INT(ScriptDrawingSurface, DrawingSurface_GetWidth);
 }
 
+RuntimeScriptValue Sc_DrawingSurface_GetPixelArray(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    ASSERT_SELF(DrawingSurface_GetPixelArray);
+    auto ref = DrawingSurface_GetPixelArray((ScriptDrawingSurface*)self);
+    return RuntimeScriptValue().SetDynamicObject(ref.Obj, ref.Mgr);
+}
+
+RuntimeScriptValue Sc_DrawingSurface_GetPixelArray32(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    ASSERT_SELF(DrawingSurface_GetPixelArray32);
+    auto ref = DrawingSurface_GetPixelArray32((ScriptDrawingSurface*)self);
+    return RuntimeScriptValue().SetDynamicObject(ref.Obj, ref.Mgr);
+}
+
 //=============================================================================
 //
 // Exclusive API for Plugins
@@ -629,6 +661,9 @@ void RegisterDrawingSurfaceAPI(ScriptAPIVersion base_api, ScriptAPIVersion /*com
     ccAddExternalObjectFunction("DrawingSurface::get_UseHighResCoordinates", Sc_DrawingSurface_GetUseHighResCoordinates);
     ccAddExternalObjectFunction("DrawingSurface::set_UseHighResCoordinates", Sc_DrawingSurface_SetUseHighResCoordinates);
     ccAddExternalObjectFunction("DrawingSurface::get_Width",            Sc_DrawingSurface_GetWidth);
+
+    ccAddExternalObjectFunction("DrawingSurface::GetPixelArray",            Sc_DrawingSurface_GetPixelArray);
+    ccAddExternalObjectFunction("DrawingSurface::GetPixelArray32",            Sc_DrawingSurface_GetPixelArray32);
 
     /* ----------------------- Registering unsafe exports for plugins -----------------------*/
 
