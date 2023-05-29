@@ -22,6 +22,10 @@ namespace AGS.Editor
         private List<int> _selectedIndexes = new List<int>();
         private TabPage _colourFinder;
 
+        private int _PalColorW;
+        private int _PalColorH;
+        private int _PalMarginLeft;
+
         public PaletteEditor()
         {
             InitializeComponent();
@@ -140,25 +144,28 @@ namespace AGS.Editor
         {
             Game game = Factory.AGSEditor.CurrentGame;
             System.Drawing.Font boldFont = new System.Drawing.Font(this.Font, FontStyle.Bold);
+            _PalColorW = ((palettePanel.Width / 16) * 90) / 100;
+            _PalColorH = ((palettePanel.Height / 16) * 90) / 100;
+            _PalMarginLeft = (_PalColorW * 30) / 20;
 
             for (int i = 0; i < game.Palette.Length; i++)
             {
-                int x = (i % 16) * 20 + 30;
-                int y = (i / 16) * 20;
+                int x = (i % 16) * _PalColorW + _PalMarginLeft;
+                int y = (i / 16) * _PalColorH;
                 if (i % 16 == 0)
                 {
-                    int textXpos = 25 - (int)e.Graphics.MeasureString(i.ToString(), this.Font).Width;
+                    int textXpos = (5* _PalMarginLeft) /6 - (int)e.Graphics.MeasureString(i.ToString(), this.Font).Width;
                     e.Graphics.DrawString(i.ToString(), this.Font, Brushes.Black, textXpos, y + 3);
                 }
                 if (game.Palette[i].ColourType == PaletteColourType.Background)
                 {
-                    e.Graphics.FillRectangle(Brushes.Black, x, y, 20, 20);
+                    e.Graphics.FillRectangle(Brushes.Black, x, y, _PalColorW, _PalColorH);
                     e.Graphics.DrawString("X", boldFont, Brushes.White, x + 5, y + 3);
                 }
                 else
                 {
                     Color thisColor = game.Palette[i].Colour;
-                    e.Graphics.FillRectangle(new SolidBrush(thisColor), x, y, 20, 20);
+                    e.Graphics.FillRectangle(new SolidBrush(thisColor), x, y, _PalColorW, _PalColorH);
 /*
                     if (game.Palette[i].ColourType == PaletteColourType.Locked)
                     {
@@ -172,8 +179,8 @@ namespace AGS.Editor
                 }
                 if (_selectedIndexes.Contains(i))
                 {
-                    e.Graphics.DrawRectangle(Pens.White, x, y, 19, 19);
-                    e.Graphics.DrawRectangle(Pens.DarkBlue, x + 1, y + 1, 17, 17);
+                    e.Graphics.DrawRectangle(Pens.White, x, y, _PalColorW - 1, _PalColorH - 1);
+                    e.Graphics.DrawRectangle(Pens.DarkBlue, x + 1, y + 1, _PalColorW - 3, _PalColorH - 3);
                 }
             }
         }
@@ -218,9 +225,9 @@ namespace AGS.Editor
 
         private void palettePanel_MouseDown(object sender, MouseEventArgs e)
         {
-            if ((e.X > 30) && (e.X < 30 + 16 * 20) && (e.Y > 0) && (e.Y < 16 * 20))
+            if ((e.X > _PalMarginLeft) && (e.X < _PalMarginLeft + 16 * _PalColorW) && (e.Y > 0) && (e.Y < 16 * _PalColorH))
             {
-                int selectedIndex = (e.X - 30) / 20 + (e.Y / 20) * 16;
+                int selectedIndex = (e.X - _PalMarginLeft) / _PalColorW + (e.Y / _PalColorH) * 16;
 
                 if (e.Button == MouseButtons.Right)
                 {
@@ -422,6 +429,30 @@ namespace AGS.Editor
             {
                 Factory.GUIController.ColorThemes.Apply(LoadColorTheme);
             }
+        }
+
+        private void panelPaletteIntroText_ClientSizeChanged(object sender, EventArgs e)
+        {
+            lblPaletteIntro.MaximumSize = new Size((sender as Control).ClientSize.Width - lblPaletteIntro.Left, panelPaletteIntroText.Height/2);
+            lblPaletteIntro2.MaximumSize = new Size((sender as Control).ClientSize.Width - lblPaletteIntro2.Left, panelPaletteIntroText.Height / 2);
+        }
+
+        private void panelPaletteIntroText_Layout(object sender, LayoutEventArgs e)
+        {
+            lblPaletteIntro.MaximumSize = new Size((sender as Control).ClientSize.Width - lblPaletteIntro.Left, panelPaletteIntroText.Height / 2);
+            lblPaletteIntro2.MaximumSize = new Size((sender as Control).ClientSize.Width - lblPaletteIntro2.Left, panelPaletteIntroText.Height / 2);
+        }
+
+        private void flowLayoutColorPanel_ClientSizeChanged(object sender, EventArgs e)
+        {
+            lblColorFinderIntro.MaximumSize = new Size((sender as Control).ClientSize.Width - lblColorFinderIntro.Left, 96);
+            lblFixedColorsWarning.MaximumSize = new Size((sender as Control).ClientSize.Width - lblFixedColorsWarning.Left, 96);
+        }
+
+        private void flowLayoutColorPanel_Layout(object sender, LayoutEventArgs e)
+        {
+            lblColorFinderIntro.MaximumSize = new Size((sender as Control).ClientSize.Width - lblColorFinderIntro.Left, 96);
+            lblFixedColorsWarning.MaximumSize = new Size((sender as Control).ClientSize.Width - lblFixedColorsWarning.Left, 96);
         }
     }
 }
