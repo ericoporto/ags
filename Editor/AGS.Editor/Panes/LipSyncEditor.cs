@@ -12,7 +12,7 @@ namespace AGS.Editor
     public partial class LipSyncEditor : EditorContentPanel
     {
         private const int TEXT_BOX_START_X = 10;
-        private const int TEXT_BOX_START_Y = 65;
+        private const int TEXT_BOX_START_Y = 10;
         private LipSync _lipSync;
 
         public LipSyncEditor(LipSync lipSync)
@@ -20,6 +20,7 @@ namespace AGS.Editor
             InitializeComponent();
             _lipSync = lipSync;
             this.AutoScroll = true;
+            panelLipSyncList.AutoScroll = true;
 
             int x = TEXT_BOX_START_X, y = TEXT_BOX_START_Y;
 
@@ -30,21 +31,23 @@ namespace AGS.Editor
                 label.Top = y + 2;
                 label.AutoSize = true;
                 label.Text = i.ToString();
-                this.Controls.Add(label);
+                panelLipSyncList.Controls.Add(label);
+
+                int height_text = label.Height + label.Margin.Top + label.Margin.Bottom + 2;
 
                 TextBox textBox = new TextBox();
-                textBox.Left = x + 20;
+                textBox.Left = x + 40;
                 textBox.Top = y;
-                textBox.Size = new Size(150, 23);
+                textBox.Size = new Size(150, height_text);
                 textBox.Tag = i;
                 textBox.Text = _lipSync.CharactersPerFrame[i];
                 textBox.TextChanged += new EventHandler(textBox_TextChanged);
 
-                this.Controls.Add(textBox);
-                y += 25;
+                panelLipSyncList.Controls.Add(textBox);
+                y += height_text + 8;
                 if (i % 10 == 9)
                 {
-                    x += 200;
+                    x += 220;
                     y = TEXT_BOX_START_Y;
                 }
             }
@@ -79,7 +82,7 @@ namespace AGS.Editor
             {
                 shouldBeEnabled = false;
             }
-            foreach (Control control in this.Controls)
+            foreach (Control control in panelLipSyncList.Controls)
             {
                 if (control is TextBox)
                 {
@@ -109,6 +112,12 @@ namespace AGS.Editor
             {
                 Factory.GUIController.ColorThemes.Apply(LoadColorTheme);
             }
+        }
+
+        private void flowLayoutPanel1_Layout(object sender, LayoutEventArgs e)
+        {
+            labelLipSyncIntro1.MaximumSize = new Size((sender as Control).ClientSize.Width - labelLipSyncIntro1.Left, 64);
+            labelLipSyncIntro2.MaximumSize = new Size((sender as Control).ClientSize.Width - labelLipSyncIntro2.Left, 64);
         }
     }
 }
