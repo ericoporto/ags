@@ -1715,6 +1715,11 @@ namespace AGS.Editor
                 Factory.GUIController.ColorThemes.Apply(LoadColorTheme);
             }
         }
+
+        private void panel1_Layout(object sender, LayoutEventArgs e)
+        {
+            splitContainer1.SplitterDistance = 2 * (button_importNew.Font.Height) + button_importNew.Margin.Top + button_importNew.Margin.Bottom - 4;
+        }
     }
 
     internal class SpriteManagerDragDropData
