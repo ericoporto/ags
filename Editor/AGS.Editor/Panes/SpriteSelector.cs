@@ -58,6 +58,7 @@ namespace AGS.Editor
         private const string MENU_ITEM_PREVIEW_SIZE_2X = "PreviewSizeMedium";
         private const string MENU_ITEM_PREVIEW_SIZE_3X = "PreviewSizeLarge";
         private const string MENU_ITEM_PREVIEW_SIZE_4X = "PreviewSizeExtraLarge";
+        private const string MENU_ITEM_PREVIEW_TEXT_FILENAME = "PreviewTextFilename";
         
         private const int SPRITE_BASE_SIZE = 32;
 
@@ -76,6 +77,9 @@ namespace AGS.Editor
         private TreeNode _dropHighlight;
         private int _spriteSizeMultiplier = 1;
         private bool _idleHandlerSet = false;
+        // Which information to display under sprites
+        // TODO: extract into flags?
+        private bool _showSpriteFilenames = false;
 
         public SpriteSelector()
         {
@@ -114,6 +118,12 @@ namespace AGS.Editor
         {
             get { return _sendUpdateNotifications; }
             set { _sendUpdateNotifications = value; }
+        }
+
+        public bool ShowSpriteFilenames
+        {
+            get { return _showSpriteFilenames; }
+            set { _showSpriteFilenames = value; }
         }
 
         public Sprite SelectedSprite
@@ -236,6 +246,7 @@ namespace AGS.Editor
             Progress progress = new Progress(folder.Sprites.Count, "Refreshing folder...");
             progress.Show();
 
+            string itemTextFormat = _showSpriteFilenames ? "{0}\n{1}" : "{0}";
             for (int index = 0; index < folder.Sprites.Count; index ++)
             {
                 progress.SetProgressValue(index);
@@ -251,7 +262,8 @@ namespace AGS.Editor
 
                 // adding items individually in this loop is extremely slow, so build
                 // a List of items and use AddRange instead
-                var item = new ListViewItem(sprite.Number.ToString(), index);
+                string text = string.Format(itemTextFormat, sprite.Number, Path.GetFileName(sprite.SourceFile));
+                var item = new ListViewItem(text, index);
                 item.Tag = sprite;
                 itemsToAdd.Add(item);
             }
@@ -270,6 +282,24 @@ namespace AGS.Editor
             }
         }
 
+        /// <summary>
+        /// Updates the listview item texts according to the current settings.
+        /// </summary>
+        private void RefreshSpriteTexts()
+        {
+            spriteList.BeginUpdate();
+            string itemTextFormat = _showSpriteFilenames ? "{0}\n{1}" : "{0}";
+            foreach (ListViewItem item in spriteList.Items)
+            {
+                var sprite = item.Tag as Sprite;
+                item.Text = string.Format(itemTextFormat, sprite.Number, Path.GetFileName(sprite.SourceFile));
+            }
+            spriteList.EndUpdate();
+        }
+
+        /// <summary>
+        /// Fully repopulates the sprite listview.
+        /// </summary>
         private void RefreshSpriteDisplay()
         {
             DisplaySpritesForFolder(_currentFolder);
@@ -834,6 +864,11 @@ namespace AGS.Editor
             {
                 SetSpritePreviewMultiplier(8);
             }
+            else if (item.Name == MENU_ITEM_PREVIEW_TEXT_FILENAME)
+            {
+                ShowSpriteFilenames = !ShowSpriteFilenames;
+                RefreshSpriteTexts();
+            }
         }
 
         private void ReplaceSpritesFromSource()
@@ -1346,6 +1381,10 @@ namespace AGS.Editor
             viewMenu.DropDownItems.Add(new ToolStripMenuItem("Medium icons", null, onClick, MENU_ITEM_PREVIEW_SIZE_2X));
             viewMenu.DropDownItems.Add(new ToolStripMenuItem("Large icons", null, onClick, MENU_ITEM_PREVIEW_SIZE_3X));
             viewMenu.DropDownItems.Add(new ToolStripMenuItem("Extra large icons", null, onClick, MENU_ITEM_PREVIEW_SIZE_4X));
+            viewMenu.DropDownItems.Add(new ToolStripSeparator());
+            var item = new ToolStripMenuItem("Show filenames", null, onClick, MENU_ITEM_PREVIEW_TEXT_FILENAME);
+            item.Checked = ShowSpriteFilenames; // NOTE: the menu is recreated, so CheckOnClick would be useless
+            viewMenu.DropDownItems.Add(item);
 
             menu.Items.Add(viewMenu);
 
