@@ -80,10 +80,14 @@ namespace AGS.Editor
         // Which information to display under sprites
         // TODO: extract into flags?
         private bool _showSpriteFilenames = false;
+        private System.Drawing.Font _spriteListDefaultFont;
+        private System.Drawing.Font _spriteListDefaultFontSmaller;
 
         public SpriteSelector()
         {
             InitializeComponent();
+            _spriteListDefaultFont = (System.Drawing.Font)spriteList.Font.Clone();
+            _spriteListDefaultFontSmaller = new System.Drawing.Font(_spriteListDefaultFont.FontFamily, _spriteListDefaultFont.Size * 0.75f);
             _folders = new Dictionary<string, SpriteFolder>(
                 // The TreeNodeCollection uses case-insensitive string comparer
                 StringComparer.Create(System.Globalization.CultureInfo.CurrentCulture, true));
@@ -636,6 +640,13 @@ namespace AGS.Editor
         {
             if (_spriteSizeMultiplier != multiplier)
             {
+                if(multiplier == 1)
+                {
+                    spriteList.Font = _spriteListDefaultFontSmaller;
+                } else
+                {
+                    spriteList.Font = _spriteListDefaultFont;
+                }
                 sliderPreviewSize.Value = multiplier;
                 _spriteSizeMultiplier = multiplier;
                 RefreshSpriteDisplay();
