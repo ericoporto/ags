@@ -664,6 +664,8 @@ int ccInstance::Run(int32_t curpc)
         //=====================================================================
         switch (codeOp.Instruction.Code)
         {
+        case 0:
+            return -1;
         case SCMD_ADD:
         {
             const auto arg_reg = codeOp.Arg1i();
@@ -1643,6 +1645,7 @@ int ccInstance::Run(int32_t curpc)
             break;
         }
         default:
+            __assume(false);
             cc_error("instruction %d is not implemented", codeOp.Instruction.Code);
             return -1;
         }
