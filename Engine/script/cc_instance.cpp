@@ -664,12 +664,6 @@ int ccInstance::Run(int32_t curpc)
         //=====================================================================
         switch (codeOp.Instruction.Code)
         {
-        case SCMD_LINENUM:
-            line_number = codeOp.Arg1i();
-            currentline = line_number;
-            if (new_line_hook)
-                new_line_hook(this, currentline);
-            break;
         case SCMD_ADD:
         {
             const auto arg_reg = codeOp.Arg1i();
@@ -809,13 +803,6 @@ int ccInstance::Run(int32_t curpc)
             registers[SREG_MAR].WriteValue(reg1);
             break;
         }
-        case SCMD_LOADSPOFFS:
-        {
-            const auto arg_off = codeOp.Arg1i();
-            registers[SREG_MAR] = GetStackPtrOffsetRw(arg_off);
-            ASSERT_CC_ERROR();
-            break;
-        }
         case SCMD_MULREG:
         {
             auto       &reg1 = registers[codeOp.Arg1i()];
@@ -921,32 +908,6 @@ int ccInstance::Run(int32_t curpc)
             reg1.SetInt32AsBool(reg1.IValue || reg2.IValue);
             break;
         }
-        case SCMD_XORREG:
-        {
-            auto       &reg1 = registers[codeOp.Arg1i()];
-            const auto &reg2 = registers[codeOp.Arg2i()];
-            reg1.SetInt32(reg1.IValue ^ reg2.IValue);
-            break;
-        }
-        case SCMD_MODREG:
-        {
-            auto       &reg1 = registers[codeOp.Arg1i()];
-            const auto &reg2 = registers[codeOp.Arg2i()];
-            if (reg2.IValue == 0)
-            {
-                cc_error("!Integer divide by zero");
-                return -1;
-            }
-            reg1.SetInt32(reg1.IValue % reg2.IValue);
-            break;
-        }
-        case SCMD_NOTREG:
-        {
-            auto       &reg1 = registers[codeOp.Arg1i()];
-            const auto &reg2 = registers[codeOp.Arg2i()];
-            reg1 = !(reg1);
-            break;
-        }
         case SCMD_CALL:
         {
             // Call another function within same script, just save PC
@@ -1015,13 +976,6 @@ int ccInstance::Run(int32_t curpc)
                 pc += arg_lit;
             break;
         }
-        case SCMD_JNZ:
-        {
-            const auto arg_lit = codeOp.Arg1i();
-            if (!registers[SREG_AX].IsNull())
-                pc += arg_lit;
-            break;
-        }
         case SCMD_PUSHREG:
         {
             // Push reg[arg1] value to the stack
@@ -1075,235 +1029,6 @@ int ccInstance::Run(int32_t curpc)
             auto &reg1 = registers[codeOp.Arg1i()];
             const auto arg_lit = codeOp.Arg2i();
             reg1.IValue *= arg_lit;
-            break;
-        }
-        case SCMD_CHECKBOUNDS:
-        {
-            const auto &reg1 = registers[codeOp.Arg1i()];
-            const auto arg_lit = codeOp.Arg2i();
-            if ((reg1.IValue < 0) ||
-                (reg1.IValue >= arg_lit))
-            {
-                cc_error("!Array index out of bounds (index: %d, bounds: 0..%d)", reg1.IValue, arg_lit - 1);
-                return -1;
-            }
-            break;
-        }
-        case SCMD_DYNAMICBOUNDS:
-        {
-            const auto &reg1 = registers[codeOp.Arg1i()];
-            // TODO: test reg[MAR] type here;
-            // That might be dynamic object, but also a non-managed dynamic array, "allocated"
-            // on global or local memspace (buffer)
-            void *arr_ptr = registers[SREG_MAR].GetPtrWithOffset();
-            const auto &hdr = CCDynamicArray::GetHeader(arr_ptr);
-            if ((reg1.IValue < 0) ||
-                (static_cast<uint32_t>(reg1.IValue) >= hdr.TotalSize))
-            {
-                int elem_count = hdr.ElemCount & (~ARRAY_MANAGED_TYPE_FLAG);
-                if (elem_count <= 0)
-                {
-                    cc_error("!Array has an invalid size (%d) and cannot be accessed", elem_count);
-                }
-                else
-                {
-                    int elementSize = (hdr.TotalSize / elem_count);
-                    cc_error("!Array index out of bounds (index: %d, bounds: 0..%d)", reg1.IValue / elementSize, elem_count - 1);
-                }
-                return -1;
-            }
-            break;
-        }
-        case SCMD_MEMREADPTR:
-        {
-            auto &reg1 = registers[codeOp.Arg1i()];
-            int32_t handle = registers[SREG_MAR].ReadInt32();
-            // FIXME: make pool return a ready RuntimeScriptValue with these set?
-            // or another struct, which may be assigned to RSV
-            void *object;
-            IScriptObject *manager;
-            ScriptValueType obj_type = ccGetObjectAddressAndManagerFromHandle(handle, object, manager);
-            reg1.SetScriptObject(obj_type, object, manager);
-            ASSERT_CC_ERROR();
-            break;
-        }
-        case SCMD_MEMWRITEPTR:
-        {
-            const auto &reg1 = registers[codeOp.Arg1i()];
-            int32_t handle = registers[SREG_MAR].ReadInt32();
-            void *address;
-
-            switch (reg1.Type)
-            {
-            case kScValStaticArray:
-                //FIXME: return manager type from interface?
-                //CC_ERROR_IF_RETCODE(!reg1.ArrMgr->GetDynamicManager(), "internal error: MEMWRITEPTR argument is not a dynamic object");
-                address = reg1.ArrMgr->GetElementPtr(reg1.Ptr, reg1.IValue);
-                break;
-            case kScValScriptObject:
-            case kScValPluginObject:
-                address = reg1.Ptr;
-                break;
-            case kScValPluginArg:
-                // FIXME: plugin API is currently strictly 32-bit, so this may break on 64-bit systems
-                address = Int32ToPtr<char>(reg1.IValue);
-                break;
-            default:
-                // There's one possible case when the reg1 is 0, which means writing nullptr
-                CC_ERROR_IF_RETCODE(!reg1.IsNull(), "internal error: MEMWRITEPTR argument is not a dynamic object");
-                address = nullptr;
-                break;
-            }
-
-            int32_t newHandle = ccGetObjectHandleFromAddress(address);
-            if (newHandle == -1)
-                return -1;
-
-            if (handle != newHandle)
-            {
-                ccReleaseObjectReference(handle);
-                ccAddObjectReference(newHandle);
-            }
-            // Assign always, avoid leaving undefined value
-            registers[SREG_MAR].WriteInt32(newHandle);
-            break;
-        }
-        case SCMD_MEMINITPTR:
-        {
-            void *address;
-            const auto &reg1 = registers[codeOp.Arg1i()];
-
-            switch (reg1.Type)
-            {
-            case kScValStaticArray:
-                //FIXME: return manager type from interface?
-                //CC_ERROR_IF_RETCODE(!reg1.ArrMgr->GetDynamicManager(), "internal error: SCMD_MEMINITPTR argument is not a dynamic object");
-                address = reg1.ArrMgr->GetElementPtr(reg1.Ptr, reg1.IValue);
-                break;
-            case kScValScriptObject:
-            case kScValPluginObject:
-                address = reg1.Ptr;
-                break;
-            case kScValPluginArg:
-                // FIXME: plugin API is currently strictly 32-bit, so this may break on 64-bit systems
-                address = Int32ToPtr<uint8_t>(reg1.IValue);
-                break;
-            default:
-                // There's one possible case when the reg1 is 0, which means writing nullptr
-                CC_ERROR_IF_RETCODE(!reg1.IsNull(), "internal error: SCMD_MEMINITPTR argument is not a dynamic object");
-                address = nullptr;
-                break;
-            }
-
-            // like memwriteptr, but doesn't attempt to free the old one
-            int32_t newHandle = ccGetObjectHandleFromAddress(address);
-            if (newHandle == -1)
-                return -1;
-
-            ccAddObjectReference(newHandle);
-            registers[SREG_MAR].WriteInt32(newHandle);
-            break;
-        }
-        case SCMD_MEMZEROPTR:
-        {
-            int32_t handle = registers[SREG_MAR].ReadInt32();
-            ccReleaseObjectReference(handle);
-            registers[SREG_MAR].WriteInt32(0);
-            break;
-        }
-        case SCMD_MEMZEROPTRND:
-        {
-            int32_t handle = registers[SREG_MAR].ReadInt32();
-
-            // don't do the Dispose check for the object being returned -- this is
-            // for returning a String (or other pointer) from a custom function.
-            // Note: we might be freeing a dynamic array which contains the DisableDispose
-            // object, that will be handled inside the recursive call to SubRef.
-            // CHECKME!! what type of data may reg1 point to?
-            pool.disableDisposeForObject = registers[SREG_AX].Ptr;
-            ccReleaseObjectReference(handle);
-            pool.disableDisposeForObject = nullptr;
-            registers[SREG_MAR].WriteInt32(0);
-            break;
-        }
-        case SCMD_CHECKNULL:
-            if (registers[SREG_MAR].IsNull())
-            {
-                cc_error("!Null pointer referenced");
-                return -1;
-            }
-            break;
-        case SCMD_CHECKNULLREG:
-        {
-            const auto &reg1 = registers[codeOp.Arg1i()];
-            if (reg1.IsNull())
-            {
-                cc_error("!Null string referenced");
-                return -1;
-            }
-            break;
-        }
-        case SCMD_NUMFUNCARGS:
-        {
-            const auto arg_lit = codeOp.Arg1i();
-            num_args_to_func = arg_lit;
-            break;
-        }
-        case SCMD_CALLAS:
-        {
-            PUSH_CALL_STACK;
-
-            // Call to a function in another script
-            const auto &reg1 = registers[codeOp.Arg1i()];
-
-            // If there are nested CALLAS calls, the stack might
-            // contain 2 calls worth of parameters, so only
-            // push args for this call
-            if (num_args_to_func < 0)
-            {
-                num_args_to_func = func_callstack.Count;
-            }
-            ASSERT_STACK_SPACE_VALS(num_args_to_func + 1 /* return address */);
-            for (const RuntimeScriptValue *prval = func_callstack.GetHead() + num_args_to_func;
-                prval > func_callstack.GetHead(); --prval)
-            {
-                PushValueToStack(*prval);
-            }
-
-            const RuntimeScriptValue oldstack = registers[SREG_SP];
-            const char *oldstackdata = stackdata_ptr;
-            // Push placeholder for the return value (it will be popped before ret)
-            PushValueToStack(RuntimeScriptValue().SetInt32(0));
-
-            int oldpc = pc;
-            ccInstance *wasRunning = runningInst;
-
-            // extract the instance ID
-            int32_t instId = codeOp.Instruction.InstanceId;
-            // determine the offset into the code of the instance we want
-            runningInst = loadedInstances[instId];
-            intptr_t callAddr = reg1.PtrU8 - reinterpret_cast<uint8_t*>(&runningInst->code[0]);
-            if (callAddr % sizeof(intptr_t) != 0)
-            {
-                cc_error("call address not aligned");
-                return -1;
-            }
-            callAddr /= sizeof(intptr_t); // size of ccScript::code elements
-
-            if (Run((int32_t)callAddr))
-                return -1;
-
-            runningInst = wasRunning;
-
-            if ((flags & INSTF_ABORTED) == 0)
-                ASSERT_STACK_UNWINDED(oldstack, oldstackdata);
-
-            next_call_needs_object = 0;
-
-            pc = oldpc;
-            was_just_callas = func_callstack.Count;
-            num_args_to_func = -1;
-            POP_CALL_STACK;
             break;
         }
         case SCMD_CALLEXT:
@@ -1405,40 +1130,105 @@ int ccInstance::Run(int32_t curpc)
             }
             break;
         }
-        case SCMD_CALLOBJ:
+        case SCMD_LINENUM:
+            line_number = codeOp.Arg1i();
+            currentline = line_number;
+            if (new_line_hook)
+                new_line_hook(this, currentline);
+            break;
+        case SCMD_CALLAS:
         {
-            // set the OP register
+            PUSH_CALL_STACK;
+
+            // Call to a function in another script
             const auto &reg1 = registers[codeOp.Arg1i()];
-            if (reg1.IsNull())
+
+            // If there are nested CALLAS calls, the stack might
+            // contain 2 calls worth of parameters, so only
+            // push args for this call
+            if (num_args_to_func < 0)
             {
-                cc_error("!Null pointer referenced");
+                num_args_to_func = func_callstack.Count;
+            }
+            ASSERT_STACK_SPACE_VALS(num_args_to_func + 1 /* return address */);
+            for (const RuntimeScriptValue *prval = func_callstack.GetHead() + num_args_to_func;
+                 prval > func_callstack.GetHead(); --prval)
+            {
+                PushValueToStack(*prval);
+            }
+
+            const RuntimeScriptValue oldstack = registers[SREG_SP];
+            const char *oldstackdata = stackdata_ptr;
+            // Push placeholder for the return value (it will be popped before ret)
+            PushValueToStack(RuntimeScriptValue().SetInt32(0));
+
+            int oldpc = pc;
+            ccInstance *wasRunning = runningInst;
+
+            // extract the instance ID
+            int32_t instId = codeOp.Instruction.InstanceId;
+            // determine the offset into the code of the instance we want
+            runningInst = loadedInstances[instId];
+            intptr_t callAddr = reg1.PtrU8 - reinterpret_cast<uint8_t*>(&runningInst->code[0]);
+            if (callAddr % sizeof(intptr_t) != 0)
+            {
+                cc_error("call address not aligned");
                 return -1;
             }
-            switch (reg1.Type)
+            callAddr /= sizeof(intptr_t); // size of ccScript::code elements
+
+            if (Run((int32_t)callAddr))
+                return -1;
+
+            runningInst = wasRunning;
+
+            if ((flags & INSTF_ABORTED) == 0)
+                ASSERT_STACK_UNWINDED(oldstack, oldstackdata);
+
+            next_call_needs_object = 0;
+
+            pc = oldpc;
+            was_just_callas = func_callstack.Count;
+            num_args_to_func = -1;
+            POP_CALL_STACK;
+            break;
+        }
+        case SCMD_THISBASE:
+        {
+            const auto arg_lit = codeOp.Arg1i();
+            thisbase[curnest] = arg_lit;
+            break;
+        }
+        case SCMD_NUMFUNCARGS:
+        {
+            const auto arg_lit = codeOp.Arg1i();
+            num_args_to_func = arg_lit;
+            break;
+        }
+        case SCMD_MODREG:
+        {
+            auto       &reg1 = registers[codeOp.Arg1i()];
+            const auto &reg2 = registers[codeOp.Arg2i()];
+            if (reg2.IValue == 0)
             {
-                // This might be a static object, passed to the user-defined extender function
-            case kScValScriptObject:
-            case kScValPluginObject:
-            case kScValPluginArg:
-                // This might be an object of USER-DEFINED type, calling its MEMBER-FUNCTION.
-                // Note, that this is the only case known when such object is written into reg[SREG_OP];
-                // in any other case that would count as error. 
-            case kScValGlobalVar:
-            case kScValStackPtr:
-                registers[SREG_OP] = reg1;
-                break;
-            case kScValStaticArray:
-                //FIXME: return manager type from interface?
-                //CC_ERROR_IF_RETCODE(!reg1.ArrMgr->GetDynamicManager(), "internal error: SCMD_CALLOBJ argument is not a dynamic object");
-                registers[SREG_OP].SetScriptObject(
-                        reg1.ArrMgr->GetElementPtr(reg1.Ptr, reg1.IValue),
-                        reg1.ArrMgr->GetObjectManager());
-                break;
-            default:
-                cc_error("internal error: SCMD_CALLOBJ argument is not an object of built-in or user-defined type");
+                cc_error("!Integer divide by zero");
                 return -1;
             }
-            next_call_needs_object = 1;
+            reg1.SetInt32(reg1.IValue % reg2.IValue);
+            break;
+        }
+        case SCMD_XORREG:
+        {
+            auto       &reg1 = registers[codeOp.Arg1i()];
+            const auto &reg2 = registers[codeOp.Arg2i()];
+            reg1.SetInt32(reg1.IValue ^ reg2.IValue);
+            break;
+        }
+        case SCMD_NOTREG:
+        {
+            auto       &reg1 = registers[codeOp.Arg1i()];
+            const auto &reg2 = registers[codeOp.Arg2i()];
+            reg1 = !(reg1);
             break;
         }
         case SCMD_SHIFTLEFT:
@@ -1455,40 +1245,165 @@ int ccInstance::Run(int32_t curpc)
             reg1.SetInt32(reg1.IValue >> reg2.IValue);
             break;
         }
-        case SCMD_THISBASE:
+        case SCMD_CALLOBJ:
         {
-            const auto arg_lit = codeOp.Arg1i();
-            thisbase[curnest] = arg_lit;
-            break;
-        }
-        case SCMD_NEWARRAY:
-        {
-            auto &reg1 = registers[codeOp.Arg1i()];
-            const auto arg_elsize = codeOp.Arg2i();
-            const auto arg_managed = codeOp.Arg3().GetAsBool();
-            int numElements = reg1.IValue;
-            if (numElements < 1)
+            // set the OP register
+            const auto &reg1 = registers[codeOp.Arg1i()];
+            if (reg1.IsNull())
             {
-                cc_error("invalid size for dynamic array; requested: %d, range: 1..%d", numElements, INT32_MAX);
+                cc_error("!Null pointer referenced");
                 return -1;
             }
-            DynObjectRef ref = CCDynamicArray::Create(numElements, arg_elsize, arg_managed);
-            reg1.SetScriptObject(ref.Obj, &globalDynamicArray);
+            switch (reg1.Type)
+            {
+                // This might be a static object, passed to the user-defined extender function
+                case kScValScriptObject:
+                case kScValPluginObject:
+                case kScValPluginArg:
+                    // This might be an object of USER-DEFINED type, calling its MEMBER-FUNCTION.
+                    // Note, that this is the only case known when such object is written into reg[SREG_OP];
+                    // in any other case that would count as error.
+                case kScValGlobalVar:
+                case kScValStackPtr:
+                    registers[SREG_OP] = reg1;
+                    break;
+                case kScValStaticArray:
+                    //FIXME: return manager type from interface?
+                    //CC_ERROR_IF_RETCODE(!reg1.ArrMgr->GetDynamicManager(), "internal error: SCMD_CALLOBJ argument is not a dynamic object");
+                    registers[SREG_OP].SetScriptObject(
+                            reg1.ArrMgr->GetElementPtr(reg1.Ptr, reg1.IValue),
+                            reg1.ArrMgr->GetObjectManager());
+                    break;
+                default:
+                    cc_error("internal error: SCMD_CALLOBJ argument is not an object of built-in or user-defined type");
+                    return -1;
+            }
+            next_call_needs_object = 1;
             break;
         }
-        case SCMD_NEWUSEROBJECT:
+        case SCMD_CHECKBOUNDS:
         {
-            auto &reg1 = registers[codeOp.Arg1i()];
-            const auto arg_size = codeOp.Arg2i();
-            if (arg_size < 0)
+            const auto &reg1 = registers[codeOp.Arg1i()];
+            const auto arg_lit = codeOp.Arg2i();
+            if ((reg1.IValue < 0) ||
+                (reg1.IValue >= arg_lit))
             {
-                cc_error("Invalid size for user object; requested: %d (or %d), range: 0..%d", arg_size, arg_size, INT_MAX);
+                cc_error("!Array index out of bounds (index: %d, bounds: 0..%d)", reg1.IValue, arg_lit - 1);
                 return -1;
             }
-            DynObjectRef ref = ScriptUserObject::Create(arg_size);
-            reg1.SetScriptObject(ref.Obj, ref.Mgr);
             break;
         }
+        case SCMD_MEMWRITEPTR:
+        {
+            const auto &reg1 = registers[codeOp.Arg1i()];
+            int32_t handle = registers[SREG_MAR].ReadInt32();
+            void *address;
+
+            switch (reg1.Type)
+            {
+                case kScValStaticArray:
+                    //FIXME: return manager type from interface?
+                    //CC_ERROR_IF_RETCODE(!reg1.ArrMgr->GetDynamicManager(), "internal error: MEMWRITEPTR argument is not a dynamic object");
+                    address = reg1.ArrMgr->GetElementPtr(reg1.Ptr, reg1.IValue);
+                    break;
+                case kScValScriptObject:
+                case kScValPluginObject:
+                    address = reg1.Ptr;
+                    break;
+                case kScValPluginArg:
+                    // FIXME: plugin API is currently strictly 32-bit, so this may break on 64-bit systems
+                    address = Int32ToPtr<char>(reg1.IValue);
+                    break;
+                default:
+                    // There's one possible case when the reg1 is 0, which means writing nullptr
+                    CC_ERROR_IF_RETCODE(!reg1.IsNull(), "internal error: MEMWRITEPTR argument is not a dynamic object");
+                    address = nullptr;
+                    break;
+            }
+
+            int32_t newHandle = ccGetObjectHandleFromAddress(address);
+            if (newHandle == -1)
+                return -1;
+
+            if (handle != newHandle)
+            {
+                ccReleaseObjectReference(handle);
+                ccAddObjectReference(newHandle);
+            }
+            // Assign always, avoid leaving undefined value
+            registers[SREG_MAR].WriteInt32(newHandle);
+            break;
+        }
+        case SCMD_MEMREADPTR:
+        {
+            auto &reg1 = registers[codeOp.Arg1i()];
+            int32_t handle = registers[SREG_MAR].ReadInt32();
+            // FIXME: make pool return a ready RuntimeScriptValue with these set?
+            // or another struct, which may be assigned to RSV
+            void *object;
+            IScriptObject *manager;
+            ScriptValueType obj_type = ccGetObjectAddressAndManagerFromHandle(handle, object, manager);
+            reg1.SetScriptObject(obj_type, object, manager);
+            ASSERT_CC_ERROR();
+            break;
+        }
+        case SCMD_MEMZEROPTR:
+        {
+            int32_t handle = registers[SREG_MAR].ReadInt32();
+            ccReleaseObjectReference(handle);
+            registers[SREG_MAR].WriteInt32(0);
+            break;
+        }
+        case SCMD_MEMINITPTR:
+        {
+            void *address;
+            const auto &reg1 = registers[codeOp.Arg1i()];
+
+            switch (reg1.Type)
+            {
+                case kScValStaticArray:
+                    //FIXME: return manager type from interface?
+                    //CC_ERROR_IF_RETCODE(!reg1.ArrMgr->GetDynamicManager(), "internal error: SCMD_MEMINITPTR argument is not a dynamic object");
+                    address = reg1.ArrMgr->GetElementPtr(reg1.Ptr, reg1.IValue);
+                    break;
+                case kScValScriptObject:
+                case kScValPluginObject:
+                    address = reg1.Ptr;
+                    break;
+                case kScValPluginArg:
+                    // FIXME: plugin API is currently strictly 32-bit, so this may break on 64-bit systems
+                    address = Int32ToPtr<uint8_t>(reg1.IValue);
+                    break;
+                default:
+                    // There's one possible case when the reg1 is 0, which means writing nullptr
+                    CC_ERROR_IF_RETCODE(!reg1.IsNull(), "internal error: SCMD_MEMINITPTR argument is not a dynamic object");
+                    address = nullptr;
+                    break;
+            }
+
+            // like memwriteptr, but doesn't attempt to free the old one
+            int32_t newHandle = ccGetObjectHandleFromAddress(address);
+            if (newHandle == -1)
+                return -1;
+
+            ccAddObjectReference(newHandle);
+            registers[SREG_MAR].WriteInt32(newHandle);
+            break;
+        }
+        case SCMD_LOADSPOFFS:
+        {
+            const auto arg_off = codeOp.Arg1i();
+            registers[SREG_MAR] = GetStackPtrOffsetRw(arg_off);
+            ASSERT_CC_ERROR();
+            break;
+        }
+        case SCMD_CHECKNULL:
+            if (registers[SREG_MAR].IsNull())
+            {
+                cc_error("!Null pointer referenced");
+                return -1;
+            }
+            break;
         case SCMD_FADD:
         {
             auto &reg1 = registers[codeOp.Arg1i()];
@@ -1638,10 +1553,95 @@ int ccInstance::Run(int32_t curpc)
             }
             break;
         }
+        case SCMD_CHECKNULLREG:
+        {
+            const auto &reg1 = registers[codeOp.Arg1i()];
+            if (reg1.IsNull())
+            {
+                cc_error("!Null string referenced");
+                return -1;
+            }
+            break;
+        }
         case SCMD_LOOPCHECKOFF:
             if (loopIterationCheckDisabled == 0)
                 loopIterationCheckDisabled++;
             break;
+        case SCMD_MEMZEROPTRND:
+        {
+            int32_t handle = registers[SREG_MAR].ReadInt32();
+
+            // don't do the Dispose check for the object being returned -- this is
+            // for returning a String (or other pointer) from a custom function.
+            // Note: we might be freeing a dynamic array which contains the DisableDispose
+            // object, that will be handled inside the recursive call to SubRef.
+            // CHECKME!! what type of data may reg1 point to?
+            pool.disableDisposeForObject = registers[SREG_AX].Ptr;
+            ccReleaseObjectReference(handle);
+            pool.disableDisposeForObject = nullptr;
+            registers[SREG_MAR].WriteInt32(0);
+            break;
+        }
+        case SCMD_JNZ:
+        {
+            const auto arg_lit = codeOp.Arg1i();
+            if (!registers[SREG_AX].IsNull())
+                pc += arg_lit;
+            break;
+        }
+        case SCMD_DYNAMICBOUNDS:
+        {
+            const auto &reg1 = registers[codeOp.Arg1i()];
+            // TODO: test reg[MAR] type here;
+            // That might be dynamic object, but also a non-managed dynamic array, "allocated"
+            // on global or local memspace (buffer)
+            void *arr_ptr = registers[SREG_MAR].GetPtrWithOffset();
+            const auto &hdr = CCDynamicArray::GetHeader(arr_ptr);
+            if ((reg1.IValue < 0) ||
+                (static_cast<uint32_t>(reg1.IValue) >= hdr.TotalSize))
+            {
+                int elem_count = hdr.ElemCount & (~ARRAY_MANAGED_TYPE_FLAG);
+                if (elem_count <= 0)
+                {
+                    cc_error("!Array has an invalid size (%d) and cannot be accessed", elem_count);
+                }
+                else
+                {
+                    int elementSize = (hdr.TotalSize / elem_count);
+                    cc_error("!Array index out of bounds (index: %d, bounds: 0..%d)", reg1.IValue / elementSize, elem_count - 1);
+                }
+                return -1;
+            }
+            break;
+        }
+        case SCMD_NEWARRAY:
+        {
+            auto &reg1 = registers[codeOp.Arg1i()];
+            const auto arg_elsize = codeOp.Arg2i();
+            const auto arg_managed = codeOp.Arg3().GetAsBool();
+            int numElements = reg1.IValue;
+            if (numElements < 1)
+            {
+                cc_error("invalid size for dynamic array; requested: %d, range: 1..%d", numElements, INT32_MAX);
+                return -1;
+            }
+            DynObjectRef ref = CCDynamicArray::Create(numElements, arg_elsize, arg_managed);
+            reg1.SetScriptObject(ref.Obj, &globalDynamicArray);
+            break;
+        }
+        case SCMD_NEWUSEROBJECT:
+        {
+            auto &reg1 = registers[codeOp.Arg1i()];
+            const auto arg_size = codeOp.Arg2i();
+            if (arg_size < 0)
+            {
+                cc_error("Invalid size for user object; requested: %d (or %d), range: 0..%d", arg_size, arg_size, INT_MAX);
+                return -1;
+            }
+            DynObjectRef ref = ScriptUserObject::Create(arg_size);
+            reg1.SetScriptObject(ref.Obj, ref.Mgr);
+            break;
+        }
         default:
             cc_error("instruction %d is not implemented", codeOp.Instruction.Code);
             return -1;
