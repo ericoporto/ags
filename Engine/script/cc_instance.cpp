@@ -146,6 +146,17 @@ const ScriptCommandInfo sccmd_info[CC_NUM_SCCMDS] =
     ScriptCommandInfo( SCMD_NEWUSEROBJECT   , "newuserobject"     , 2, kScOpOneArgIsReg ),
 };
 
+const int sccmd_info_argcount[CC_NUM_SCCMDS] = {
+    0, 2, 2, 2, 2, 0, 2, 1, 1, 2,
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    2, 2, 2, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 2, 1, 1, 1, 1, 1, 1, 1,
+    2, 2, 1, 2, 2, 1, 2, 1, 1, 0,
+    1, 1, 0, 2, 2, 2, 2, 2, 2, 2,
+    2, 2, 2, 1, 1, 2, 2, 1, 0, 0,
+    1, 1, 3, 2,
+};
+
 const char *regnames[] = { "null", "sp", "mar", "ax", "bx", "cx", "op", "dx" };
 const char *fixupnames[] = { "null", "fix_gldata", "fix_func", "fix_string", "fix_import", "fix_datadata", "fix_stack" };
 
@@ -216,7 +227,7 @@ unsigned ccInstance::_maxWhileLoops = 0u;
 
 ccInstance *ccInstance::GetCurrentInstance()
 {
-    return InstThreads.size() > 0 ? InstThreads.back() : nullptr;
+    return !InstThreads.empty() ? InstThreads.back() : nullptr;
 }
 
 ccInstance *ccInstance::CreateFromScript(PScript scri)
@@ -405,7 +416,7 @@ int ccInstance::CallScriptFunction(const char *funcname, int32_t numargs, const 
     int export_args = numargs;
 
     for (int k = 0; k < instanceof->numexports; k++) {
-        char *thisExportName = instanceof->exports[k];
+        char const *thisExportName = instanceof->exports[k];
         bool match = false;
 
         // check for a mangled name match
@@ -553,10 +564,10 @@ inline bool FixupArgument(RuntimeScriptValue &arg, int fixup, uintptr_t code,
         return true;
     case FIXUP_IMPORT:
         {
-            const ScriptImport *import = simp.getByIndex(static_cast<uint32_t>(code));
-            if (import)
+            const ScriptImport *sc_import = simp.getByIndex(static_cast<uint32_t>(code));
+            if (sc_import)
             {
-                arg = import->Value;
+                arg = sc_import->Value;
             }
             else
             {
@@ -628,7 +639,7 @@ int ccInstance::Run(int32_t curpc)
         CC_ERROR_IF_RETCODE((codeOp.Instruction.Code < 0 || codeOp.Instruction.Code >= CC_NUM_SCCMDS),
             "invalid instruction %d found in code stream", codeOp.Instruction.Code);
 
-        codeOp.ArgCount = sccmd_info[codeOp.Instruction.Code].ArgCount;
+        codeOp.ArgCount = sccmd_info_argcount[codeOp.Instruction.Code];
 
         CC_ERROR_IF_RETCODE(pc + codeOp.ArgCount >= codeInst->codesize,
             "unexpected end of code data (%d; %d)", pc + codeOp.ArgCount, codeInst->codesize);
@@ -1679,12 +1690,11 @@ void ccInstance::GetScriptPosition(ScriptPosition &script_pos) const
 // get a pointer to a variable or function exported by the script
 RuntimeScriptValue ccInstance::GetSymbolAddress(const char *symname) const
 {
-    int k;
     char altName[200];
     snprintf(altName, sizeof(altName), "%s$", symname);
     RuntimeScriptValue rval_null;
     size_t len_altName = strlen(altName);
-    for (k = 0; k < instanceof->numexports; k++) {
+    for (int k = 0; k < instanceof->numexports; k++) {
         if (strcmp(instanceof->exports[k], symname) == 0)
             return exports[k];
         // mangled function name
@@ -2264,9 +2274,9 @@ RuntimeScriptValue ccInstance::GetStackPtrOffsetRw(int32_t rw_offset)
 {
     int32_t total_off = 0;
     RuntimeScriptValue *stack_entry = registers[SREG_SP].RValue;
-    while (total_off < rw_offset && stack_entry >= &stack[0])
+    while (total_off < rw_offset && stack_entry >= stack)
     {
-        stack_entry--;
+        --stack_entry;
         total_off += stack_entry->Size;
     }
     CC_ERROR_IF_RETVAL(total_off < rw_offset, RuntimeScriptValue, "accessing address before stack's head");

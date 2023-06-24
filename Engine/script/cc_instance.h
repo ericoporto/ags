@@ -19,7 +19,7 @@
 #define __CC_INSTANCE_H
 
 #include <memory>
-#include <unordered_map>
+#include <map>
 
 #include "ac/timer.h"
 #include "script/cc_script.h"  // ccScript
@@ -117,7 +117,7 @@ struct ScriptPosition
 struct ccInstance
 {
 public:
-    typedef std::unordered_map<int32_t, ScriptVariable> ScVarMap;
+    typedef std::map<int32_t, ScriptVariable> ScVarMap;
     typedef std::shared_ptr<ScVarMap>                   PScVarMap;
 public:
     int32_t flags;
