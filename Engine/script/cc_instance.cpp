@@ -649,13 +649,13 @@ int ccInstance::Run(int32_t curpc)
         switch (codeOp.ArgCount)
         {
         case 3:
-            codeOp.Args[2].SetInt32((int32_t)codeInst->code[pc + 3]);
+            codeOp.Args[2].SetInt32(static_cast<int32_t>(codeInst->code[pc + 3]));
             /* fall-through */
         case 2:
-            codeOp.Args[1].SetInt32((int32_t)codeInst->code[pc + 2]);
+            codeOp.Args[1].SetInt32(static_cast<int32_t>(codeInst->code[pc + 2]));
             /* fall-through */
         case 1:
-            codeOp.Args[0].SetInt32((int32_t)codeInst->code[pc + 1]);
+            codeOp.Args[0].SetInt32(static_cast<int32_t>(codeInst->code[pc + 1]));
             break;
         default:
             break;
