@@ -587,6 +587,12 @@ inline bool FixupArgument(RuntimeScriptValue &arg, int fixup, uintptr_t code,
     }
 }
 
+union CodeUnion
+{
+    uint32_t code;
+    uint8_t bytes[4];
+};
+
 
 #define MAXNEST 50  // number of recursive function calls allowed
 int ccInstance::Run(int32_t curpc)
@@ -610,6 +616,7 @@ int ccInstance::Run(int32_t curpc)
     ccInstance *codeInst = runningInst;
     ScriptOperation codeOp;
     FunctionCallStack func_callstack;
+    CodeUnion coby;
 #if DEBUG_CC_EXEC
     const bool dump_opcodes = ccGetOption(SCOPT_DEBUGRUN) != 0;
 #endif
@@ -632,9 +639,9 @@ int ccInstance::Run(int32_t curpc)
         //
         /* Read operation */
         //=====================================================================
-        codeOp.Instruction.Code = codeInst->code[pc];
-        codeOp.Instruction.InstanceId = (codeOp.Instruction.Code >> INSTANCE_ID_SHIFT) & INSTANCE_ID_MASK;
-        codeOp.Instruction.Code &= INSTANCE_ID_REMOVEMASK; // now this is pure instruction code
+        coby.code = codeInst->code[pc];
+        codeOp.Instruction.InstanceId = coby.bytes[3];
+        codeOp.Instruction.Code = coby.bytes[0]; // now this is pure instruction code
 
         CC_ERROR_IF_RETCODE((codeOp.Instruction.Code < 0 || codeOp.Instruction.Code >= CC_NUM_SCCMDS),
             "invalid instruction %d found in code stream", codeOp.Instruction.Code);
