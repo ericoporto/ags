@@ -2114,7 +2114,7 @@ static void draw_gui_controls_batch(int gui_id)
     const int draw_index = guiobjddbref[gui_id];
     for (const auto &obj_id : gui.GetControlsDrawOrder())
     {
-        GUIObject *obj = gui.GetControl(obj_id);
+        GUIObject const *obj = gui.GetControl(obj_id);
         if (!obj->IsVisible() ||
             (obj->Width <= 0 || obj->Height <= 0) ||
             (!obj->IsEnabled() && (GUI::Options.DisabledStyle == kGuiDis_Blackout)))
@@ -2204,8 +2204,7 @@ void draw_gui_and_overlays()
             quit("!The player.activeinv variable has been corrupted, probably as a result\n"
                 "of an incorrect assignment in the game script.");
         }
-        if (playerchar->activeinv < 1) gui_inv_pic=-1;
-        else gui_inv_pic=game.invinfo[playerchar->activeinv].pic;
+        gui_inv_pic = (playerchar->activeinv < 1) ? -1 : game.invinfo[playerchar->activeinv].pic;
         our_eip = 37;
 
         prepare_and_update_gui_textures(draw_controls_as_textures);
@@ -2226,7 +2225,9 @@ void draw_gui_and_overlays()
 
             auto *gui_ddb = guibg[index].Ddb;
             assert(gui_ddb); // Test for missing texture, might happen if not marked for update
-            if (!gui_ddb) continue;
+            if (!gui_ddb)
+                continue;
+
             if (draw_controls_as_textures)
             {
                 gui_render_tex[index] = recycle_render_target(gui_render_tex[index],
@@ -2278,7 +2279,7 @@ bool GfxDriverSpriteEvtCallback(int evt, int data)
     if (displayed_room < 0)
     {
         // if no room loaded, various stuff won't be initialized yet
-        return 1;
+        return true;
     }
     return (pl_run_plugin_hooks(evt, data) != 0);
 }
