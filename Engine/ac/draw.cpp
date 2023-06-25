@@ -2129,6 +2129,50 @@ static void draw_gui_controls_batch(int gui_id)
     gfxDriver->EndSpriteBatch();
 }
 
+void prepare_and_update_gui_textures(const bool draw_controls_as_textures)
+{
+    for (int index = 0; index < game.numgui; ++index)
+    {
+        auto &gui = guis[index];
+        if (!gui.IsDisplayed() || (gui.Transparency == 255))
+            continue; // not on screen or 100% transparent
+        if (!gui.HasChanged() && !gui.HasControlsChanged())
+            continue; // no changes: no need to update image
+
+        eip_guinum = index;
+        our_eip = 372;
+        const bool draw_with_controls = !draw_controls_as_textures;
+        if (gui.HasChanged() || (draw_with_controls && gui.HasControlsChanged()))
+        {
+            auto &gbg = guibg[index];
+            recycle_bitmap(gbg.Bmp, game.GetColorDepth(), gui.Width, gui.Height, true);
+            if (draw_with_controls)
+                gui.DrawWithControls(gbg.Bmp.get());
+            else
+                gui.DrawSelf(gbg.Bmp.get());
+
+            const bool is_alpha = gui.HasAlphaChannel();
+            if (is_alpha && (game.options[OPT_NEWGUIALPHA] == kGuiAlphaRender_Legacy) && (gui.BgImage > 0))
+            {
+                // old-style (pre-3.0.2) GUI alpha rendering
+                repair_alpha_channel(gbg.Bmp.get(), spriteset[gui.BgImage]);
+            }
+            sync_object_texture(gbg, is_alpha);
+        }
+
+        our_eip = 373;
+        // Update control textures, if they have changed themselves
+        if (draw_controls_as_textures && gui.HasControlsChanged())
+        {
+            construct_guictrl_tex(gui);
+        }
+
+        our_eip = 374;
+
+        gui.ClearChanged();
+    }
+}
+
 // Draw GUI and overlays of all kinds, anything outside the room space
 void draw_gui_and_overlays()
 {
@@ -2144,13 +2188,11 @@ void draw_gui_and_overlays()
 
     clear_sprite_list();
 
-    const bool is_software_mode = !gfxDriver->HasAcceleratedTransform();
     // Add active overlays to the sprite list
-    for (size_t i = 0; i < screenover.size(); ++i)
+    for (auto & over : screenover)
     {
-        auto &over = screenover[i];
-        if (over.IsRoomLayer()) continue; // not a ui layer
-        if (over.transparency == 255) continue; // skip fully transparent
+        if ((over.transparency == 255) || over.IsRoomLayer())
+            continue; // skip  fully transparent overlays and non-ui layers
         Point pos = get_overlay_position(over);
         add_to_sprite_list(over.ddb, pos.X, pos.Y, over.zorder, false);
     }
@@ -2165,58 +2207,16 @@ void draw_gui_and_overlays()
         if (playerchar->activeinv < 1) gui_inv_pic=-1;
         else gui_inv_pic=game.invinfo[playerchar->activeinv].pic;
         our_eip = 37;
-        // Prepare and update GUI textures
-        {
-            for (int index = 0; index < game.numgui; ++index)
-            {
-                auto &gui = guis[index];
-                if (!gui.IsDisplayed()) continue; // not on screen
-                if (!gui.HasChanged() && !gui.HasControlsChanged()) continue; // no changes: no need to update image
-                if (gui.Transparency == 255) continue; // 100% transparent
 
-                eip_guinum = index;
-                our_eip = 372;
-                const bool draw_with_controls = !draw_controls_as_textures;
-                if (gui.HasChanged() || (draw_with_controls && gui.HasControlsChanged()))
-                {
-                    auto &gbg = guibg[index];
-                    recycle_bitmap(gbg.Bmp, game.GetColorDepth(), gui.Width, gui.Height, true);
-                    if (draw_with_controls)
-                        gui.DrawWithControls(gbg.Bmp.get());
-                    else
-                        gui.DrawSelf(gbg.Bmp.get());
+        prepare_and_update_gui_textures(draw_controls_as_textures);
 
-                    const bool is_alpha = gui.HasAlphaChannel();
-                    if (is_alpha)
-                    {
-                        if ((game.options[OPT_NEWGUIALPHA] == kGuiAlphaRender_Legacy) && (gui.BgImage > 0))
-                        {
-                            // old-style (pre-3.0.2) GUI alpha rendering
-                            repair_alpha_channel(gbg.Bmp.get(), spriteset[gui.BgImage]);
-                        }
-                    }
-                    sync_object_texture(gbg, is_alpha);
-                }
-
-                our_eip = 373;
-                // Update control textures, if they have changed themselves
-                if (draw_controls_as_textures && gui.HasControlsChanged())
-                {
-                    construct_guictrl_tex(gui);
-                }
-
-                our_eip = 374;
-
-                gui.ClearChanged();
-            }
-        }
         our_eip = 38;
         // Draw the GUIs
         for (int index = 0; index < game.numgui; ++index)
         {
             const auto &gui = guis[index];
-            if (!gui.IsDisplayed()) continue; // not on screen
-            if (gui.Transparency == 255) continue; // 100% transparent
+            if (!gui.IsDisplayed() || (gui.Transparency == 255))
+                continue; // not on screen or it's 100% transparent
 
             // Don't draw GUI if "GUIs Turn Off When Disabled"
             if ((game.options[OPT_DISABLEOFF] == kGuiDis_Off) &&
