@@ -9,7 +9,7 @@
   * If you are using MSVS 2019 and higher you might need to manually download [Windows 10 SDK (10.0.10240)](https://go.microsoft.com/fwlink/p/?LinkId=619296) from the [SDK Archive](https://developer.microsoft.com/en-us/windows/downloads/sdk-archive/).
 * Specifically for the Engine:
   * SDL 2.0.12 or higher (https://www.libsdl.org/download-2.0.php)
-  * SDL_Sound 2.0.* (revision 495e948b455 or higher) https://github.com/icculus/SDL_sound/archive/495e948b455af48eb45f75cccc060498f1e0e8a2.tar.gz
+  * SDL_Sound 2.0.2 (or higher) https://github.com/icculus/SDL_sound/releases/download/v2.0.2/SDL2_sound-2.0.2.tar.gz
   * libogg-1.1.3 or higher ([Download](https://www.xiph.org/downloads/))
   * libtheora-1.0 or higher ([Download](https://www.xiph.org/downloads/))
   * libvorbis-1.2.0 or higher ([Download](https://www.xiph.org/downloads/))
@@ -54,7 +54,7 @@ and SDL2.dll to run.
 Official page for SDL_Sound library is https://www.icculus.org/SDL_sound/, but downloads are hosted on github: https://github.com/icculus/SDL_sound/releases.
 Any latest 2.0.X release should be good.
 
-For the reference, at the time of writing our build server is using revision 495e948b45: https://github.com/icculus/SDL_sound/archive/495e948b455af48eb45f75cccc060498f1e0e8a2.tar.gz
+For the reference, at the time of writing our build server is using version 2.0.02: https://github.com/icculus/SDL_sound/releases/download/v2.0.2/SDL2_sound-2.0.2.tar.gz
 
 After you downloaded the source this way or another, you should use CMake to generate MSVS solution from their provided CMakeList.txt.
 Note that when doing this you may have to direct CMake to the SDL2's cmake config files. First go to the SDL2's sources location and find "cmake" directory inside. It should contain the file called "sdl2-config.cmake". If the file is not present, this means something is wrong with the SDL2's package, or maybe you've downloaded a way too old version of SDL2.
@@ -63,7 +63,7 @@ If you are running CMake from command line, you may also pass this path as an ar
 
     cmake . -DSDL2_DIR="absolute-path-to-my-libs\SDL2-2.24.1\cmake"
 
-Once CMake finished working, you should have "SDL_sound.sln" MSVS solution in the same dir. Open the generated solution in MSVS, build a SDL2_sound-static project using wanted configuration.
+Once CMake finished working, you should have "SDL2_sound.sln" MSVS solution in the same dir. Open the generated solution in MSVS, build a SDL2_sound-static project using wanted configuration.
 
 ### OGG, Theora and Vorbis
 
@@ -74,7 +74,7 @@ All of these come with MSVC projects. You may need to make sure there are distin
 
 Engine requires following libraries:
 * SDL2
-* SDL_Sound
+* SDL2_Sound
 * libogg
 * libtheora
 * libvorbis
