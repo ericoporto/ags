@@ -3201,6 +3201,7 @@
 		20373CEE298EAE7C00162BBA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				205CAAAD2A86E1C900523BE2 /* ios.cfg */,
 				20373CEF298EAE7C00162BBA /* speech.vox */,
 				20373CF0298EAE7C00162BBA /* game.ags */,
 				20373CF1298EAE7C00162BBA /* audio.vox */,
