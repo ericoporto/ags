@@ -494,6 +494,7 @@
 		20373D00298EAE7C00162BBA /* game.ags in Resources */ = {isa = PBXBuildFile; fileRef = 20373CF0298EAE7C00162BBA /* game.ags */; };
 		20373D01298EAE7C00162BBA /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = 20373CF1298EAE7C00162BBA /* audio.vox */; };
 		20373D02298EAE7C00162BBA /* acsetup.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 20373CF2298EAE7C00162BBA /* acsetup.cfg */; };
+		205CAAAE2A86E1C900523BE2 /* ios.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 205CAAAD2A86E1C900523BE2 /* ios.cfg */; };
 		20F3EDCF2A6DC96A00C7BD28 /* scriptmouse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20F3EDC62A6DC96A00C7BD28 /* scriptmouse.cpp */; };
 		20F3EDD02A6DC96A00C7BD28 /* cc_staticarray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20F3EDC72A6DC96A00C7BD28 /* cc_staticarray.cpp */; };
 		20F3EDD12A6DC96A00C7BD28 /* scriptsystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20F3EDC92A6DC96A00C7BD28 /* scriptsystem.cpp */; };
@@ -1462,6 +1463,7 @@
 		20373CF0298EAE7C00162BBA /* game.ags */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = game.ags; sourceTree = "<group>"; };
 		20373CF1298EAE7C00162BBA /* audio.vox */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = audio.vox; sourceTree = "<group>"; };
 		20373CF2298EAE7C00162BBA /* acsetup.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = acsetup.cfg; sourceTree = "<group>"; };
+		205CAAAD2A86E1C900523BE2 /* ios.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios.cfg; path = ../misc/ios.cfg; sourceTree = "<group>"; };
 		20F3EDC62A6DC96A00C7BD28 /* scriptmouse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scriptmouse.cpp; sourceTree = "<group>"; };
 		20F3EDC72A6DC96A00C7BD28 /* cc_staticarray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cc_staticarray.cpp; sourceTree = "<group>"; };
 		20F3EDC82A6DC96A00C7BD28 /* scriptgame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scriptgame.h; sourceTree = "<group>"; };
@@ -3358,6 +3360,7 @@
 				20155992290D9DF8005E5B22 /* LaunchScreen.storyboard in Resources */,
 				20373D02298EAE7C00162BBA /* acsetup.cfg in Resources */,
 				20155A25290DCAAC005E5B22 /* fmaths.inl in Resources */,
+				205CAAAE2A86E1C900523BE2 /* ios.cfg in Resources */,
 				20156963290DD94E005E5B22 /* tintshaderLegacy.fxo in Resources */,
 				20373D00298EAE7C00162BBA /* game.ags in Resources */,
 				20155A24290DCAAC005E5B22 /* gfx.inl in Resources */,
