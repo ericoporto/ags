@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Text;
 using System.Xml;
 using AGS.Types.Interfaces;
@@ -12,22 +13,32 @@ namespace AGS.Types
     {
         public const int MAX_OPTIONS_PER_DIALOG = 30;
 
+        private string _fileName;
         private int _id;
         private string _name;
         private bool _showTextParser;
-        private string _script;
+        private string _text;
         private bool _scriptChangedSinceLastCompile;
         private string _cachedConvertedScript;
+        private bool _modified = false;
         private List<DialogOption> _options = new List<DialogOption>();
+        private bool _isBeingSaved = false;
+        private DateTime _lastSavedAt = DateTime.MinValue;
 
-        public Dialog()
+        /// <summary>
+        /// Current global text encoding for scripts.
+        /// TODO: store per-script, assign from the game setting when it is changed?
+        /// </summary>
+        public static Encoding TextEncoding = Utilities.UTF8;
+
+        public Dialog(string fileName, string text)
         {
-            _script = "// Dialog script file" + Environment.NewLine + 
-                "@S  // Dialog startup entry point" + Environment.NewLine +
-                "return" + Environment.NewLine;
+            _fileName = fileName;
+            _text = text ?? string.Empty;
             _cachedConvertedScript = null;
             _scriptChangedSinceLastCompile = true;
         }
+
 
         [Description("The ID number of the dialog")]
         [Category("Design")]
@@ -46,9 +57,21 @@ namespace AGS.Types
             set { _name = Utilities.ValidateScriptName(value); }
         }
 
-        public string FileName { get { return "Dialog " + ID; } }
+        [ReadOnly(true)]
+        [Category("Setup")]
+        [Description("File name that the script is stored in")]
+        public string FileName
+        {
+            get { return _fileName; }
+            set { _fileName = value; }
+        }
 
-        public string Text { get { return _script; } }
+        [Browsable(false)]
+        public string Text
+        {
+            get { return _text; }
+            set { _text = value ?? string.Empty; _modified = true; }
+        }
 
         public ScriptAutoCompleteData AutoCompleteData { get { return null; } }
 
@@ -63,14 +86,14 @@ namespace AGS.Types
         [Browsable(false)]
         public string Script
         {
-            get { return _script; }
+            get { return _text; }
             set 
             {
-                if (_script != value)
+                if (_text != value)
                 {
                     _scriptChangedSinceLastCompile = true;
                 }
-                _script = value; 
+                _text = value; 
             }
         }
 
@@ -101,6 +124,76 @@ namespace AGS.Types
             get { return string.IsNullOrEmpty(this.Name) ? ("Dialog " + this.ID) : ("Dialog: " + this.Name); }
         }
 
+        [Browsable(false)]
+        public string NameForLabelEdit
+        {
+            get { return Path.GetFileNameWithoutExtension(_fileName); }
+            set { _fileName = value + Path.GetExtension(_fileName); }
+        }
+
+        [Browsable(false)]
+        public bool Modified
+        {
+            get { return _modified; }
+            set { _modified = value; }
+        }
+
+        [Browsable(false)]
+        public bool IsBeingSaved
+        {
+            get { return _isBeingSaved; }
+        }
+
+        [Browsable(false)]
+        public DateTime LastSavedAt
+        {
+            get { return _lastSavedAt; }
+        }
+
+        public void SaveToDisk()
+        {
+            SaveToDisk(false);
+        }
+
+        public void SaveToDisk(bool force)
+        {
+            if (_modified || force)
+            {
+                _isBeingSaved = true;
+                try
+                {
+                    byte[] bytes = TextEncoding.GetBytes(_text);
+                    using (BinaryWriter binWriter = new BinaryWriter(File.Open(_fileName, FileMode.Create)))
+                    {
+                        binWriter.Write(bytes);
+                        _lastSavedAt = DateTime.Now;
+                    }
+                }
+                finally
+                {
+                    _isBeingSaved = false;
+                }
+                _modified = false;
+            }
+        }
+        public void LoadFromDisk()
+        {
+            try
+            {
+                using (BinaryReader reader = new BinaryReader(File.Open(_fileName, FileMode.Open, FileAccess.Read)))
+                {
+                    byte[] bytes = reader.ReadBytes((int)reader.BaseStream.Length);
+                    _text = TextEncoding.GetString(bytes) ?? string.Empty;
+                }
+            }
+            catch (Exception)
+            {
+                // TODO: add warning? would require changes to report system
+                _text = string.Empty;
+            }
+            _modified = false;
+        }
+
         public Dialog(XmlNode node)
         {
             _scriptChangedSinceLastCompile = true;
@@ -108,13 +201,15 @@ namespace AGS.Types
             _name = SerializeUtils.GetElementString(node, "Name");
             _showTextParser = Boolean.Parse(SerializeUtils.GetElementString(node, "ShowTextParser"));
             XmlNode scriptNode = node.SelectSingleNode("Script");
-            // Luckily the CDATA section is easy to read back
-            _script = scriptNode.InnerText;
-
+            
             foreach (XmlNode child in SerializeUtils.GetChildNodes(node, "DialogOptions"))
             {
                 _options.Add(new DialogOption(child));
             }
+
+            LoadFromDisk();
+
+            _modified = false;
         }
 
         public void ToXml(XmlTextWriter writer)
@@ -124,7 +219,7 @@ namespace AGS.Types
             writer.WriteElementString("Name", _name);
             writer.WriteElementString("ShowTextParser", _showTextParser.ToString());
             writer.WriteStartElement("Script");
-            writer.WriteCData(_script);
+
             writer.WriteEndElement();
 
             writer.WriteStartElement("DialogOptions");
@@ -136,6 +231,7 @@ namespace AGS.Types
 
             writer.WriteEndElement();
 
+            SaveToDisk();
         }
 
         #region IComparable<Dialog> Members

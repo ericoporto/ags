@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Xml;
 using AGS.Types;
 using AGS.Editor.TextProcessing;
+using System.IO;
 
 namespace AGS.Editor.Components
 {
@@ -53,12 +54,19 @@ namespace AGS.Editor.Components
         {
             if (controlID == COMMAND_NEW_ITEM)
             {
-                Dialog newItem = new Dialog();
-                newItem.ID = _agsEditor.CurrentGame.RootDialogFolder.GetAllItemsCount();
-                newItem.Name = _agsEditor.GetFirstAvailableScriptName("dDialog");
-                string newNodeID = AddSingleItem(newItem);
+                string newFileContent = "// Dialog script file" + Environment.NewLine +
+                                        "@S  // Dialog startup entry point" + Environment.NewLine +
+                                        "return" + Environment.NewLine;
+
+                string newFileName = FindFirstAvailableFileName("dNewDialog");
+                Dialog newDialog = new Dialog(newFileName + ".asd", newFileContent);
+                newDialog.Modified = true;
+                newDialog.SaveToDisk();
+                string newNodeID = AddSingleItem(newDialog);
+                _agsEditor.CurrentGame.FilesAddedOrRemoved = true;
+                RePopulateTreeView(GetNodeID(newDialog));
                 _guiController.ProjectTree.SelectNode(this, newNodeID);
-				ShowPaneForDialog(newItem);
+                _guiController.ProjectTree.BeginLabelEdit(this, ITEM_COMMAND_PREFIX + newDialog.NameForLabelEdit);
             }
             else if (controlID == COMMAND_DELETE_ITEM)
             {
@@ -121,6 +129,20 @@ namespace AGS.Editor.Components
         protected override void DeleteResourcesUsedByItem(Dialog item)
         {
             DeleteDialog(item);
+        }
+
+        private string FindFirstAvailableFileName(string prefix)
+        {
+            int attempt = 0;
+            string newFileName;
+            do
+            {
+                newFileName = prefix + ((attempt > 0) ? attempt.ToString() : string.Empty);
+                attempt++;
+            }
+            while (File.Exists(newFileName + ".asd"));
+
+            return newFileName;
         }
 
         private void OnItemIDOrNameChanged(Dialog item, bool name_only)
