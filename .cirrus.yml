@@ -240,6 +240,8 @@ build_android_task:
     cpu: 4
     memory: 8G
     greedy: true
+  env:
+    GRADLE_OPTS: -Dorg.gradle.daemon=false
   git_submodules_script: git submodule update --init --recursive
   build_prepare_script: |
     cd Android && ./and-build.sh prepare
