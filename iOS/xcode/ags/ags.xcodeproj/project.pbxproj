@@ -457,6 +457,7 @@
 		2015697C290DD94E005E5B22 /* gfxfilter_scaling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2015684F290DD94B005E5B22 /* gfxfilter_scaling.cpp */; };
 		2015697D290DD94E005E5B22 /* gfxdriverbase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20156854290DD94B005E5B22 /* gfxdriverbase.cpp */; };
 		2015697E290DD94E005E5B22 /* gfxfilter_sdl_renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20156855290DD94B005E5B22 /* gfxfilter_sdl_renderer.cpp */; };
+		2015697F290DD94E005E5B22 /* consoleoutputtarget.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2015685E290DD94B005E5B22 /* consoleoutputtarget.cpp */; };
 		20156980290DD94E005E5B22 /* logfile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2015685F290DD94B005E5B22 /* logfile.cpp */; };
 		20156981290DD94E005E5B22 /* messagebuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20156860290DD94B005E5B22 /* messagebuffer.cpp */; };
 		20156982290DD94E005E5B22 /* filebasedagsdebugger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20156861290DD94B005E5B22 /* filebasedagsdebugger.cpp */; };
@@ -494,7 +495,6 @@
 		20373D01298EAE7C00162BBA /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = 20373CF1298EAE7C00162BBA /* audio.vox */; };
 		20373D02298EAE7C00162BBA /* acsetup.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 20373CF2298EAE7C00162BBA /* acsetup.cfg */; };
 		205CAAAE2A86E1C900523BE2 /* ios.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 205CAAAD2A86E1C900523BE2 /* ios.cfg */; };
-		205F24E82AC08C470048F634 /* miniz.c in Sources */ = {isa = PBXBuildFile; fileRef = 205F24E72AC08C470048F634 /* miniz.c */; };
 		20F3EDCF2A6DC96A00C7BD28 /* scriptmouse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20F3EDC62A6DC96A00C7BD28 /* scriptmouse.cpp */; };
 		20F3EDD02A6DC96A00C7BD28 /* cc_staticarray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20F3EDC72A6DC96A00C7BD28 /* cc_staticarray.cpp */; };
 		20F3EDD12A6DC96A00C7BD28 /* scriptsystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20F3EDC92A6DC96A00C7BD28 /* scriptsystem.cpp */; };
@@ -1395,10 +1395,12 @@
 		20156855290DD94B005E5B22 /* gfxfilter_sdl_renderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gfxfilter_sdl_renderer.cpp; sourceTree = "<group>"; };
 		20156856290DD94B005E5B22 /* gfxfilter_sdl_renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gfxfilter_sdl_renderer.h; sourceTree = "<group>"; };
 		20156857290DD94B005E5B22 /* ddb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ddb.h; sourceTree = "<group>"; };
+		20156859290DD94B005E5B22 /* consoleoutputtarget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = consoleoutputtarget.h; sourceTree = "<group>"; };
 		2015685A290DD94B005E5B22 /* dummyagsdebugger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dummyagsdebugger.h; sourceTree = "<group>"; };
 		2015685B290DD94B005E5B22 /* logfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logfile.h; sourceTree = "<group>"; };
 		2015685C290DD94B005E5B22 /* messagebuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = messagebuffer.h; sourceTree = "<group>"; };
 		2015685D290DD94B005E5B22 /* debug_log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = debug_log.h; sourceTree = "<group>"; };
+		2015685E290DD94B005E5B22 /* consoleoutputtarget.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = consoleoutputtarget.cpp; sourceTree = "<group>"; };
 		2015685F290DD94B005E5B22 /* logfile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = logfile.cpp; sourceTree = "<group>"; };
 		20156860290DD94B005E5B22 /* messagebuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = messagebuffer.cpp; sourceTree = "<group>"; };
 		20156861290DD94B005E5B22 /* filebasedagsdebugger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = filebasedagsdebugger.cpp; sourceTree = "<group>"; };
@@ -1469,8 +1471,6 @@
 		20373CF1298EAE7C00162BBA /* audio.vox */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = audio.vox; sourceTree = "<group>"; };
 		20373CF2298EAE7C00162BBA /* acsetup.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = acsetup.cfg; sourceTree = "<group>"; };
 		205CAAAD2A86E1C900523BE2 /* ios.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ios.cfg; path = ../misc/ios.cfg; sourceTree = "<group>"; };
-		205F24E62AC08C470048F634 /* miniz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = miniz.h; sourceTree = "<group>"; };
-		205F24E72AC08C470048F634 /* miniz.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = miniz.c; sourceTree = "<group>"; };
 		20F3EDC62A6DC96A00C7BD28 /* scriptmouse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scriptmouse.cpp; sourceTree = "<group>"; };
 		20F3EDC72A6DC96A00C7BD28 /* cc_staticarray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cc_staticarray.cpp; sourceTree = "<group>"; };
 		20F3EDC82A6DC96A00C7BD28 /* scriptgame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scriptgame.h; sourceTree = "<group>"; };
@@ -1540,7 +1540,6 @@
 		201559C5290DCA75005E5B22 /* libsrc */ = {
 			isa = PBXGroup;
 			children = (
-				205F24E52AC08C2C0048F634 /* miniz */,
 				201560C9290DD5FF005E5B22 /* SDL_sound */,
 				20155D81290DD4BF005E5B22 /* vorbis */,
 				20155B60290DD378005E5B22 /* theora */,
@@ -2091,7 +2090,6 @@
 		2015622A290DD65E005E5B22 /* libsrc */ = {
 			isa = PBXGroup;
 			children = (
-				205F24DF2AC08B9D0048F634 /* miniz */,
 				2015622B290DD65E005E5B22 /* freetype-2.1.3 */,
 				20156460290DD65F005E5B22 /* alfont-2.0.9 */,
 				20156469290DD65F005E5B22 /* aastr-0.1.1 */,
@@ -3024,10 +3022,12 @@
 		20156858290DD94B005E5B22 /* debug */ = {
 			isa = PBXGroup;
 			children = (
+				20156859290DD94B005E5B22 /* consoleoutputtarget.h */,
 				2015685A290DD94B005E5B22 /* dummyagsdebugger.h */,
 				2015685B290DD94B005E5B22 /* logfile.h */,
 				2015685C290DD94B005E5B22 /* messagebuffer.h */,
 				2015685D290DD94B005E5B22 /* debug_log.h */,
+				2015685E290DD94B005E5B22 /* consoleoutputtarget.cpp */,
 				2015685F290DD94B005E5B22 /* logfile.cpp */,
 				20156860290DD94B005E5B22 /* messagebuffer.cpp */,
 				20156861290DD94B005E5B22 /* filebasedagsdebugger.cpp */,
@@ -3217,22 +3217,6 @@
 			);
 			name = Resources;
 			path = ../../../Resources;
-			sourceTree = "<group>";
-		};
-		205F24DF2AC08B9D0048F634 /* miniz */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = miniz;
-			sourceTree = "<group>";
-		};
-		205F24E52AC08C2C0048F634 /* miniz */ = {
-			isa = PBXGroup;
-			children = (
-				205F24E72AC08C470048F634 /* miniz.c */,
-				205F24E62AC08C470048F634 /* miniz.h */,
-			);
-			path = miniz;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -3493,6 +3477,7 @@
 				20155CD0290DD37E005E5B22 /* decinfo.c in Sources */,
 				20156887290DD94C005E5B22 /* global_textbox.cpp in Sources */,
 				201568BB290DD94D005E5B22 /* cc_agsdynamicobject.cpp in Sources */,
+				2015697F290DD94E005E5B22 /* consoleoutputtarget.cpp in Sources */,
 				20155B5E290DD35D005E5B22 /* framing.c in Sources */,
 				20156928290DD94D005E5B22 /* runtimescriptvalue.cpp in Sources */,
 				201568D7290DD94D005E5B22 /* properties.cpp in Sources */,
@@ -3710,7 +3695,6 @@
 				2015660D290DD662005E5B22 /* ftinit.c in Sources */,
 				20156897290DD94C005E5B22 /* dynamicsprite.cpp in Sources */,
 				20156946290DD94D005E5B22 /* mpeg1dec.c in Sources */,
-				205F24E82AC08C470048F634 /* miniz.c in Sources */,
 				20156637290DD662005E5B22 /* guibutton.cpp in Sources */,
 				20156140290DD5FF005E5B22 /* SDL_sound_coreaudio.c in Sources */,
 				2015663E290DD662005E5B22 /* guiinv.cpp in Sources */,
@@ -4016,7 +4000,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2Y58QRT4D5;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"ZLIB_DEBUG=1",
@@ -4035,7 +4018,6 @@
 					"\"${SOURCE_ROOT}/../../../libsrc/vorbis/include\"",
 					"\"${SOURCE_ROOT}/../../../libsrc/ogg/include\"",
 					"\"${SOURCE_ROOT}/../../../libsrc/vorbis/lib\"",
-					"\"${SOURCE_ROOT}/../../../libsrc/miniz\"",
 					"\"${SOURCE_ROOT}/../../../Common/libsrc/aastr-0.1.1\"",
 					"\"${SOURCE_ROOT}/../../../Common/libsrc/alfont-2.0.9\"",
 					"\"${SOURCE_ROOT}/../../../Engine/libsrc/apeg-1.2.1\"",
@@ -4073,7 +4055,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2Y58QRT4D5;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DISABLE_MPEG_AUDIO=1",
 					"IOS_VERSION=1",
@@ -4090,7 +4071,6 @@
 					"\"${SOURCE_ROOT}/../../../libsrc/vorbis/include\"",
 					"\"${SOURCE_ROOT}/../../../libsrc/ogg/include\"",
 					"\"${SOURCE_ROOT}/../../../libsrc/vorbis/lib\"",
-					"\"${SOURCE_ROOT}/../../../libsrc/miniz\"",
 					"\"${SOURCE_ROOT}/../../../Common/libsrc/aastr-0.1.1\"",
 					"\"${SOURCE_ROOT}/../../../Common/libsrc/alfont-2.0.9\"",
 					"\"${SOURCE_ROOT}/../../../Engine/libsrc/apeg-1.2.1\"",
