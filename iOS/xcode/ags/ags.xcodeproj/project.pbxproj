@@ -1540,6 +1540,7 @@
 		201559C5290DCA75005E5B22 /* libsrc */ = {
 			isa = PBXGroup;
 			children = (
+				20F269372AC091E800DC959A /* miniz */,
 				201560C9290DD5FF005E5B22 /* SDL_sound */,
 				20155D81290DD4BF005E5B22 /* vorbis */,
 				20155B60290DD378005E5B22 /* theora */,
@@ -3217,6 +3218,13 @@
 			);
 			name = Resources;
 			path = ../../../Resources;
+			sourceTree = "<group>";
+		};
+		20F269372AC091E800DC959A /* miniz */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = miniz;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
