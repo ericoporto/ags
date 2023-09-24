@@ -1527,7 +1527,7 @@
 				2015598E290D9DF8005E5B22 /* Assets.xcassets */,
 				20155990290D9DF8005E5B22 /* LaunchScreen.storyboard */,
 			);
-			path = AGS;
+			path = ags;
 			sourceTree = "<group>";
 		};
 		201559BE290DC9F2005E5B22 /* Frameworks */ = {
