@@ -258,13 +258,15 @@ namespace AGS.Editor
         public void UpdateAllStyles()
         {
             this.scintillaControl1.Technology = _technology;
+            this.scintillaControl1.SuspendDrawing();
 
             scintillaControl1.StyleResetDefault();
 
             this.scintillaControl1.Styles[Style.Default].Font = _scriptFont;
             this.scintillaControl1.Styles[Style.Default].Size = _scriptFontSize;
 
-            scintillaControl1.StyleClearAll();
+            UpdateColors(); // we actually only want the `Style.Default` of the colors from here
+            scintillaControl1.StyleClearAll(); // this propagates the `Style.Default`, but removes the others like `Style.Cpp`
 
             this.scintillaControl1.Styles[Style.BraceBad].Font = _scriptFont;
             this.scintillaControl1.Styles[Style.BraceBad].Size = _scriptFontSize;
@@ -275,7 +277,9 @@ namespace AGS.Editor
             this.scintillaControl1.Styles[Style.CallTip].Size = _calltipFontSize;
 
             if(this.scintillaControl1.Margins[0].Width > 0) EnableLineNumbers();
-            UpdateColors();
+            UpdateColors(); // now we update all the colors
+            this.scintillaControl1.ResumeDrawing();
+            this.scintillaControl1.Update();
         }
 
         public ScintillaWrapper()
