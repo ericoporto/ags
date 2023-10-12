@@ -9,6 +9,8 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace AGS.Editor
 {
@@ -469,6 +471,16 @@ namespace AGS.Editor
             _activated = true;
             this.Focus();
             this.scintillaControl1.Focus();
+        }
+
+        public void BeginUndoAction()
+        {
+            this.scintillaControl1.BeginUndoAction();
+        }
+
+        public void EndUndoAction()
+        {
+            this.scintillaControl1.EndUndoAction();
         }
 
         public void DeactivateTextEditor()
@@ -2435,6 +2447,87 @@ namespace AGS.Editor
 
                 menu.Show(this.scintillaControl1, e.X, e.Y);
             }
+        }
+
+        internal static string StripComments(string str)
+        {
+            const string blockComments = @"/\*(.*?)\*/";
+            const string lineComments = @"//(.*?)\r?\n";
+
+            return Regex.Replace(
+                str,
+                blockComments + "|" + lineComments,
+                match =>
+                {
+                    if (match.Value.StartsWith("//", StringComparison.Ordinal))
+                    {
+                        return "\r\n";
+                    }
+                    else if (match.Value.StartsWith("/*", StringComparison.Ordinal))
+                    {
+                        string newLines = "";
+                        for (int i = 0; i < match.Value.Count(c => c == '\n'); i++)
+                        {
+                            newLines += "\r\n";
+                        }
+                        return newLines;
+                    }
+                    return match.Value;
+                },
+                RegexOptions.Singleline);
+        }
+
+        private void IndentLine(int line)
+        {
+            int tabWidth = this.scintillaControl1.TabWidth;
+            int foldParentLine = this.scintillaControl1.Lines[line].FoldParent;
+            if (foldParentLine < 0) foldParentLine = 0;
+            int foldLevelLastLine = 0;
+            int lastLineLength = 0;
+            int lastLineIndent = 0;
+            if (line > 0)
+            {
+                foldLevelLastLine = this.scintillaControl1.Lines[line - 1].FoldLevel;
+                lastLineLength = this.scintillaControl1.Lines[line - 1].EndPosition - this.scintillaControl1.Lines[line - 1].Position;
+                lastLineIndent = this.scintillaControl1.Lines[line - 1].Indentation / tabWidth;
+            }
+            int foldLevelCurrentLine = this.scintillaControl1.Lines[line].FoldLevel;
+
+            bool isLastLineFoldParent = foldLevelLastLine == foldParentLine;
+
+            if (!isLastLineFoldParent)
+            {
+                isLastLineFoldParent = true;
+            }
+
+            if (isLastLineFoldParent && line != foldParentLine && foldParentLine > 0 && lastLineLength > lastLineIndent)
+            {
+                int indent = this.scintillaControl1.Lines[line].Indentation;
+                this.scintillaControl1.Lines[line].Indentation = indent + tabWidth;
+            }
+            else if (foldLevelLastLine > foldLevelCurrentLine)
+            {
+                foldParentLine = this.scintillaControl1.Lines[line-1].FoldParent;
+                int indent = this.scintillaControl1.Lines[foldParentLine].Indentation;
+                this.scintillaControl1.Lines[line - 1].Indentation = indent;
+                this.scintillaControl1.Lines[line].Indentation = indent;
+            }
+            else
+            {
+                int indent = this.scintillaControl1.Lines[line - 1].Indentation;
+                this.scintillaControl1.Lines[line].Indentation = indent;
+            }
+        }
+
+        public void AutoFormatDocument()
+        {
+            this.BeginUndoAction();
+            this.scintillaControl1.Lines[0].Indentation = 0;
+            for(int i=1; i<this.scintillaControl1.Lines.Count; i++)
+            {
+                IndentLine(i);
+            }
+            this.EndUndoAction();
         }
 
         public int LineCount

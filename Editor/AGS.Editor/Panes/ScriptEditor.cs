@@ -20,6 +20,7 @@ namespace AGS.Editor
         private delegate void AnonymousDelegate();
 
         // Custom Edit menu commands
+        private const string AUTO_FORMAT_SCRIPT_COMMAND = "AutoFormatScript";
         private const string TOGGLE_BREAKPOINT_COMMAND = "ToggleBreakpoint";
         private const string SHOW_MATCHING_SCRIPT_OR_HEADER_COMMAND = "ScriptShowMatchingScript";
         // Custom context menu commands
@@ -121,8 +122,15 @@ namespace AGS.Editor
             Scintilla = scintilla;
         }
 
+
+        internal void AutoFormatDocument()
+        {
+            this.Scintilla.AutoFormatDocument();
+        }
+
         protected override void AddEditMenuCommands(MenuCommands commands)
         {
+            commands.Commands.Add(new MenuCommand(AUTO_FORMAT_SCRIPT_COMMAND, "Auto Format Script"));
             commands.Commands.Add(new MenuCommand(TOGGLE_BREAKPOINT_COMMAND, "Toggle Breakpoint", System.Windows.Forms.Keys.F9, "ToggleBreakpointMenuIcon"));
             commands.Commands.Add(new MenuCommand(SHOW_MATCHING_SCRIPT_OR_HEADER_COMMAND, "Switch to Matching Script or Header", System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M));
         }
@@ -518,6 +526,10 @@ namespace AGS.Editor
                 {
                     _showMatchingScript(this.Script);
                 }
+            }
+            else if (command == AUTO_FORMAT_SCRIPT_COMMAND)
+            {
+                AutoFormatDocument();
             }
             else
             {
