@@ -413,5 +413,55 @@ function room_AfterFadeIn()
             Assert.That(scriptFunction.Type, Is.EqualTo("String"));
             Assert.That(scriptFunction.Description, Is.EqualTo("Returns a new string with the specified string appended to this string."));
         }
+
+        [Test]
+        public void CheckSimpleGetLocalVariableDeclarationsFromScriptExtract()
+        {
+            // Arrange
+            string scriptToParse = "int a, b, c[10];\r\nCharacter* pEgo = null;\r\nbool d;";
+            int relativeCharacterIndex = 0;
+
+            // Act
+            List<ScriptVariable> variables = AutoComplete.GetLocalVariableDeclarationsFromScriptExtract(scriptToParse, relativeCharacterIndex);
+
+            // Assert
+            Assert.That(variables, Is.Not.Null);
+            Assert.That(variables.Count, Is.EqualTo(5));
+
+            // Check the first variable
+            Assert.That(variables[0].VariableName, Is.EqualTo("a"));
+            Assert.That(variables[0].Type, Is.EqualTo("int"));
+            Assert.That(variables[0].IsArray, Is.False);
+            Assert.That(variables[0].IsPointer, Is.False);
+            Assert.That(variables[0].StartsAtCharacterIndex, Is.EqualTo(6));
+
+            // Check the second variable
+            Assert.That(variables[1].VariableName, Is.EqualTo("b"));
+            Assert.That(variables[1].Type, Is.EqualTo("int"));
+            Assert.That(variables[1].IsArray, Is.False);
+            Assert.That(variables[1].IsPointer, Is.False);
+            Assert.That(variables[1].StartsAtCharacterIndex, Is.EqualTo(9));
+
+            // Check the third variable
+            Assert.That(variables[2].VariableName, Is.EqualTo("c"));
+            Assert.That(variables[2].Type, Is.EqualTo("int"));
+            Assert.That(variables[2].IsArray, Is.True);
+            Assert.That(variables[2].IsPointer, Is.False);
+            Assert.That(variables[2].StartsAtCharacterIndex, Is.EqualTo(16));
+
+            // Check the fourth variable
+            Assert.That(variables[3].VariableName, Is.EqualTo("pEgo"));
+            Assert.That(variables[3].Type, Is.EqualTo("Character"));
+            Assert.That(variables[3].IsArray, Is.False);
+            Assert.That(variables[3].IsPointer, Is.True);
+            Assert.That(variables[3].StartsAtCharacterIndex, Is.EqualTo(35));
+
+            // Check the fourth variable
+            Assert.That(variables[4].VariableName, Is.EqualTo("d"));
+            Assert.That(variables[4].Type, Is.EqualTo("bool"));
+            Assert.That(variables[4].IsArray, Is.False);
+            Assert.That(variables[4].IsPointer, Is.False);
+            Assert.That(variables[4].StartsAtCharacterIndex, Is.EqualTo(50));
+        }
     }
 }
