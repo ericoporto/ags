@@ -110,6 +110,11 @@ void Hotspot_GetPropertyText (ScriptHotspot *hss, const char *property, char *bu
 
 }
 
+bool Hotspot_HasProperty(ScriptHotspot *hss, const char *property)
+{
+    return exists_property(thisroom.Hotspots[hss->id].Properties, property);
+}
+
 const char* Hotspot_GetTextProperty(ScriptHotspot *hss, const char *property)
 {
     return get_text_property_dynamic_string(thisroom.Hotspots[hss->id].Properties, croom->hsProps[hss->id], property);
@@ -189,6 +194,12 @@ RuntimeScriptValue Sc_Hotspot_GetProperty(void *self, const RuntimeScriptValue *
 RuntimeScriptValue Sc_Hotspot_GetPropertyText(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
     API_OBJCALL_VOID_POBJ2(ScriptHotspot, Hotspot_GetPropertyText, const char, char);
+}
+
+// bool  (ScriptHotspot *hss, const char *property)
+RuntimeScriptValue Sc_Hotspot_HasProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_BOOL_POBJ(ScriptHotspot, Hotspot_HasProperty, const char);
 }
 
 // const char* (ScriptHotspot *hss, const char *property)
@@ -277,6 +288,7 @@ void RegisterHotspotAPI()
         { "Hotspot::GetName^1",           API_FN_PAIR(Hotspot_GetName) },
         { "Hotspot::GetProperty^1",       API_FN_PAIR(Hotspot_GetProperty) },
         { "Hotspot::GetPropertyText^2",   API_FN_PAIR(Hotspot_GetPropertyText) },
+        { "Hotspot::HasProperty^1",       API_FN_PAIR(Hotspot_HasProperty) },
         { "Hotspot::GetTextProperty^1",   API_FN_PAIR(Hotspot_GetTextProperty) },
         { "Hotspot::SetProperty^2",       API_FN_PAIR(Hotspot_SetProperty) },
         { "Hotspot::SetTextProperty^2",   API_FN_PAIR(Hotspot_SetTextProperty) },

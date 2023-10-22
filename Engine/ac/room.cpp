@@ -177,6 +177,11 @@ const char* Room_GetTextProperty(const char *property)
     return get_text_property_dynamic_string(thisroom.Properties, croom->roomProps, property);
 }
 
+bool Room_HasProperty(const char *property)
+{
+    return exists_property(croom->roomProps, property);
+}
+
 bool Room_SetProperty(const char *property, int value)
 {
     return set_int_property(croom->roomProps, property, value);
@@ -1125,6 +1130,12 @@ RuntimeScriptValue Sc_Room_GetTextProperty(const RuntimeScriptValue *params, int
     API_SCALL_OBJ_POBJ(const char, myScriptStringImpl, Room_GetTextProperty, const char);
 }
 
+// bool (const char *property)
+RuntimeScriptValue Sc_Room_HasProperty(const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_BOOL_POBJ(Room_HasProperty, const char);
+}
+
 RuntimeScriptValue Sc_Room_SetProperty(const RuntimeScriptValue *params, int32_t param_count)
 {
     API_SCALL_BOOL_POBJ_PINT(Room_SetProperty, const char);
@@ -1213,6 +1224,7 @@ void RegisterRoomAPI()
         { "Room::GetDrawingSurfaceForBackground^1",   API_FN_PAIR(Room_GetDrawingSurfaceForBackground) },
         { "Room::GetProperty^1",                      API_FN_PAIR(Room_GetProperty) },
         { "Room::GetTextProperty^1",                  API_FN_PAIR(Room_GetTextProperty) },
+        { "Room::HasProperty^1",                      API_FN_PAIR(Room_HasProperty) },
         { "Room::SetProperty^2",                      API_FN_PAIR(Room_SetProperty) },
         { "Room::SetTextProperty^2",                  API_FN_PAIR(Room_SetTextProperty) },
         { "Room::ProcessClick^3",                     API_FN_PAIR(RoomProcessClick) },

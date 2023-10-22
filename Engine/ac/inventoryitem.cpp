@@ -95,6 +95,10 @@ void InventoryItem_GetPropertyText(ScriptInvItem *scii, const char *property, ch
     get_text_property(game.invProps[scii->id], play.invProps[scii->id], property, bufer);
 }
 
+bool InventoryItem_HasProperty(ScriptInvItem *scii, const char *property) {
+    return exists_property(game.invProps[scii->id], property);
+}
+
 const char* InventoryItem_GetTextProperty(ScriptInvItem *scii, const char *property) {
     return get_text_property_dynamic_string(game.invProps[scii->id], play.invProps[scii->id], property);
 }
@@ -175,6 +179,12 @@ RuntimeScriptValue Sc_InventoryItem_GetProperty(void *self, const RuntimeScriptV
 RuntimeScriptValue Sc_InventoryItem_GetPropertyText(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
     API_OBJCALL_VOID_POBJ2(ScriptInvItem, InventoryItem_GetPropertyText, const char, char);
+}
+
+// bool (ScriptInvItem *scii, const char *property)
+RuntimeScriptValue Sc_InventoryItem_HasProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_BOOL_POBJ(ScriptInvItem, InventoryItem_HasProperty, const char);
 }
 
 // const char* (ScriptInvItem *scii, const char *property)

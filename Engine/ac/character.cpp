@@ -1085,6 +1085,13 @@ const char* Character_GetTextProperty(CharacterInfo *chaa, const char *property)
     return get_text_property_dynamic_string(game.charProps[chaa->index_id], play.charProps[chaa->index_id], property);
 }
 
+bool Character_HasProperty(CharacterInfo *chaa, const char *property)
+{
+    if (!AssertCharacter("Character.HasProperty", chaa->index_id))
+        return false;
+    return exists_property(play.charProps[chaa->index_id], property);
+}
+
 bool Character_SetProperty(CharacterInfo *chaa, const char *property, int value)
 {
     if (!AssertCharacter("Character.SetProperty", chaa->index_id))
@@ -3142,6 +3149,11 @@ RuntimeScriptValue Sc_Character_GetTextProperty(void *self, const RuntimeScriptV
     API_OBJCALL_OBJ_POBJ(CharacterInfo, const char, myScriptStringImpl, Character_GetTextProperty, const char);
 }
 
+RuntimeScriptValue Sc_Character_HasProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_BOOL_POBJ(CharacterInfo, Character_HasProperty, const char);
+}
+
 RuntimeScriptValue Sc_Character_SetProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
     API_OBJCALL_BOOL_POBJ_PINT(CharacterInfo, Character_SetProperty, const char);
@@ -3958,6 +3970,7 @@ void RegisterCharacterAPI(ScriptAPIVersion base_api, ScriptAPIVersion /*compat_a
         { "Character::FollowCharacter^3",         API_FN_PAIR(Character_FollowCharacter) },
         { "Character::GetProperty^1",             API_FN_PAIR(Character_GetProperty) },
         { "Character::GetPropertyText^2",         API_FN_PAIR(Character_GetPropertyText) },
+        { "Character::HasProperty^1",             API_FN_PAIR(Character_HasProperty) },
         { "Character::GetTextProperty^1",         API_FN_PAIR(Character_GetTextProperty) },
         { "Character::SetProperty^2",             API_FN_PAIR(Character_SetProperty) },
         { "Character::SetTextProperty^2",         API_FN_PAIR(Character_SetTextProperty) },

@@ -470,6 +470,12 @@ void Object_GetPropertyText(ScriptObject *objj, const char *property, char *bufe
     GetObjectPropertyText(objj->id, property, bufer);
 }
 
+bool Object_HasProperty (ScriptObject *objj, const char *property) {
+    if (!AssertObject("Object.HasProperty", objj->id))
+        return false;
+    return exists_property(thisroom.Objects[objj->id].Properties, property);
+}
+
 const char* Object_GetTextProperty(ScriptObject *objj, const char *property)
 {
     if (!AssertObject("Object.GetTextProperty", objj->id))
@@ -833,6 +839,12 @@ RuntimeScriptValue Sc_Object_GetProperty(void *self, const RuntimeScriptValue *p
 RuntimeScriptValue Sc_Object_GetPropertyText(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
     API_OBJCALL_VOID_POBJ2(ScriptObject, Object_GetPropertyText, const char, char);
+}
+
+// bool (ScriptObject *objj, const char *property)
+RuntimeScriptValue Sc_Object_HasProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_BOOL_POBJ(ScriptObject, Object_HasProperty, const char);
 }
 
 //const char* (ScriptObject *objj, const char *property)
@@ -1204,6 +1216,7 @@ void RegisterObjectAPI()
         { "Object::GetName^1",                API_FN_PAIR(Object_GetName) },
         { "Object::GetProperty^1",            API_FN_PAIR(Object_GetProperty) },
         { "Object::GetPropertyText^2",        API_FN_PAIR(Object_GetPropertyText) },
+        { "Object::HasProperty^1",            API_FN_PAIR(Object_HasProperty) },
         { "Object::GetTextProperty^1",        API_FN_PAIR(Object_GetTextProperty) },
         { "Object::SetProperty^2",            API_FN_PAIR(Object_SetProperty) },
         { "Object::SetTextProperty^2",        API_FN_PAIR(Object_SetTextProperty) },
