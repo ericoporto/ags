@@ -26,6 +26,7 @@
 #define __AGS_CN_GAME__CUSTOMPROPERTIES_H
 
 #include <unordered_map>
+#include <unordered_set>
 #include "util/string.h"
 #include "util/string_types.h"
 
@@ -47,7 +48,8 @@ enum PropertyVersion
 {
     kPropertyVersion_Initial = 1,
     kPropertyVersion_340,
-    kPropertyVersion_Current = kPropertyVersion_340
+    kPropertyVersion_361,
+    kPropertyVersion_Current = kPropertyVersion_361
 };
 
 enum PropertyType
@@ -70,12 +72,13 @@ enum PropertyError
 struct PropertyDesc
 {
     String       Name;
+    std::unordered_set<String> OwningTypes;
     PropertyType Type;
     String       Description;
     String       DefaultValue;
 
     PropertyDesc();
-    PropertyDesc(const String &name, PropertyType type, const String &desc, const String &def_value);
+    PropertyDesc(const String &name, const std::unordered_set<String> &owner_type, PropertyType type, const String &desc, const String &def_value);
 };
 
 // NOTE: AGS has case-insensitive property IDs

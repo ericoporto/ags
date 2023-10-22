@@ -105,3 +105,13 @@ bool set_text_property(StringIMap &rt_prop, const char *property, const char* va
     }
     return false;
 }
+
+bool property_exist_in_schema(const char* owner_type, const char *property)
+{
+    PropertySchema::const_iterator sch_it = game.propSchema.find(property);
+    if (sch_it == game.propSchema.end())
+        return false; // property doesn't exist in schema
+
+    PropertyDesc desc = sch_it->second;
+    return desc.OwningTypes.count(owner_type) != 0;
+}

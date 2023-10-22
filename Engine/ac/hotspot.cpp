@@ -110,6 +110,11 @@ void Hotspot_GetPropertyText (ScriptHotspot *hss, const char *property, char *bu
 
 }
 
+bool Hotspot_HasProperty(const char *property)
+{
+    return property_exist_in_schema(ccDynamicHotspot.GetType(), property);
+}
+
 const char* Hotspot_GetTextProperty(ScriptHotspot *hss, const char *property)
 {
     return get_text_property_dynamic_string(thisroom.Hotspots[hss->id].Properties, croom->hsProps[hss->id], property);
@@ -189,6 +194,12 @@ RuntimeScriptValue Sc_Hotspot_GetProperty(void *self, const RuntimeScriptValue *
 RuntimeScriptValue Sc_Hotspot_GetPropertyText(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
     API_OBJCALL_VOID_POBJ2(ScriptHotspot, Hotspot_GetPropertyText, const char, char);
+}
+
+// bool  (ScriptHotspot *hss, const char *property)
+RuntimeScriptValue Sc_Hotspot_HasProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_BOOL_POBJ(Hotspot_HasProperty, const char);
 }
 
 // const char* (ScriptHotspot *hss, const char *property)
@@ -273,6 +284,7 @@ void RegisterHotspotAPI()
         { "Hotspot::GetAtScreenXY^2",     API_FN_PAIR(GetHotspotAtScreen) },
         { "Hotspot::GetByName",           API_FN_PAIR(Hotspot_GetByName) },
         { "Hotspot::GetDrawingSurface",   API_FN_PAIR(Hotspot_GetDrawingSurface) },
+        { "Hotspot::HasProperty^1",       API_FN_PAIR(Hotspot_HasProperty) },
 
         { "Hotspot::GetName^1",           API_FN_PAIR(Hotspot_GetName) },
         { "Hotspot::GetProperty^1",       API_FN_PAIR(Hotspot_GetProperty) },

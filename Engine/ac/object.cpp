@@ -470,6 +470,10 @@ void Object_GetPropertyText(ScriptObject *objj, const char *property, char *bufe
     GetObjectPropertyText(objj->id, property, bufer);
 }
 
+bool Object_HasProperty (const char *property) {
+    return property_exist_in_schema(ccDynamicObject.GetType(), property);
+}
+
 const char* Object_GetTextProperty(ScriptObject *objj, const char *property)
 {
     if (!AssertObject("Object.GetTextProperty", objj->id))
@@ -835,6 +839,12 @@ RuntimeScriptValue Sc_Object_GetPropertyText(void *self, const RuntimeScriptValu
     API_OBJCALL_VOID_POBJ2(ScriptObject, Object_GetPropertyText, const char, char);
 }
 
+// bool (ScriptObject *objj, const char *property)
+RuntimeScriptValue Sc_Object_HasProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_SCALL_BOOL_POBJ(Object_HasProperty, const char);
+}
+
 //const char* (ScriptObject *objj, const char *property)
 RuntimeScriptValue Sc_Object_GetTextProperty(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
@@ -1196,6 +1206,7 @@ void RegisterObjectAPI()
         { "Object::GetAtRoomXY^2",            API_FN_PAIR(GetObjectAtRoom) },
         { "Object::GetAtScreenXY^2",          API_FN_PAIR(GetObjectAtScreen) },
         { "Object::GetByName",                API_FN_PAIR(Object_GetByName) },
+        { "Object::HasProperty^1",            API_FN_PAIR(Object_HasProperty) },
 
         { "Object::Animate^5",                API_FN_PAIR(Object_Animate5) },
         { "Object::Animate^6",                API_FN_PAIR(Object_Animate6) },

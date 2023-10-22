@@ -72,6 +72,17 @@ namespace AGS.Types
             set { _appliesToRooms = value; }
         }
 
+        public string[] GetTypesItApplies()
+        {
+                List<string> arr = new List<string>();
+                if (_appliesToCharacters) arr.Add("Character");
+                if (_appliesToHotspots) arr.Add("Hotspot");
+                if (_appliesToInvItems) arr.Add("Inventory");
+                if (_appliesToObjects) arr.Add("Object");
+                if (_appliesToRooms) arr.Add("Room");
+                return arr.ToArray();
+        }
+
         public CustomPropertyType Type
         {
             get { return _type; }

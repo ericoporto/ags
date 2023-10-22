@@ -26,12 +26,9 @@ PropertyDesc::PropertyDesc()
     Type = kPropertyBoolean;
 }
 
-PropertyDesc::PropertyDesc(const String &name, PropertyType type, const String &desc, const String &def_value)
+PropertyDesc::PropertyDesc(const String &name, const std::unordered_set<String> &owner_type, PropertyType type, const String &desc, const String &def_value)
+: Name(name), OwningTypes(owner_type), Type(type), Description(desc), DefaultValue(def_value)
 {
-    Name = name;
-    Type = type;
-    Description = desc;
-    DefaultValue = def_value;
 }
 
 
@@ -60,7 +57,7 @@ PropertyError ReadSchema(PropertySchema &schema, Stream *in)
             schema[prop.Name] = prop;
         }
     }
-    else
+    else if(version == kPropertyVersion_340)
     {
         for (int i = 0; i < count; ++i)
         {
@@ -70,6 +67,18 @@ PropertyError ReadSchema(PropertySchema &schema, Stream *in)
             prop.DefaultValue = StrUtil::ReadString(in);
             schema[prop.Name] = prop;
         }
+    }
+    else if(version == kPropertyVersion_Current)
+    {
+        prop.Name = StrUtil::ReadString(in);
+        const int type_count = in->ReadInt16();
+        for(int i=0; i<type_count; i++) {
+            prop.OwningTypes.emplace(StrUtil::ReadString(in));
+        }
+        prop.Type = (PropertyType)in->ReadInt32();
+        prop.Description = StrUtil::ReadString(in);
+        prop.DefaultValue = StrUtil::ReadString(in);
+        schema[prop.Name] = prop;
     }
     return kPropertyErr_NoError;
 }
@@ -83,6 +92,10 @@ void WriteSchema(const PropertySchema &schema, Stream *out)
     {
         const PropertyDesc &prop = it->second;
         StrUtil::WriteString(prop.Name, out);
+        out->WriteInt16(static_cast<int16_t>(prop.OwningTypes.size()));
+        for(auto itot = prop.OwningTypes.begin(); itot != prop.OwningTypes.end(); itot++) {
+            StrUtil::WriteString(itot->GetCStr(), out);
+        }
         out->WriteInt32(prop.Type);
         StrUtil::WriteString(prop.Description, out);
         StrUtil::WriteString(prop.DefaultValue, out);

@@ -1646,6 +1646,12 @@ namespace AGS.Editor
                 writer.Write((int)schemaItem.Type);
                 FilePutString(TextProperty(schemaItem.Description), writer);
                 FilePutString(TextProperty(schemaItem.DefaultValue), writer);
+                string[] appliedTypes = schemaItem.GetTypesItApplies();
+                writer.Write((int)appliedTypes.Length);
+                foreach(string appliedType in appliedTypes)
+                {
+                    FilePutString(appliedType, writer);
+                }
             }
             for (int i = 0; i < game.Characters.Count; ++i)
             {
