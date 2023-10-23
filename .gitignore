@@ -178,3 +178,8 @@ libsrc/SDL2-Framework.dmg
 
 # ags game in ios game project
 iOS/Resources
+
+Editor/References/x64/AGS.Native.dll
+Editor/References/x64/ikpFlac.dll
+Editor/References/x64/ikpMP3.dll
+Editor/References/x64/irrKlang.NET4.dll
