@@ -535,7 +535,6 @@ target_link_libraries(engine PUBLIC
     Cda::Cda
     External::OpenAL
     ${SDL2_LIBRARY}
-    ${SDL2_LIBRARIES}
     SDL2_sound::SDL2_sound
 )
 
@@ -563,9 +562,6 @@ if (AGS_NO_VIDEO_PLAYER)
     target_compile_definitions(engine PRIVATE AGS_NO_VIDEO_PLAYER)
 else()
     target_link_libraries(engine PUBLIC Apeg::Apeg)
-    if (WIN32)
-        target_link_libraries(engine PUBLIC amstrmid quartz)
-    endif()
 endif()
 
 if (WIN32)
