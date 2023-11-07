@@ -674,7 +674,7 @@ if (MACOS)
         ${RESOURCE_FILES}
     )
 
-    target_link_libraries(ags-app PRIVATE engine SDL2::SDL2main)
+    target_link_libraries(ags-app PRIVATE engine ${SDL2MAIN_LIBRARY})
 
     set_target_properties(ags-app PROPERTIES
         RUNTIME_OUTPUT_NAME AGS
