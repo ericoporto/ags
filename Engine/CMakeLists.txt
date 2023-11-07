@@ -601,7 +601,7 @@ target_sources(ags
     main/main_sdl2.cpp
 )
 
-target_link_libraries(ags PRIVATE engine ${SDL2MAIN_LIBRARY})
+target_link_libraries(ags PRIVATE engine ${SDL2_LIBRARIES})
 
 if (LINUX)
     # We may override `allegro_icon` and `load_midi_pf` depending on the version
