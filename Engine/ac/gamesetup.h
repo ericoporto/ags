@@ -55,11 +55,7 @@ using AGS::Common::String;
 // to the config file).
 struct GameSetup
 {
-#if AGS_PLATFORM_OS_ANDROID || AGS_PLATFORM_OS_IOS
-    static const size_t DefSpriteCacheSize = (32 * 1024); // 32 MB
-#else
     static const size_t DefSpriteCacheSize = (128 * 1024); // 128 MB
-#endif
     static const size_t DefTexCacheSize = (128 * 1024); // 128 MB
     static const size_t DefSoundLoadAtOnce = 1024; // 1 MB
     static const size_t DefSoundCache = 1024u * 32; // 32 MB
