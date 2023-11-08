@@ -44,6 +44,8 @@ message(" AGS_NO_VIDEO_PLAYER: ${AGS_NO_VIDEO_PLAYER}")
 message(" AGS_BUILTIN_PLUGINS: ${AGS_BUILTIN_PLUGINS}")
 message(" AGS_DEBUG_MANAGED_OBJECTS: ${AGS_DEBUG_MANAGED_OBJECTS}")
 message("----------------------------------------")
+message("CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+message("----------------------------------------")
 
 if(AGS_USE_LOCAL_SDL2)
     message(WARNING "Your local SDL2 may require SDL2.dll or other dynamic library to be installed.")
