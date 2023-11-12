@@ -180,6 +180,12 @@
     <Compile Include="GUI\Progress.Designer.cs">
       <DependentUpon>Progress.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\RoomsOverview.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\RoomsOverview.Designer.cs">
+      <DependentUpon>RoomsOverview.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\SplashScreen.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -396,6 +402,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Progress.resx">
       <DependentUpon>Progress.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\RoomsOverview.resx">
+      <DependentUpon>RoomsOverview.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\SpriteExportDialog.resx">
       <DependentUpon>SpriteExportDialog.cs</DependentUpon>
