@@ -30,6 +30,10 @@ android {
         noCompress = ['ags', 'vox']
     }
 
+    sourceSets.main {
+        jniLibs.srcDir '../plugins'
+    }
+
     signingConfigs {
         release {
             storeFile file(keyStoreProperties['storeFile'])
