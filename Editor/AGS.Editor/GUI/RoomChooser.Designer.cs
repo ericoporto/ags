@@ -1,7 +1,7 @@
 ﻿
 namespace AGS.Editor.GUI
 {
-    partial class RoomsOverview
+    partial class RoomChooser
     {
         /// <summary>
         /// Required designer variable.
@@ -42,14 +42,14 @@ namespace AGS.Editor.GUI
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             // 
-            // RoomsOverview
+            // RoomChooser
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.listView1);
-            this.Name = "RoomsOverview";
-            this.Text = "RoomsOverview";
+            this.Name = "RoomChooser";
+            this.Text = "RoomChooser";
             this.ResumeLayout(false);
 
         }

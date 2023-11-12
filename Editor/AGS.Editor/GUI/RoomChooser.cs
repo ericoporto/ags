@@ -12,8 +12,10 @@ using System.Windows.Forms;
 
 namespace AGS.Editor.GUI
 {
-    public partial class RoomsOverview : Form
+    public partial class RoomChooser : Form
     {
+        private Room _selectedRoom;
+
         /// <summary>
         /// Resize the image to the specified width and height.
         /// </summary>
@@ -74,7 +76,7 @@ namespace AGS.Editor.GUI
                 thumb.Save(room.FileName.Replace(".crm",".png"), ImageFormat.Png);
             }
         }
-        public RoomsOverview()
+        public RoomChooser(int existingRoom)
         {
             InitializeComponent();
 
@@ -84,6 +86,32 @@ namespace AGS.Editor.GUI
                 Room room = Factory.NativeProxy.LoadRoom(unloaded_room);
                 saveThumb(room);
             }
+        }
+
+        public Room SelectedRoom
+        {
+            get { return _selectedRoom; }
+        }
+
+        public static Room ShowRoomChooser(int currentRoom)
+        {
+            return ShowRoomChooser(currentRoom, null);
+        }
+
+        public static Room ShowRoomChooser(int currentRoom, string text)
+        {
+            Room selectedRoom = null;
+            RoomChooser chooser = new RoomChooser(currentRoom);
+            if (text != null)
+            {
+                chooser.Text = text;
+            }
+            if (chooser.ShowDialog() == DialogResult.OK)
+            {
+                selectedRoom = chooser.SelectedRoom;
+            }
+            chooser.Dispose();
+            return selectedRoom;
         }
     }
 }
