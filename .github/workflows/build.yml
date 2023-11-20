@@ -43,6 +43,9 @@ jobs:
         ${{matrix.platform.runbin}} --user-data-dir . tap_demo.ags
         ${{matrix.platform.catcmd}} agstest.log
         
+    - uses: ericoporto/tap-summary@v1.0.1
+      with:
+        path: ${{github.workspace}}/${{matrix.platform.bindir}}/agstest.log
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
