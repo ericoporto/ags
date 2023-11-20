@@ -17,9 +17,9 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-        - { name: Windows,         os: windows-latest, artifact: 'ags-windows', shell: cmd }
-        - { name: Ubuntu,          os: ubuntu-latest,  artifact: 'ags-linux',   shell: sh  }
-        - { name: macOS,           os: macos-latest,   artifact: 'ags-macos',   shell: sh  }
+        - { name: Windows,         os: windows-latest, artifact: 'ags-windows', shell: cmd, bindir: "build/Release", runbin: ".\\ags.exe", catcmd: type }
+        - { name: Ubuntu,          os: ubuntu-latest,  artifact: 'ags-linux',   shell: sh,  bindir: "build", runbin: "./ags", catcmd: cat                          }
+        - { name: macOS,           os: macos-latest,   artifact: 'ags-macos',   shell: sh,  bindir: "build", runbin: "./ags", catcmd: cat                          }
 
     steps:    
     - uses: actions/checkout@v4
@@ -35,6 +35,14 @@ jobs:
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: ctest -C ${{env.BUILD_TYPE}}
+            
+    - name: TAP Test
+      working-directory: ${{github.workspace}}/${{matrix.platform.bindir}}
+      run: |
+        curl -sLo tap_demo.ags https://github.com/ericoporto/tap/releases/download/0.1.0/tap_demo.ags
+        ${{matrix.platform.runbin}} --user-data-dir . tap_demo.ags
+        ${{matrix.platform.catcmd}} agstest.log
+        
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
