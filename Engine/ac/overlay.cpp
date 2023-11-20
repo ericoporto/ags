@@ -84,7 +84,7 @@ void Overlay_SetText(ScriptOverlay *scover, int width, int fontid, int text_colo
 }
 
 int Overlay_GetX(ScriptOverlay *scover) {
-    auto *over = get_overlay(scover->overlayId);
+    auto const *over = get_overlay(scover->overlayId);
     if (!over)
         quit("!invalid overlay ID specified");
 
@@ -101,7 +101,7 @@ void Overlay_SetX(ScriptOverlay *scover, int newx) {
 }
 
 int Overlay_GetY(ScriptOverlay *scover) {
-    auto *over = get_overlay(scover->overlayId);
+    auto const *over = get_overlay(scover->overlayId);
     if (!over)
         quit("!invalid overlay ID specified");
 
@@ -118,7 +118,7 @@ void Overlay_SetY(ScriptOverlay *scover, int newy) {
 }
 
 int Overlay_GetGraphic(ScriptOverlay *scover) {
-    auto *over = get_overlay(scover->overlayId);
+    auto const *over = get_overlay(scover->overlayId);
     if (!over)
         quit("!invalid overlay ID specified");
     return over->GetSpriteNum();
@@ -137,35 +137,35 @@ void Overlay_SetGraphic(ScriptOverlay *scover, int slot) {
 }
 
 bool Overlay_InRoom(ScriptOverlay *scover) {
-    auto *over = get_overlay(scover->overlayId);
+    auto const *over = get_overlay(scover->overlayId);
     if (!over)
         quit("!invalid overlay ID specified");
     return over->IsRoomLayer();
 }
 
 int Overlay_GetWidth(ScriptOverlay *scover) {
-    auto *over = get_overlay(scover->overlayId);
+    auto const *over = get_overlay(scover->overlayId);
     if (!over)
         quit("!invalid overlay ID specified");
     return game_to_data_coord(over->scaleWidth);
 }
 
 int Overlay_GetHeight(ScriptOverlay *scover) {
-    auto *over = get_overlay(scover->overlayId);
+    auto const *over = get_overlay(scover->overlayId);
     if (!over)
         quit("!invalid overlay ID specified");
     return game_to_data_coord(over->scaleHeight);
 }
 
 int Overlay_GetGraphicWidth(ScriptOverlay *scover) {
-    auto *over = get_overlay(scover->overlayId);
+    auto const *over = get_overlay(scover->overlayId);
     if (!over)
         quit("!invalid overlay ID specified");
     return game_to_data_coord(over->GetGraphicSize().Width);
 }
 
 int Overlay_GetGraphicHeight(ScriptOverlay *scover) {
-    auto *over = get_overlay(scover->overlayId);
+    auto const *over = get_overlay(scover->overlayId);
     if (!over)
         quit("!invalid overlay ID specified");
     return game_to_data_coord(over->GetGraphicSize().Height);
@@ -277,7 +277,7 @@ ScriptOverlay* Overlay_CreateRoomTextual(int x, int y, int width, int font, int 
 }
 
 int Overlay_GetTransparency(ScriptOverlay *scover) {
-    auto *over = get_overlay(scover->overlayId);
+    auto const *over = get_overlay(scover->overlayId);
     if (!over)
         quit("!invalid overlay ID specified");
 
@@ -295,7 +295,7 @@ void Overlay_SetTransparency(ScriptOverlay *scover, int trans) {
 }
 
 int Overlay_GetZOrder(ScriptOverlay *scover) {
-    auto *over = get_overlay(scover->overlayId);
+    auto const *over = get_overlay(scover->overlayId);
     if (!over)
         quit("!invalid overlay ID specified");
 
@@ -409,7 +409,7 @@ size_t add_screen_overlay_impl(bool roomlayer, int x, int y, int type, int sprnu
     if (type == OVER_CUSTOM)
     {
         // Find a free ID
-        if (over_free_ids.size() > 0)
+        if (!over_free_ids.empty())
         {
             type = over_free_ids.front();
             over_free_ids.pop();
