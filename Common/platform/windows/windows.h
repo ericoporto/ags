@@ -25,7 +25,7 @@
 #define NOMINMAX
 #define BITMAP WINDOWS_BITMAP
 
-#include <windows.h>
+#include <Windows.h>
 
 #undef BITMAP
 #undef CreateFile
