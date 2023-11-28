@@ -13,6 +13,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
         
+    - uses: GuillaumeFalourd/setup-windows10-sdk-action@v1.12
+      with:
+        sdk-version: 18362
+        
     - name: Install the .NET 4.6 SDK (using Windows 10.0.10240 SDK)
       shell: cmd
       run: |
