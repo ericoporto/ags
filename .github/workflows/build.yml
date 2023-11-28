@@ -38,6 +38,7 @@ jobs:
         "--add", "Microsoft.VisualStudio.Component.VC.140", `
         "--add", "Microsoft.VisualStudio.Component.Windows81SDK", `
         "--add", "Microsoft.VisualStudio.Workload.VCTools", `
+        "--add", "Microsoft.Component.NetFX.Native", `
         "--add", "Microsoft.VisualStudio.Workload.MSBuildTools", `
         "--add", "Microsoft.VisualStudio.Component.VC.CLI.Support", `
         "--add", "Microsoft.Component.VC.Runtime.UCRTSDK", `
