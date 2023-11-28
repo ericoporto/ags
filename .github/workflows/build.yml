@@ -13,10 +13,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
         
-    - uses: GuillaumeFalourd/setup-windows10-sdk-action@v1.12
-      with:
-        sdk-version: 18362
-        
     - name: Install the .NET 4.6 SDK (using Windows 10.0.10240 SDK)
       shell: cmd
       run: |
@@ -41,6 +37,10 @@ jobs:
         Start-Process -FilePath ./vs_BuildTools.exe -ArgumentList `
         "--add", "Microsoft.VisualStudio.Component.VC.140", `
         "--add", "Microsoft.VisualStudio.Component.Windows81SDK", `
+        "--add", "Microsoft.VisualStudio.Workload.VCTools", `
+        "--add", "Microsoft.VisualStudio.Workload.MSBuildTools", `
+        "--add", "Microsoft.VisualStudio.Component.VC.CLI.Support", `
+        "--add", "Microsoft.Component.VC.Runtime.UCRTSDK", `
         "--quiet", "--norestart", "--force", "--wait" -Wait -PassThru
         
     - name: Get Irrklang
