@@ -39,9 +39,10 @@ jobs:
         "--add", "Microsoft.VisualStudio.Component.Windows81SDK", `
         "--add", "Microsoft.VisualStudio.Workload.VCTools", `
         "--add", "Microsoft.Component.NetFX.Native", `
+        "--add", "Microsoft.Net.Component.4.6.TargetingPack", `        
         "--add", "Microsoft.VisualStudio.Workload.MSBuildTools", `
         "--add", "Microsoft.VisualStudio.Component.VC.CLI.Support", `
-        "--add", "Microsoft.Component.VC.Runtime.UCRTSDK", `
+        "--add", "Microsoft.VisualStudio.Component.Windows10SDK", `
         "--quiet", "--norestart", "--force", "--wait" -Wait -PassThru
         
     - name: Get Irrklang
