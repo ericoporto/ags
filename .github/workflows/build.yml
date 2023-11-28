@@ -6,9 +6,91 @@ env:
   BUILD_TYPE: Release
 
 jobs:
+  build-editor:
+    name: Windows Editor Build
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+        
+    - name: Install the .NET 4.6 SDK (using Windows 10.0.10240 SDK)
+      shell: cmd
+      run: |
+        mkdir tmp
+        pushd tmp
+        curl -fLO https://download.microsoft.com/download/E/1/F/E1F1E61E-F3C6-4420-A916-FB7C47FBC89E/standalonesdk/sdksetup.exe
+        dir
+        start /wait sdksetup /ceip off /features OptionID.NetFxSoftwareDevelopmentKit /quiet /norestart
+        echo sdksetup ran
+        popd
+        rd /s /q tmp
+        pushd "C:\Program Files (x86)\Windows Kits\NETFXSDK\"
+        dir
+        popd
+        
+    - name: Install MSVC 2015 (v140) and Windows 8.1 SDK
+      shell: powershell
+      run: |
+        $VS_BTOOLS_EXE="vs_buildtools.exe"
+        $VS_BTOOLS_URI="https://aka.ms/vs/15/release/vs_buildtools.exe"
+        Invoke-WebRequest -Uri $VS_BTOOLS_URI -OutFile $VS_BTOOLS_EXE
+        Start-Process -FilePath ./vs_BuildTools.exe -ArgumentList `
+        "--add", "Microsoft.VisualStudio.Component.VC.140", `
+        "--add", "Microsoft.VisualStudio.Component.Windows81SDK", `
+        "--quiet", "--norestart", "--force", "--wait" -Wait -PassThru
+        
+    - name: Get Irrklang
+      shell: cmd
+      run: |
+        mkdir tmp
+        pushd tmp
+        curl -fLOJ https://www.ambiera.at/downloads/irrKlang-32bit-1.6.0.zip
+        popd
+        tar -f tmp/irrKlang-32bit-1.6.0.zip -xvzC tmp irrKlang-1.6.0/bin/dotnet-4/*.dll
+        move tmp\\irrKlang-1.6.0\\bin\\dotnet-4\\*.dll ${{github.workspace}}\\Editor\\References\\
+        rd /s /q tmp
+    
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1
+           
+    - name: Restore Packages
+      run: nuget restore ${{github.workspace}}/Solutions/AGS.Editor.Full.sln
+
+    - name: Set Paths
+      run: |
+        echo "C:\Program Files (x86)\Windows Kits\8.1\bin\x86;" >> $env:GITHUB_PATH
+
+    - uses: TheMrMilchmann/setup-msvc-dev@v3
+      with:
+        arch: x86
+        sdk: 8.1
+        toolset: 14.0
+        
+    - name: Set .NET Env 
+      run: |
+        echo "LIBUMX86=C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6\Lib\um\x86" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        echo "NETFXKitsDir=C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6\" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        echo "NETFXSDKDir=C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6\" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append    
+
+    - name: Build Solution
+      shell: cmd
+      run: |
+        set LIB=%LIB%;${{ env.LIBUMX86 }}
+        cd ${{github.workspace}}/Solutions
+        msbuild AGS.Editor.Full.sln /p:UseEnv=true /p:VisualStudioVersion=14.0 /p:WindowsTargetPlatformVersion=8.1 /p:PlatformToolset=v140 /p:Configuration=Release /p:Platform="Mixed Platforms" /maxcpucount /nologo
+
+    - name: Check Editor Built
+      shell: powershell
+      run: Test-Path ${{github.workspace}}/Solutions/.build/Release/AGSEditor.exe -PathType Leaf
+      
+
   build:
     name: ${{ matrix.platform.name }}
     runs-on: ${{ matrix.platform.os }}
+    needs: build-editor
     strategy:
       fail-fast: false
       matrix:
