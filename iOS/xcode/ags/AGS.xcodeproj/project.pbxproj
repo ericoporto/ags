@@ -7,14 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2015598F290D9DF8005E5B22 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2015598E290D9DF8005E5B22 /* Assets.xcassets */; };
-		20155992290D9DF8005E5B22 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 20155990290D9DF8005E5B22 /* LaunchScreen.storyboard */; };
+		1C96467B2B1BAE930034D46A /* ios.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 205CAAAD2A86E1C900523BE2 /* ios.cfg */; };
+		1C96467C2B1BAE930034D46A /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 20373CEF298EAE7C00162BBA /* speech.vox */; };
+		1C96467D2B1BAE940034D46A /* game.ags in Resources */ = {isa = PBXBuildFile; fileRef = 20373CF0298EAE7C00162BBA /* game.ags */; };
+		1C96467E2B1BAE940034D46A /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = 20373CF1298EAE7C00162BBA /* audio.vox */; };
 		201559C4290DCA40005E5B22 /* SDL_uikit_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 201559C3290DCA3F005E5B22 /* SDL_uikit_main.c */; };
-		20155A23290DCAAC005E5B22 /* draw.inl in Resources */ = {isa = PBXBuildFile; fileRef = 201559DD290DCAA9005E5B22 /* draw.inl */; };
-		20155A24290DCAAC005E5B22 /* gfx.inl in Resources */ = {isa = PBXBuildFile; fileRef = 201559DE290DCAA9005E5B22 /* gfx.inl */; };
-		20155A25290DCAAC005E5B22 /* fmaths.inl in Resources */ = {isa = PBXBuildFile; fileRef = 201559DF290DCAA9005E5B22 /* fmaths.inl */; };
-		20155A26290DCAAC005E5B22 /* color.inl in Resources */ = {isa = PBXBuildFile; fileRef = 201559E0290DCAA9005E5B22 /* color.inl */; };
-		20155A27290DCAAC005E5B22 /* fix.inl in Resources */ = {isa = PBXBuildFile; fileRef = 201559E1290DCAA9005E5B22 /* fix.inl */; };
 		20155A28290DCAAC005E5B22 /* gfx.c in Sources */ = {isa = PBXBuildFile; fileRef = 201559EB290DCAA9005E5B22 /* gfx.c */; };
 		20155A29290DCAAC005E5B22 /* unicode.c in Sources */ = {isa = PBXBuildFile; fileRef = 201559EC290DCAA9005E5B22 /* unicode.c */; };
 		20155A2A290DCAAC005E5B22 /* blit.c in Sources */ = {isa = PBXBuildFile; fileRef = 201559ED290DCAA9005E5B22 /* blit.c */; };
@@ -248,7 +245,6 @@
 		20156644290DD662005E5B22 /* allegrobitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20156493290DD65F005E5B22 /* allegrobitmap.cpp */; };
 		20156645290DD662005E5B22 /* debugmanager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20156496290DD65F005E5B22 /* debugmanager.cpp */; };
 		20156882290DD94C005E5B22 /* global_palette.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2015664B290DD945005E5B22 /* global_palette.cpp */; };
-		20156883290DD94C005E5B22 /* route_finder_jps.inl in Resources */ = {isa = PBXBuildFile; fileRef = 2015664E290DD945005E5B22 /* route_finder_jps.inl */; };
 		20156884290DD94C005E5B22 /* global_audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2015664F290DD945005E5B22 /* global_audio.cpp */; };
 		20156885290DD94C005E5B22 /* global_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20156650290DD945005E5B22 /* global_object.cpp */; };
 		20156886290DD94C005E5B22 /* global_listbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20156651290DD945005E5B22 /* global_listbox.cpp */; };
@@ -427,12 +423,6 @@
 		2015695C290DD94E005E5B22 /* mylabel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20156810290DD94A005E5B22 /* mylabel.cpp */; };
 		2015695D290DD94E005E5B22 /* mousew32.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20156812290DD94A005E5B22 /* mousew32.cpp */; };
 		2015695F290DD94E005E5B22 /* fonts_engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20156816290DD94B005E5B22 /* fonts_engine.cpp */; };
-		20156960290DD94E005E5B22 /* game-1.ICO in Resources */ = {isa = PBXBuildFile; fileRef = 20156818290DD94B005E5B22 /* game-1.ICO */; };
-		20156961290DD94E005E5B22 /* tintshader.fxo in Resources */ = {isa = PBXBuildFile; fileRef = 20156819290DD94B005E5B22 /* tintshader.fxo */; };
-		20156962290DD94E005E5B22 /* tintshaderLegacy.fx in Resources */ = {isa = PBXBuildFile; fileRef = 2015681A290DD94B005E5B22 /* tintshaderLegacy.fx */; };
-		20156963290DD94E005E5B22 /* tintshaderLegacy.fxo in Resources */ = {isa = PBXBuildFile; fileRef = 2015681B290DD94B005E5B22 /* tintshaderLegacy.fxo */; };
-		20156965290DD94E005E5B22 /* tintshader.fx in Resources */ = {isa = PBXBuildFile; fileRef = 2015681E290DD94B005E5B22 /* tintshader.fx */; };
-		20156966290DD94E005E5B22 /* version.rc in Resources */ = {isa = PBXBuildFile; fileRef = 2015681F290DD94B005E5B22 /* version.rc */; };
 		20156967290DD94E005E5B22 /* engine_setup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20156824290DD94B005E5B22 /* engine_setup.cpp */; };
 		20156968290DD94E005E5B22 /* game_run.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20156827290DD94B005E5B22 /* game_run.cpp */; };
 		20156969290DD94E005E5B22 /* game_file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2015682A290DD94B005E5B22 /* game_file.cpp */; };
@@ -489,11 +479,6 @@
 		20156ADB290DE047005E5B22 /* decode.c in Sources */ = {isa = PBXBuildFile; fileRef = 20156ADA290DE046005E5B22 /* decode.c */; };
 		20224CFB2A228DCC003A32FD /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20224CEA2A228DCC003A32FD /* SDL2.framework */; };
 		20224D092A2293CC003A32FD /* SDL2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 20224CEA2A228DCC003A32FD /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		20373CFF298EAE7C00162BBA /* speech.vox in Resources */ = {isa = PBXBuildFile; fileRef = 20373CEF298EAE7C00162BBA /* speech.vox */; };
-		20373D00298EAE7C00162BBA /* game.ags in Resources */ = {isa = PBXBuildFile; fileRef = 20373CF0298EAE7C00162BBA /* game.ags */; };
-		20373D01298EAE7C00162BBA /* audio.vox in Resources */ = {isa = PBXBuildFile; fileRef = 20373CF1298EAE7C00162BBA /* audio.vox */; };
-		20373D02298EAE7C00162BBA /* acsetup.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 20373CF2298EAE7C00162BBA /* acsetup.cfg */; };
-		205CAAAE2A86E1C900523BE2 /* ios.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 205CAAAD2A86E1C900523BE2 /* ios.cfg */; };
 		205F24E82AC08C470048F634 /* miniz.c in Sources */ = {isa = PBXBuildFile; fileRef = 205F24E72AC08C470048F634 /* miniz.c */; };
 		20F3EDCF2A6DC96A00C7BD28 /* scriptmouse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20F3EDC62A6DC96A00C7BD28 /* scriptmouse.cpp */; };
 		20F3EDD02A6DC96A00C7BD28 /* cc_staticarray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20F3EDC72A6DC96A00C7BD28 /* cc_staticarray.cpp */; };
@@ -3270,7 +3255,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 20155977290D9DF6005E5B22 /* Build configuration list for PBXProject "ags" */;
+			buildConfigurationList = 20155977290D9DF6005E5B22 /* Build configuration list for PBXProject "AGS" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -3380,25 +3365,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				20156883290DD94C005E5B22 /* route_finder_jps.inl in Resources */,
-				20156965290DD94E005E5B22 /* tintshader.fx in Resources */,
-				20373D01298EAE7C00162BBA /* audio.vox in Resources */,
-				20156961290DD94E005E5B22 /* tintshader.fxo in Resources */,
-				20155A27290DCAAC005E5B22 /* fix.inl in Resources */,
-				20156962290DD94E005E5B22 /* tintshaderLegacy.fx in Resources */,
-				20156960290DD94E005E5B22 /* game-1.ICO in Resources */,
-				20155A23290DCAAC005E5B22 /* draw.inl in Resources */,
-				20155A26290DCAAC005E5B22 /* color.inl in Resources */,
-				20155992290D9DF8005E5B22 /* LaunchScreen.storyboard in Resources */,
-				20373D02298EAE7C00162BBA /* acsetup.cfg in Resources */,
-				20155A25290DCAAC005E5B22 /* fmaths.inl in Resources */,
-				205CAAAE2A86E1C900523BE2 /* ios.cfg in Resources */,
-				20156963290DD94E005E5B22 /* tintshaderLegacy.fxo in Resources */,
-				20373D00298EAE7C00162BBA /* game.ags in Resources */,
-				20155A24290DCAAC005E5B22 /* gfx.inl in Resources */,
-				20156966290DD94E005E5B22 /* version.rc in Resources */,
-				2015598F290D9DF8005E5B22 /* Assets.xcassets in Resources */,
-				20373CFF298EAE7C00162BBA /* speech.vox in Resources */,
+				1C96467B2B1BAE930034D46A /* ios.cfg in Resources */,
+				1C96467C2B1BAE930034D46A /* speech.vox in Resources */,
+				1C96467D2B1BAE940034D46A /* game.ags in Resources */,
+				1C96467E2B1BAE940034D46A /* audio.vox in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4053,8 +4023,8 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = metal;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -4109,8 +4079,8 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = metal;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -4126,7 +4096,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		20155977290D9DF6005E5B22 /* Build configuration list for PBXProject "ags" */ = {
+		20155977290D9DF6005E5B22 /* Build configuration list for PBXProject "AGS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				20155995290D9DF8005E5B22 /* Debug */,
