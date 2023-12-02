@@ -3219,6 +3219,22 @@
 			path = ../../../Resources;
 			sourceTree = "<group>";
 		};
+		205F24DF2AC08B9D0048F634 /* miniz */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = miniz;
+			sourceTree = "<group>";
+		};
+		205F24E52AC08C2C0048F634 /* miniz */ = {
+			isa = PBXGroup;
+			children = (
+				205F24E72AC08C470048F634 /* miniz.c */,
+				205F24E62AC08C470048F634 /* miniz.h */,
+			);
+			path = miniz;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
