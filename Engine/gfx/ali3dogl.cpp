@@ -311,6 +311,11 @@ bool OGLGraphicsDriver::CreateWindowAndGlContext(const DisplayMode &mode)
   if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1) != 0)
     SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Error occured setting attribute SDL_GL_CONTEXT_MINOR_VERSION: %s", SDL_GetError());
 #endif
+#ifdef AGS_PLATFORM_OS_IOS
+  if (SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0) != 0)
+    SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Error occured setting attribute SDL_GL_DEPTH_SIZE");
+//  SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+#endif
   if (SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1) != 0)
     SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Error occured setting attribute SDL_GL_DOUBLEBUFFER: %s", SDL_GetError());
 
@@ -346,6 +351,11 @@ bool OGLGraphicsDriver::CreateWindowAndGlContext(const DisplayMode &mode)
 #endif
   _sdlWindow = sdl_window;
   _sdlGlContext = sdlgl_ctx;
+#ifdef AGS_PLATFORM_OS_IOS
+  // The SDL implementation of the iOS OpenGL view (SDL_uikitopenglview.m) generates its own framebuffer to target the renderbuffer
+  // Instead of using framebuffer 0, we ask OpenGL to get the current framebuffer.
+  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &_screenFramebuffer);
+#endif
   return true;
 }
 
@@ -738,8 +748,12 @@ void OGLGraphicsDriver::SetupBackbufferTexture()
   glGenFramebuffersEXT(1, &_fbo);
   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _fbo);
   glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, _backbuffer, 0);
+  
+  GLenum status  = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  if (status != GL_FRAMEBUFFER_COMPLETE)
+    Debug::Printf(kDbgMsg_Error, "Error while setting OpenGL backbuffer: %x", status);
 
-  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _screenFramebuffer);
 
   // Assign vertices of the backbuffer texture position in the scene
   _backbuffer_vertices[0] = _backbuffer_vertices[4] = 0;
@@ -933,7 +947,9 @@ bool OGLGraphicsDriver::GetCopyOfScreenIntoBitmap(Bitmap *destination, bool at_n
   }
   else
   {
-#if !AGS_OPENGL_ES2
+#if AGS_OPENGL_ES2
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _screenFramebuffer);
+#else
     glReadBuffer(GL_FRONT);
 #endif
 
@@ -1177,26 +1193,12 @@ void OGLGraphicsDriver::_renderSprite(const OGLDrawListEntry *drawListEntry,
 
 void OGLGraphicsDriver::_render(bool clearDrawListAfterwards)
 {
-#if 0
-  // TODO:
-  // For some reason, mobile ports initialize actual display size after a short delay.
-  // This is why we update display mode and related parameters (projection, viewport)
-  // at the first render pass.
-  // Ofcourse this is not a good thing, ideally the display size should be made
-  // known before graphic mode is initialized. This would require analysis and rewrite
-  // of the platform-specific part of the code (Java app for Android / XCode for iOS).
-  if (!device_screen_initialized)
-  {
-    UpdateDeviceScreen();
-    device_screen_initialized = 1;
-  }
-#endif
   glm::mat4 projection;
+  
+  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _do_render_to_texture ? _fbo : _screenFramebuffer);
 
   if (_do_render_to_texture)
   {
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _fbo);
-
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -1232,7 +1234,7 @@ void OGLGraphicsDriver::_render(bool clearDrawListAfterwards)
     glUniform1f(program.Alpha, 1.0f);
 
     // Texture is ready, now create rectangle in the world space and draw texture upon it
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _screenFramebuffer);
 
     glViewport(_viewportRect.Left, _viewportRect.Top, _viewportRect.GetWidth(), _viewportRect.GetHeight());
 
@@ -1321,7 +1323,7 @@ void OGLGraphicsDriver::SetRenderTarget(const OGLSpriteBatch *batch, Size &surfa
         else
         {
             surface_sz = _srcRect.GetSize();
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0u);
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _screenFramebuffer);
             glViewport(_viewportRect.Left, _viewportRect.Top, _viewportRect.GetWidth(), _viewportRect.GetHeight());
         }
         projection = glm::ortho(0.0f, (float)surface_sz.Width, 0.0f, (float)surface_sz.Height, 0.0f, 1.0f);
@@ -1769,7 +1771,7 @@ IDriverDependantBitmap* OGLGraphicsDriver::CreateRenderTargetDDB(int width, int 
     // FIXME: this ugly accessing internal texture members
     unsigned int tex = ddb->_data->_tiles[0].texture;
     glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, tex, 0);
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _screenFramebuffer);
     ddb->_renderHint = kTxHint_PremulAlpha;
     return ddb;
 }
