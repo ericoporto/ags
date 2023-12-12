@@ -43,6 +43,11 @@ namespace AGS.Editor
             return sb.ToString();
         }
 
+        public virtual RuntimeSetup FixInvalidSettings(RuntimeSetup setup)
+        {
+            return setup;
+        }
+
         public virtual string[] GetRequiredLibraryNames()
         {
             return new List<string>(GetRequiredLibraryPaths().Keys).ToArray();
@@ -148,7 +153,11 @@ namespace AGS.Editor
                 }
                 catch (Exception) { }
             }
-            AGSEditor.Instance.WriteConfigFile(destPath, false);
+
+            RuntimeSetup setup = Factory.AGSEditor.CurrentGame.DefaultSetup;
+            setup = FixInvalidSettings(setup.Clone());
+
+            AGSEditor.Instance.WriteConfigFile(destPath, setup, false);
         }
 
         /// <summary>
