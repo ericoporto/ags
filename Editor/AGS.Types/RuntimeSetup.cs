@@ -423,6 +423,21 @@ namespace AGS.Types
             SerializeUtils.DeserializeFromXML(this, node);
         }
 
+        public RuntimeSetup Clone()
+        {
+            XmlDocument doc = new XmlDocument();
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                XmlTextWriter xmlWriter = new XmlTextWriter(stringWriter);
+                this.ToXml(xmlWriter);
+                doc.LoadXml(stringWriter.ToString());
+            }
+
+            RuntimeSetup clone = new RuntimeSetup(_gameSettings);
+            clone.FromXml(doc);
+            return clone;
+        }
+
         #region ICustomTypeDescriptor Members
 
         public AttributeCollection GetAttributes()
