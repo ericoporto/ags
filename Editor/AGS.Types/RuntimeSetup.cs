@@ -425,16 +425,8 @@ namespace AGS.Types
 
         public RuntimeSetup Clone()
         {
-            XmlDocument doc = new XmlDocument();
-            using (StringWriter stringWriter = new StringWriter())
-            {
-                XmlTextWriter xmlWriter = new XmlTextWriter(stringWriter);
-                this.ToXml(xmlWriter);
-                doc.LoadXml(stringWriter.ToString());
-            }
-
             RuntimeSetup clone = new RuntimeSetup(_gameSettings);
-            clone.FromXml(doc);
+            Utilities.NaiveCopyProperties(this, clone);
             return clone;
         }
 
