@@ -5,7 +5,6 @@ using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Reflection;
-using System.Linq;
 
 namespace AGS.Types
 {
@@ -211,17 +210,6 @@ namespace AGS.Types
             else if (string.Compare(name, "UTF-8", true) == 0)
                 return Utilities.UTF8; // UTF-8 w/o BOM
             return Encoding.GetEncoding(name);
-        }
-
-        public static void NaiveCopyProperties(object source_obj, object clone)
-        {
-            IEnumerable<PropertyInfo> properties = source_obj.GetType().GetProperties()
-                .Where(f => f.CanWrite && f.CanRead );
-
-            foreach (PropertyInfo prop in properties)
-            {
-                prop.SetValue(clone, prop.GetValue(source_obj));
-            }
         }
     }
 }

@@ -423,13 +423,6 @@ namespace AGS.Types
             SerializeUtils.DeserializeFromXML(this, node);
         }
 
-        public RuntimeSetup Clone()
-        {
-            RuntimeSetup clone = new RuntimeSetup(_gameSettings);
-            Utilities.NaiveCopyProperties(this, clone);
-            return clone;
-        }
-
         #region ICustomTypeDescriptor Members
 
         public AttributeCollection GetAttributes()

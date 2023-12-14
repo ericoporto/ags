@@ -155,9 +155,20 @@ namespace AGS.Editor
             }
 
             RuntimeSetup setup = Factory.AGSEditor.CurrentGame.DefaultSetup;
-            setup = FixInvalidSettings(setup.Clone());
+            setup = FixInvalidSettings(CloneRuntimeSetup(setup, Factory.AGSEditor.CurrentGame.Settings));
 
             AGSEditor.Instance.WriteConfigFile(destPath, setup, false);
+        }
+
+        /// <summary>
+        /// clones a RuntimeSetup.
+        /// TO-DO: remove this if we decide to implement it in RuntimeSetup itself.
+        /// </summary>
+        protected static RuntimeSetup CloneRuntimeSetup(RuntimeSetup setup, Settings settings)
+        {
+            RuntimeSetup clone = new RuntimeSetup(settings);
+            Utilities.NaiveCopyProperties(setup, clone);
+            return clone;
         }
 
         /// <summary>
