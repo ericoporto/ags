@@ -68,6 +68,7 @@ jobs:
     - name: Set Paths
       run: |
         echo "C:\Program Files (x86)\Windows Kits\8.1\bin\x86;" >> $env:GITHUB_PATH
+        echo "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\;" >> $env:GITHUB_PATH
 
     - uses: TheMrMilchmann/setup-msvc-dev@v3
       with:
@@ -86,9 +87,8 @@ jobs:
       run: |
         set LIB=%LIB%;${{ env.LIBUMX86 }}
         cd ${{github.workspace}}/Solutions
-        pushd "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\"
-        vcvarsall.bat x86
-        popd
+        vcvarsall x86
+        SET
         msbuild AGS.Editor.Full.sln /p:UseEnv=true /p:VisualStudioVersion=14.0 /p:WindowsTargetPlatformVersion=8.1 /p:PlatformToolset=v140 /p:Configuration=Release /p:Platform="Mixed Platforms" /maxcpucount /nologo
 
     - name: Check Editor Built
