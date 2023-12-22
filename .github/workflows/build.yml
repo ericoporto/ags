@@ -87,7 +87,7 @@ jobs:
       run: |
         set LIB=%LIB%;${{ env.LIBUMX86 }}
         cd ${{github.workspace}}/Solutions
-        vcvarsall x86
+        vcvarsall help
         SET
         msbuild AGS.Editor.Full.sln /p:UseEnv=true /p:VisualStudioVersion=14.0 /p:WindowsTargetPlatformVersion=8.1 /p:PlatformToolset=v140 /p:Configuration=Release /p:Platform="Mixed Platforms" /maxcpucount /nologo
 
