@@ -3,13 +3,14 @@ cmake_minimum_required(VERSION 3.13..3.14)
 set(CMAKE_USER_MAKE_RULES_OVERRIDE ${CMAKE_CURRENT_SOURCE_DIR}/CMake/c_flag_overrides.cmake)
 set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX ${CMAKE_CURRENT_SOURCE_DIR}/CMake/cxx_flag_overrides.cmake)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment version")
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
+
+include(AgsPolicies)
+ags_policies()
 
 project(AGS
     VERSION 3.6.0.56
     LANGUAGES CXX C)
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
 option(AGS_USE_LOCAL_ALL_LIBRARIES "Use a locally installed libraries" OFF)
 option(AGS_USE_LOCAL_SDL2 "Use a locally installed SDL2" ${AGS_USE_LOCAL_ALL_LIBRARIES})
