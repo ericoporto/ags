@@ -13,8 +13,8 @@
         "urlHash": "2e9ab24fd861f61349b9386fd66c9851e9f03a60"
     },
     "sdl": {
-        "revision": "2.28.5",
-        "release_type": "release",
-        "urlHash": "9dba2b579b7bfbd24cb302e4f4b27563cc8f1070"
+        "revision": "2.29.1",
+        "release_type": "prerelease",
+        "urlHash": "1343d5c10d03fbc20c128b5632fa5571ab9015da"
     }
 }
