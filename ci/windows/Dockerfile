@@ -1,5 +1,5 @@
 # base will already have Chocolatey installed
-FROM ghcr.io/ericoporto/min-ags-dev-env:2.0.1
+FROM ghcr.io/ericoporto/min-ags-dev-env:2.0.2
 
 # if no temp folder exists by default, create it
 RUN IF exist %TEMP%\nul ( echo %TEMP% ) ELSE ( mkdir %TEMP% )
@@ -15,8 +15,8 @@ RUN pushd %TEMP% && \
 
 ARG NUGET_VERSION=5.7.0
 ARG INNO_SETUP_VERSION=6.0.5
-RUN cinst nuget.commandline --version %NUGET_VERSION% -y && \
-  cinst innosetup --version %INNO_SETUP_VERSION% -y && \
+RUN choco install nuget.commandline --version %NUGET_VERSION% -y && \
+  choco install innosetup --version %INNO_SETUP_VERSION% -y && \
   mkdir empty && \
   robocopy empty %TEMP% /MIR > nul & \
   rd /s /q empty
