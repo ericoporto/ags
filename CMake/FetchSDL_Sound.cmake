@@ -1,8 +1,8 @@
 FetchContent_Declare(
     sdlsound_content
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    URL https://github.com/icculus/SDL_sound/archive/c5639414c1bb24fb4eef5861c13adb42a4aab950.tar.gz
-    URL_HASH SHA1=2e9ab24fd861f61349b9386fd66c9851e9f03a60
+    URL https://github.com/ericoporto/SDL_sound-1/archive/0187e9a04196c147a4366edd0917811b8d263e16.tar.gz
+    URL_HASH SHA1=ac200f41e5dac97729e322a2eaf85b3d1595b0f2
 )
 
 FetchContent_GetProperties(sdlsound_content)
