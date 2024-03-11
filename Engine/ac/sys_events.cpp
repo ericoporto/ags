@@ -31,6 +31,7 @@
 #include "main/engine.h"
 #include "util/string_utils.h"
 #include "util/utf8.h"
+#include "pointer.h"
 
 using namespace AGS::Common;
 using namespace AGS::Engine;
@@ -561,7 +562,7 @@ int ags_check_mouse_wheel()
 struct Fingers
 {
 public:
-    static const int MAX_FINGERS = 2;
+    static const int MAX_FINGERS = 10;
     static const int NO_INDEX = -1;
 
     // store fingerId, return given finger index
@@ -786,6 +787,14 @@ static void sync_sys_mouse_pos()
     }
 }
 
+// get finger position for pointer
+static Point get_touch_to_pointer_pos(float x, float y) {
+    const float w = static_cast<float>(gfxDriver->GetDisplayMode().Width);
+    const float h = static_cast<float>(gfxDriver->GetDisplayMode().Height);
+    // Save real touch pos
+    return Point(static_cast<int>(std::roundf(x * w)), static_cast<int>(std::roundf(y * h)));
+}
+
 static void on_sdl_touch_down(const SDL_TouchFingerEvent &event)
 {
     int finger_index = touch.fingers.push(event.fingerId);
@@ -793,6 +802,8 @@ static void on_sdl_touch_down(const SDL_TouchFingerEvent &event)
 
     touch.fingers_down |= 1 << finger_index;
     detect_double_tap(event, true);
+
+    on_pointer_down(finger_index+1, get_touch_to_pointer_pos(event.x, event.y));
 
     switch (t2m.mode)
     {
@@ -858,6 +869,8 @@ static void on_sdl_touch_up(const SDL_TouchFingerEvent &event)
     touch.fingers_down &= ~(1 << finger_index);
     detect_double_tap(event, false);
 
+    on_pointer_up(finger_index+1, get_touch_to_pointer_pos(event.x, event.y));
+
     switch (t2m.mode)
     {
     case kTouchMouse_OneFingerDrag:
@@ -913,6 +926,8 @@ static void on_sdl_touch_motion(const SDL_TouchFingerEvent &event)
 {
     int finger_index = touch.fingers.get_index(event.fingerId);
     if(finger_index == Fingers::NO_INDEX) return;
+
+    on_pointer_motion(finger_index+1, get_touch_to_pointer_pos(event.x, event.y));
 
     switch (t2m.mode)
     {

@@ -2702,8 +2702,16 @@ builtin managed struct VideoPlayer {
   /// The volume of this video's sound, from 0 to 100.
   import attribute int Volume;
 };
-#endif
 
+builtin struct Pointer {
+  /// Number of pointers, this is a fixed amount
+  readonly import static attribute int Count;      // $AUTOCOMPLETESTATICONLY$
+  /// Takes pointer ID and returns where the pointer is in game screen, (-1,-1) if invalid
+  readonly import static attribute Point* Position[];      // $AUTOCOMPLETESTATICONLY$
+  /// Takes pointer ID and returns true if the pointer is pressed, the finger is on screen or left mouse button is down
+  readonly import static attribute bool IsDown[];       // $AUTOCOMPLETESTATICONLY$
+};
+#endif
 
 import ColorType palette[PALETTE_SIZE];
 import Mouse mouse;
