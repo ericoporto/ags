@@ -366,6 +366,13 @@ managed struct Point {
 };
 #endif
 
+#ifdef SCRIPT_API_v400
+managed struct TouchPoint {
+	int ID, X, Y;
+	bool IsDown;
+};
+#endif
+
 #define CHARID int  // $AUTOCOMPLETEIGNORE$
 builtin struct ColorType {
   char r,g,b;
@@ -2702,8 +2709,14 @@ builtin managed struct VideoPlayer {
   /// The volume of this video's sound, from 0 to 100.
   import attribute int Volume;
 };
-#endif
 
+builtin struct Touch {
+  /// Number of pointers, this is a fixed amount
+  readonly import static attribute int TouchPointCount;      // $AUTOCOMPLETESTATICONLY$
+  /// Takes pointer ID and returns where the pointer is in game screen, (-1,-1) if invalid
+  readonly import static attribute TouchPoint* TouchPoint[];      // $AUTOCOMPLETESTATICONLY$
+};
+#endif
 
 import ColorType palette[PALETTE_SIZE];
 import Mouse mouse;
