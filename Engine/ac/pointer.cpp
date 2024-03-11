@@ -15,6 +15,7 @@
 #include <array>
 #include "pointer.h"
 #include "ac/dynobj/scriptuserobject.h"
+#include "device/mousew32.h"
 
 enum pointer_state {
     pointer_up,
@@ -64,6 +65,11 @@ ScriptUserObject* Pointer_GetPosition(int pointerNum)
 {
     if (pointerNum < 0 || pointerNum >= _pp::MAX_POINTERS)
         return nullptr;
+
+    if (pointerNum == 0) {
+        return ScriptStructHelpers::CreatePoint(mousex, mousey);
+    }
+
     pointer p = _pp.pointers[pointerNum];
     return ScriptStructHelpers::CreatePoint(p.x, p.y);
 }
@@ -72,6 +78,11 @@ int Pointer_GetIsDown(int pointerNum)
 {
     if (pointerNum < 0 || pointerNum >= _pp::MAX_POINTERS)
         return 0;
+
+    if (pointerNum == 0) {
+        return ags_misbuttondown(eAGSMouseButton::kMouseLeft) ? 1 : 0;
+    }
+
     pointer p = _pp.pointers[pointerNum];
     return p.down;
 }
