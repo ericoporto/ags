@@ -803,7 +803,7 @@ static void on_sdl_touch_down(const SDL_TouchFingerEvent &event)
     touch.fingers_down |= 1 << finger_index;
     detect_double_tap(event, true);
 
-    on_pointer_down(finger_index+1, get_touch_to_pointer_pos(event.x, event.y));
+    on_touch_pointer_down(finger_index + 1, get_touch_to_pointer_pos(event.x, event.y));
 
     switch (t2m.mode)
     {
@@ -869,7 +869,7 @@ static void on_sdl_touch_up(const SDL_TouchFingerEvent &event)
     touch.fingers_down &= ~(1 << finger_index);
     detect_double_tap(event, false);
 
-    on_pointer_up(finger_index+1, get_touch_to_pointer_pos(event.x, event.y));
+    on_touch_pointer_up(finger_index + 1, get_touch_to_pointer_pos(event.x, event.y));
 
     switch (t2m.mode)
     {
@@ -927,7 +927,7 @@ static void on_sdl_touch_motion(const SDL_TouchFingerEvent &event)
     int finger_index = touch.fingers.get_index(event.fingerId);
     if(finger_index == Fingers::NO_INDEX) return;
 
-    on_pointer_motion(finger_index+1, get_touch_to_pointer_pos(event.x, event.y));
+    on_touch_pointer_motion(finger_index + 1, get_touch_to_pointer_pos(event.x, event.y));
 
     switch (t2m.mode)
     {

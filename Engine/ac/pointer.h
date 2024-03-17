@@ -16,9 +16,9 @@
 
 #include "util/geometry.h"
 
-void on_pointer_down(int pointer_id, Point position);
-void on_pointer_motion(int pointer_id, Point position);
-void on_pointer_up(int pointer_id, Point position);
+void on_touch_pointer_down(int pointer_id, Point position);
+void on_touch_pointer_motion(int pointer_id, Point position);
+void on_touch_pointer_up(int pointer_id, Point position);
 
 
 #endif //__AGS_EE_AC_POINTER_H

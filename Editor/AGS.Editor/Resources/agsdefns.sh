@@ -366,6 +366,13 @@ managed struct Point {
 };
 #endif
 
+#ifdef SCRIPT_API_v400
+managed struct TouchPoint {
+	int ID, X, Y;
+	bool IsDown;
+};
+#endif
+
 #define CHARID int  // $AUTOCOMPLETEIGNORE$
 builtin struct ColorType {
   char r,g,b;
@@ -2703,13 +2710,11 @@ builtin managed struct VideoPlayer {
   import attribute int Volume;
 };
 
-builtin struct Pointer {
+builtin struct Touch {
   /// Number of pointers, this is a fixed amount
-  readonly import static attribute int Count;      // $AUTOCOMPLETESTATICONLY$
+  readonly import static attribute int TouchPointCount;      // $AUTOCOMPLETESTATICONLY$
   /// Takes pointer ID and returns where the pointer is in game screen, (-1,-1) if invalid
-  readonly import static attribute Point* Position[];      // $AUTOCOMPLETESTATICONLY$
-  /// Takes pointer ID and returns true if the pointer is pressed, the finger is on screen or left mouse button is down
-  readonly import static attribute bool IsDown[];       // $AUTOCOMPLETESTATICONLY$
+  readonly import static attribute TouchPoint* TouchPoint[];      // $AUTOCOMPLETESTATICONLY$
 };
 #endif
 

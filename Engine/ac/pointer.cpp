@@ -17,13 +17,13 @@
 #include "ac/dynobj/scriptuserobject.h"
 #include "device/mousew32.h"
 
-enum pointer_state {
-    pointer_up,
-    pointer_motion,
-    pointer_down
+enum touch_pointer_state {
+    touch_pointer_up,
+    touch_pointer_motion,
+    touch_pointer_down
 };
 
-struct pointer {
+struct touch_point {
     int x;
     int y;
     bool down;
@@ -31,60 +31,48 @@ struct pointer {
 
 struct _pp {
     static const int MAX_POINTERS = 11;
-    std::array<pointer, MAX_POINTERS> pointers = {};
+    std::array<touch_point, MAX_POINTERS> touch_points = {};
 } _pp;
 
-void on_pointer(int pointer_id, Point position, pointer_state state)
+void on_touch_pointer(int pointer_id, Point position, touch_pointer_state state)
 {
-    _pp.pointers[pointer_id].x = position.X;
-    _pp.pointers[pointer_id].y = position.Y;
-    _pp.pointers[pointer_id].down = state != pointer_up;
+    _pp.touch_points[pointer_id].x = position.X;
+    _pp.touch_points[pointer_id].y = position.Y;
+    _pp.touch_points[pointer_id].down = state != touch_pointer_up;
 }
 
-void on_pointer_down(int pointer_id, Point position)
+void on_touch_pointer_down(int pointer_id, Point position)
 {
-    on_pointer(pointer_id, position, pointer_down);
+    on_touch_pointer(pointer_id, position, touch_pointer_down);
 }
 
-void on_pointer_motion(int pointer_id, Point position)
+void on_touch_pointer_motion(int pointer_id, Point position)
 {
-    on_pointer(pointer_id, position, pointer_motion);
+    on_touch_pointer(pointer_id, position, touch_pointer_motion);
 }
 
-void on_pointer_up(int pointer_id, Point position)
+void on_touch_pointer_up(int pointer_id, Point position)
 {
-    on_pointer(pointer_id, position, pointer_up);
+    on_touch_pointer(pointer_id, position, touch_pointer_up);
 }
 
-int Pointer_GetCount()
+int Touch_GetTouchPointCount()
 {
     return _pp::MAX_POINTERS;
 }
 
-ScriptUserObject* Pointer_GetPosition(int pointerNum)
+ScriptUserObject* Touch_GetTouchPoint(int pointerNum)
 {
     if (pointerNum < 0 || pointerNum >= _pp::MAX_POINTERS)
         return nullptr;
 
     if (pointerNum == 0) {
-        return ScriptStructHelpers::CreatePoint(mousex, mousey);
+        int down = ags_misbuttondown(eAGSMouseButton::kMouseLeft) ? 1 : 0;
+        return ScriptStructHelpers::CreateTouchPoint(0, mousex, mousey, down);
     }
 
-    pointer p = _pp.pointers[pointerNum];
-    return ScriptStructHelpers::CreatePoint(p.x, p.y);
-}
-
-int Pointer_GetIsDown(int pointerNum)
-{
-    if (pointerNum < 0 || pointerNum >= _pp::MAX_POINTERS)
-        return 0;
-
-    if (pointerNum == 0) {
-        return ags_misbuttondown(eAGSMouseButton::kMouseLeft) ? 1 : 0;
-    }
-
-    pointer p = _pp.pointers[pointerNum];
-    return p.down;
+    touch_point p = _pp.touch_points[pointerNum];
+    return ScriptStructHelpers::CreateTouchPoint(pointerNum, p.x, p.y, p.down);
 }
 
 //=============================================================================
@@ -97,29 +85,22 @@ int Pointer_GetIsDown(int pointerNum)
 #include "script/script_runtime.h"
 
 // int ()
-RuntimeScriptValue Sc_Pointer_GetCount(const RuntimeScriptValue *params, int32_t param_count)
+RuntimeScriptValue Sc_Touch_GetTouchPointCount(const RuntimeScriptValue *params, int32_t param_count)
 {
-    API_SCALL_INT(Pointer_GetCount);
+    API_SCALL_INT(Touch_GetTouchPointCount);
 }
 
 // Point* (int pointerNum)
-RuntimeScriptValue Sc_Pointer_GetPosition(const RuntimeScriptValue *params, int32_t param_count)
+RuntimeScriptValue Sc_Touch_GetTouchPoint(const RuntimeScriptValue *params, int32_t param_count)
 {
-    API_SCALL_OBJAUTO_PINT(ScriptUserObject, Pointer_GetPosition);
-}
-
-// int (int pointerNum)
-RuntimeScriptValue Sc_Pointer_GetIsDown(const RuntimeScriptValue *params, int32_t param_count)
-{
-    API_SCALL_INT_PINT(Pointer_GetIsDown);
+    API_SCALL_OBJAUTO_PINT(ScriptUserObject, Touch_GetTouchPoint);
 }
 
 void RegisterPointerAPI()
 {
     ScFnRegister pointer_api[] = {
-            { "Pointer::get_Count",                   API_FN_PAIR(Pointer_GetCount) },
-            { "Pointer::geti_Position",               API_FN_PAIR(Pointer_GetPosition) },
-            { "Pointer::geti_IsDown",                 API_FN_PAIR(Pointer_GetIsDown) },
+            { "Touch::get_TouchPointCount",                   API_FN_PAIR(Touch_GetTouchPointCount) },
+            { "Touch::geti_TouchPoint",               API_FN_PAIR(Touch_GetTouchPoint) },
     };
 
     ccAddExternalFunctions(pointer_api);
