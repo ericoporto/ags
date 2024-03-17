@@ -32,6 +32,7 @@
 #include "util/string_utils.h"
 #include "util/utf8.h"
 #include "pointer.h"
+#include "gamestate.h"
 
 using namespace AGS::Common;
 using namespace AGS::Engine;
@@ -789,10 +790,20 @@ static void sync_sys_mouse_pos()
 
 // get finger position for pointer
 static Point get_touch_to_pointer_pos(float x, float y) {
-    const float w = static_cast<float>(gfxDriver->GetDisplayMode().Width);
-    const float h = static_cast<float>(gfxDriver->GetDisplayMode().Height);
+    const int iw = gfxDriver->GetDisplayMode().Width;
+    const int ih = gfxDriver->GetDisplayMode().Height;
+    const float w = static_cast<float>(iw);
+    const float h = static_cast<float>(ih);
     // Save real touch pos
-    return Point(static_cast<int>(std::roundf(x * w)), static_cast<int>(std::roundf(y * h)));
+
+    int x_real = AGSMath::Clamp<int>(static_cast<int>(std::roundf(x * w)), 0, iw-1);
+    int y_real = AGSMath::Clamp<int>(static_cast<int>(std::roundf(y * h)),0, ih-1);
+
+    // duplicating code from Mouse::WindowToGame
+    int p_x = GameScaling.X.UnScalePt(x_real) - play.GetMainViewport().Left;
+    int p_y = GameScaling.Y.UnScalePt(y_real) - play.GetMainViewport().Top;
+
+    return Point(p_x, p_y);
 }
 
 static void on_sdl_touch_down(const SDL_TouchFingerEvent &event)
