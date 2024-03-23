@@ -27,6 +27,7 @@
 #include "util/aasset_stream.h"
 #include "util/android_file.h"
 #endif
+#include "util/memory_compat.h"
 
 namespace AGS
 {
@@ -208,7 +209,7 @@ String File::GetCMode(FileOpenMode open_mode, StreamMode work_mode)
     return mode;
 }
 
-Stream *File::OpenFile(const String &filename, FileOpenMode open_mode, StreamMode work_mode)
+std::unique_ptr<Stream> File::OpenFile(const String &filename, FileOpenMode open_mode, StreamMode work_mode)
 {
     std::unique_ptr<StreamBase> fs;
     try
@@ -235,25 +236,23 @@ Stream *File::OpenFile(const String &filename, FileOpenMode open_mode, StreamMod
         }
 #endif
     }
-    if (!fs)
-        return nullptr;
-    return new Stream(std::move(fs));
+    return std::make_unique<Stream>(std::move(fs));
 }
 
 
-Stream *File::OpenStdin()
+std::unique_ptr<Stream> File::OpenStdin()
 {
-    return new Stream(std::unique_ptr<FileStream>(FileStream::WrapHandle(stdin, kStream_Read)));
+    return std::make_unique<Stream>(std::unique_ptr<FileStream>(FileStream::WrapHandle(stdin, kStream_Read)));
 }
 
-Stream *File::OpenStdout()
+std::unique_ptr<Stream> File::OpenStdout()
 {
-    return new Stream(std::unique_ptr<FileStream>(FileStream::WrapHandle(stdout, kStream_Write)));
+    return std::make_unique<Stream>(std::unique_ptr<FileStream>(FileStream::WrapHandle(stdout, kStream_Write)));
 }
 
-Stream *File::OpenStderr()
+std::unique_ptr<Stream> File::OpenStderr()
 {
-    return new Stream(std::unique_ptr<FileStream>(FileStream::WrapHandle(stderr, kStream_Write)));
+    return std::make_unique<Stream>(std::unique_ptr<FileStream>(FileStream::WrapHandle(stderr, kStream_Write)));
 }
 
 String File::FindFileCI(const String &base_dir, const String &file_name,
@@ -372,7 +371,7 @@ String File::FindFileCI(const String &base_dir, const String &file_name,
 #endif
 }
 
-Stream *File::OpenFileCI(const String &base_dir, const String &file_name, FileOpenMode open_mode, StreamMode work_mode)
+std::unique_ptr<Stream> File::OpenFileCI(const String &base_dir, const String &file_name, FileOpenMode open_mode, StreamMode work_mode)
 {
 #if !defined (AGS_CASE_SENSITIVE_FILESYSTEM)
     return File::OpenFile(Path::ConcatPaths(base_dir, file_name), open_mode, work_mode);
@@ -387,7 +386,7 @@ Stream *File::OpenFileCI(const String &base_dir, const String &file_name, FileOp
 #endif
 }
 
-Stream *File::OpenFile(const String &filename, soff_t start_off, soff_t end_off)
+std::unique_ptr<Stream> File::OpenFile(const String &filename, soff_t start_off, soff_t end_off)
 {
     std::unique_ptr<StreamBase> fs;
     try
@@ -412,9 +411,7 @@ Stream *File::OpenFile(const String &filename, soff_t start_off, soff_t end_off)
         }
 #endif
     }
-    if (!fs)
-        return nullptr;
-    return new Stream(std::move(fs));
+    return std::make_unique<Stream>(std::move(fs));
 }
 
 } // namespace Common
