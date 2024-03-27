@@ -13,6 +13,7 @@
 //=============================================================================
 #include "util/stream.h"
 #include <algorithm>
+#include <stdexcept>
 
 namespace AGS
 {
