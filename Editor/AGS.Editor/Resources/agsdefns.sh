@@ -1324,11 +1324,11 @@ builtin managed struct InventoryItem {
 
 builtin managed struct Overlay {
   /// Creates an overlay that displays a sprite.
-  import static Overlay* CreateGraphical(int x, int y, int slot, bool transparent = true
 #ifdef SCRIPT_API_v360
-	, bool clone = false
+  import static Overlay* CreateGraphical(int x, int y, int slot, bool transparent = true, bool clone = false);  // $AUTOCOMPLETESTATICONLY$	
+#else
+  import static Overlay* CreateGraphical(int x, int y, int slot, bool transparent = true);  // $AUTOCOMPLETESTATICONLY$	
 #endif
-  );  // $AUTOCOMPLETESTATICONLY$
   /// Creates an overlay that displays some text.
   import static Overlay* CreateTextual(int x, int y, int width, FontType, int colour, const string text, ...);  // $AUTOCOMPLETESTATICONLY$
   /// Changes the text on the overlay.
@@ -2393,14 +2393,15 @@ builtin struct System {
 
 builtin managed struct Object {
   /// Animates the object using its current view.
-  import function Animate(int loop, int delay, RepeatStyle=eOnce, BlockingStyle=eBlock, Direction=eForwards
-#ifdef SCRIPT_API_v3507
-    , int frame=0
-#endif  
 #ifdef SCRIPT_API_v360
-    , int volume=100
-#endif
-  );
+  import function Animate(int loop, int delay, RepeatStyle=eOnce, BlockingStyle=eBlock, Direction=eForwards, int frame=0, int volume=100);
+#else
+#ifdef SCRIPT_API_v3507
+  import function Animate(int loop, int delay, RepeatStyle=eOnce, BlockingStyle=eBlock, Direction=eForwards, int frame=0);
+#else
+  import function Animate(int loop, int delay, RepeatStyle=eOnce, BlockingStyle=eBlock, Direction=eForwards);
+#endif // SCRIPT_API_v3507
+#endif // SCRIPT_API_v360  
   /// Gets the object that is on the screen at the specified co-ordinates.
   import static Object* GetAtScreenXY(int x, int y);    // $AUTOCOMPLETESTATICONLY$
 #ifndef STRICT_STRINGS
@@ -2544,14 +2545,15 @@ builtin managed struct Character {
   /// Manually adds a waypoint to the character's movement path.
   import function AddWaypoint(int x, int y);
   /// Animates the character using its current locked view.
-  import function Animate(int loop, int delay, RepeatStyle=eOnce, BlockingStyle=eBlock, Direction=eForwards
-#ifdef SCRIPT_API_v3507
-    , int frame=0
-#endif  
 #ifdef SCRIPT_API_v360
-    , int volume=100
-#endif
-  );
+  import function Animate(int loop, int delay, RepeatStyle=eOnce, BlockingStyle=eBlock, Direction=eForwards, int frame=0, int volume=100);
+#else
+#ifdef SCRIPT_API_v3507
+  import function Animate(int loop, int delay, RepeatStyle=eOnce, BlockingStyle=eBlock, Direction=eForwards, int frame=0);
+#else
+  import function Animate(int loop, int delay, RepeatStyle=eOnce, BlockingStyle=eBlock, Direction=eForwards);
+#endif // SCRIPT_API_v3507
+#endif // SCRIPT_API_v360
 #ifdef SCRIPT_API_v340
   /// Moves the character to another room. If this is the player character, the game will also switch to that room.
   import function ChangeRoom(int room, int x=SCR_NO_VALUE, int y=SCR_NO_VALUE, CharacterDirection direction=eDirectionNone);
@@ -3226,12 +3228,12 @@ builtin struct Screen {
   /// Gets the number of viewports.
   import static readonly attribute int ViewportCount;
 
-  /// Returns the point in room which is displayed at the given screen coordinates.
-  import static Point *ScreenToRoomPoint(int sx, int sy
+  /// Returns the point in room which is displayed at the given screen coordinates.  
 #ifdef SCRIPT_API_v36026
-	, bool restrictToViewport = false
-#endif
-  );
+	import static Point *ScreenToRoomPoint(int sx, int sy, bool restrictToViewport = false);
+#else  
+  import static Point *ScreenToRoomPoint(int sx, int sy);
+#endif  
   /// Returns the point on screen corresponding to the given room coordinates relative to the main viewport.
   import static Point *RoomToScreenPoint(int rx, int ry);
 };
