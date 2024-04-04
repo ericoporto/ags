@@ -134,6 +134,36 @@ namespace AGS
       FindAndUpdateMemory(memory, memorySize, (unsigned char*)searchForUnicode, (int)strlen(searchFor) * 2, replaceWithData);
     }
 
+    AGS::Common::String _GetErrorAsAgsString(DWORD error)
+    {
+        if (error)
+        {
+            TCHAR buffer[1024];
+            DWORD bufLen = FormatMessage(
+                FORMAT_MESSAGE_FROM_SYSTEM |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
+                /*source*/ NULL, /*dwMessageId*/ error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                buffer, 1024, NULL);
+            
+            if (bufLen >= 1024)
+                bufLen = 1023;
+
+            buffer[bufLen] = 0;
+
+            if (bufLen > 1)
+            {
+                if(buffer[bufLen-2] == '\r')
+                    buffer[bufLen - 2] = 0;
+
+                AGS::Common::String result = AGS::Common::String();
+                result.AppendFmt("%s", buffer);
+
+                return result;
+            }
+        }
+        return AGS::Common::String();
+    }
+
     void NativeMethods::UpdateFileVersionInfo(String ^fileToUpdate, cli::array<System::Byte> ^authorNameUnicode, cli::array<System::Byte> ^gameNameUnicode)
     {
 			char fileNameChars[MAX_PATH];
@@ -142,7 +172,15 @@ namespace AGS
       HMODULE module = LoadLibraryEx(fileNameChars, NULL, LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE);
       if (module == NULL)
       {
-        throw gcnew AGSEditorException("LoadLibrary failed");
+          DWORD error = GetLastError();
+
+          AGS::Common::String cerror = AGS::Common::String("LoadLibrary failed.");
+          cerror.AppendFmt("Error #%d, ", error);
+          cerror.Append(_GetErrorAsAgsString(error));
+
+          TextConverter^ tcv = TextHelper::GetGameTextConverter();
+          String^ ags_error_msg = tcv->Convert(cerror);
+          throw gcnew AGSEditorException(ags_error_msg);
       }
       HRSRC handle = FindResource(module, MAKEINTRESOURCE(1), RT_VERSION);
       if (handle == NULL)
