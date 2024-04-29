@@ -103,6 +103,28 @@ const char* String_Truncate(const char *thisString, int length) {
     return CreateNewScriptString(std::move(buf));
 }
 
+const char* String_Trim(const char *thisString)
+{
+    const auto &this_header = ScriptString::GetHeader(thisString);
+    const char* nonSpaceFront = thisString;
+
+    while (uisspace(*nonSpaceFront))
+        nonSpaceFront++;
+
+    if (*nonSpaceFront == '\0')
+        return CreateNewScriptString("");
+
+    const char* nonSpaceBack = thisString + this_header.Length - 1;
+    while (nonSpaceBack > nonSpaceFront && uisspace(*nonSpaceBack))
+        nonSpaceBack--;
+
+    size_t copylen = nonSpaceBack - nonSpaceFront + 1;
+    auto buf = ScriptString::CreateBuffer(copylen, 0);
+    memcpy(buf.Get(), nonSpaceFront, copylen);
+    buf.Get()[copylen] = 0;
+    return CreateNewScriptString(std::move(buf));
+}
+
 const char* String_Substring(const char *thisString, int index, int length) {
     if (length < 0)
         quit("!String.Substring: invalid length");
@@ -454,6 +476,11 @@ RuntimeScriptValue Sc_String_Truncate(void *self, const RuntimeScriptValue *para
     API_OBJCALL_OBJ_PINT(const char, const char, myScriptStringImpl, String_Truncate);
 }
 
+RuntimeScriptValue Sc_String_Trim(void *self, const RuntimeScriptValue *params, int32_t param_count)
+{
+    API_OBJCALL_OBJ(const char, const char, myScriptStringImpl, String_Trim);
+}
+
 // const char* (const char *thisString)
 RuntimeScriptValue Sc_String_UpperCase(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
@@ -517,6 +544,7 @@ void RegisterStringAPI()
         { "String::StartsWith^2",     API_FN_PAIR(String_StartsWith) },
         { "String::Substring^2",      API_FN_PAIR(String_Substring) },
         { "String::Truncate^1",       API_FN_PAIR(String_Truncate) },
+        { "String::Trim^0",           API_FN_PAIR(String_Trim) },
         { "String::UpperCase^0",      API_FN_PAIR(String_UpperCase) },
         { "String::get_AsFloat",      API_FN_PAIR(StringToFloat) },
         { "String::get_AsInt",        API_FN_PAIR(StringToInt) },
