@@ -55,7 +55,55 @@ set(COMPILER_SOURCES
         script/cs_parser.h
         script/cs_parser_common.cpp
         script/cs_parser_common.h
-        ${PREPROCESSOR_SOURCES}
+        ${PREPROCESSOR_SOURCES})
+
+set(LEGACY_COMPILER_TEST_SOURCES
+        test/cc_internallist_test.cpp
+        test/cc_symboltable_test.cpp
+        test/cc_treemap_test.cpp
+        test/cs_parser_test.cpp
+        test/preprocessor_test.cpp
+        test/cc_test_helper.cpp
+        test/cc_test_helper.h)
+
+set(NEW_COMPILER_SOURCES
+        script2/cc_compiledscript.cpp
+        script2/cc_compiledscript.h
+        script2/cc_internallist.cpp
+        script2/cc_internallist.h
+        script2/cc_symboltable.cpp
+        script2/cc_symboltable.h
+        script2/cs_compile_time.cpp
+        script2/cs_compile_time.h
+        script2/cs_compiler.cpp
+        script2/cs_compiler.h
+        script2/cs_message_handler.cpp
+        script2/cs_message_handler.h
+        script2/cs_parser.cpp
+        script2/cs_parser.h
+        script2/cs_parser_common.h
+        script2/cs_scanner.cpp
+        script2/cs_scanner.h
+        ${PREPROCESSOR_SOURCES})
+
+set(NEW_COMPILER_TEST_SOURCES
+        test2/cc_bytecode_test_0.cpp
+        test2/cc_bytecode_test_1.cpp
+        test2/cc_bytecode_test_lib.cpp
+        test2/cc_bytecode_test_lib.h
+        test2/cc_internallist_test.cpp
+        test2/cc_parser_test_0.cpp
+        test2/cc_parser_test_1.cpp
+        test2/cc_parser_test_lib.cpp
+        test2/cc_parser_test_lib.h
+        test2/cc_scanner_test.cpp
+        test2/cc_symboltable_test.cpp)
+
+set(COMPILER_SOURCES ${NEW_COMPILER_SOURCES})
+set(COMPILER_TEST_SOURCES ${NEW_COMPILER_TEST_SOURCES})
+
+target_compile_definitions(compiler PRIVATE
+    LEGACY_COMPILER=1
 )
 
 target_sources(compiler PRIVATE
@@ -87,13 +135,7 @@ endif ()
 if(AGS_TESTS)
     add_executable(
             compiler_test
-            test/cc_internallist_test.cpp
-            test/cc_symboltable_test.cpp
-            test/cc_treemap_test.cpp
-            test/cs_parser_test.cpp
-            test/preprocessor_test.cpp
-            test/cc_test_helper.cpp
-            test/cc_test_helper.h
+            ${COMPILER_TEST_SOURCES}
     )
     set_target_properties(compiler_test PROPERTIES
             CXX_STANDARD 11
