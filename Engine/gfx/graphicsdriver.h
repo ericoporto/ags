@@ -70,7 +70,7 @@ struct SpriteTransform
     SpriteColorTransform Color;
 
     SpriteTransform() = default;
-    SpriteTransform(int x, int y, float scalex = 1.0f, float scaley = 1.0f,
+    SpriteTransform(float x, float y, float scalex = 1.0f, float scaley = 1.0f,
         float rotate = 0.0f, Point pivot = Point(),
         SpriteColorTransform color = SpriteColorTransform())
         : X(x), Y(y), ScaleX(scalex), ScaleY(scaley),

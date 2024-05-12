@@ -175,7 +175,7 @@ void GamePlayState::UpdateRoomCameras()
 void GamePlayState::UpdateRoomCamera(int index)
 {
     auto cam = _roomCameras[index];
-    const Rect &rc = cam->GetRect();
+    const Rectf &rc = cam->GetRect();
     const Size real_room_sz = Size(thisroom.Width, thisroom.Height);
     if ((real_room_sz.Width > rc.GetWidth()) || (real_room_sz.Height > rc.GetHeight()))
     {

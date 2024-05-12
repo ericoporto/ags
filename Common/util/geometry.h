@@ -252,10 +252,10 @@ struct Size
 // to comply with many other libraries (i.e. Right - Left == Width)
 struct Rect
 {
-	int Left;
+    int Left;
 	int Top;
-	int Right;
-	int Bottom;
+    int Right;
+    int Bottom;
 
 	Rect()
 	{
@@ -350,6 +350,115 @@ struct Rect
     {
         return Left == r.Left && Top == r.Top &&
             Right == r.Right && Bottom == r.Bottom;
+    }
+};
+
+
+struct Rectf
+{
+    float Left;
+    float Top;
+    float Right;
+    float Bottom;
+
+    Rectf()
+    {
+        Left	= 0;
+        Top		= 0;
+        Right	= -1;
+        Bottom	= -1;
+    }
+
+    Rectf(int l, int t, int r, int b)
+    {
+        Left	= l;
+        Top		= t;
+        Right	= r;
+        Bottom	= b;
+    }
+
+    inline Rect ToRect() const
+    {
+        return Rect((int)Left, (int)Top, (int)Right, (int)Bottom);
+    }
+
+    inline Pointf GetLT() const
+    {
+        return Pointf(Left, Top);
+    }
+
+    inline Pointf GetCenter() const
+    {
+        return Pointf(Left + GetWidth() / 2.0f, Top + GetHeight() / 2.0f);
+    }
+
+    inline float GetWidth() const
+    {
+        return Right - Left + 1;
+    }
+
+    inline float GetHeight() const
+    {
+        return Bottom - Top + 1;
+    }
+
+    inline Size GetSize() const
+    {
+        return Size(GetWidth(), GetHeight());
+    }
+
+    inline bool IsEmpty() const
+    {
+        return Right < Left || Bottom < Top;
+    }
+
+    inline bool IsInside(float x, float y) const
+    {
+        return x >= Left && y >= Top && (x <= Right) && (y <= Bottom);
+    }
+
+    inline bool IsInside(const Pointf &pt) const
+    {
+        return IsInside(pt.X, pt.Y);
+    }
+
+    inline void MoveToX(float x)
+    {
+        Right += x - Left;
+        Left = x;
+    }
+
+    inline void MoveToY(float y)
+    {
+        Bottom += y - Top;
+        Top = y;
+    }
+
+    inline void MoveTo(const Pointf &pt)
+    {
+        MoveToX(pt.X);
+        MoveToY(pt.Y);
+    }
+
+    inline void SetWidth(int width)
+    {
+        Right = Left + width - 1;
+    }
+
+    inline void SetHeight(int height)
+    {
+        Bottom = Top + height - 1;
+    }
+
+    inline static Rectf MoveBy(const Rectf &r, float x, float y)
+    {
+        return Rectf(r.Left + x, r.Top + y, r.Right + x, r.Bottom + y);
+    }
+
+    inline bool operator ==(const Rectf &r) const
+    {
+        return Left == r.Left && Top == r.Top &&
+               Right == r.Right && Bottom == r.Bottom;
     }
 };
 

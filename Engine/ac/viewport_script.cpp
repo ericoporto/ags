@@ -46,26 +46,26 @@ void Camera_Delete(ScriptCamera *scam)
     play.DeleteRoomCamera(scam->GetID());
 }
 
-int Camera_GetX(ScriptCamera *scam)
+float Camera_GetX(ScriptCamera *scam)
 {
     if (scam->GetID() < 0) { debug_script_warn("Camera.X: trying to use deleted camera"); return 0; }
     return play.GetRoomCamera(scam->GetID())->GetRect().Left;
 }
 
-void Camera_SetX(ScriptCamera *scam, int x)
+void Camera_SetX(ScriptCamera *scam, float x)
 {
     if (scam->GetID() < 0) { debug_script_warn("Camera.X: trying to use deleted camera"); return; }
     auto cam = play.GetRoomCamera(scam->GetID());
     cam->LockAt(x, cam->GetRect().Top);
 }
 
-int Camera_GetY(ScriptCamera *scam)
+float Camera_GetY(ScriptCamera *scam)
 {
     if (scam->GetID() < 0) { debug_script_warn("Camera.Y: trying to use deleted camera"); return 0; }
     return play.GetRoomCamera(scam->GetID())->GetRect().Top;
 }
 
-void Camera_SetY(ScriptCamera *scam, int y)
+void Camera_SetY(ScriptCamera *scam, float y)
 {
     if (scam->GetID() < 0) { debug_script_warn("Camera.Y: trying to use deleted camera"); return; }
     auto cam = play.GetRoomCamera(scam->GetID());
@@ -151,22 +151,22 @@ RuntimeScriptValue Sc_Camera_Delete(void *self, const RuntimeScriptValue *params
 
 RuntimeScriptValue Sc_Camera_GetX(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
-    API_OBJCALL_INT(ScriptCamera, Camera_GetX);
+    API_OBJCALL_FLOAT(ScriptCamera, Camera_GetX);
 }
 
 RuntimeScriptValue Sc_Camera_SetX(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
-    API_OBJCALL_VOID_PINT(ScriptCamera, Camera_SetX);
+    API_OBJCALL_VOID_PFLOAT(ScriptCamera, Camera_SetX);
 }
 
 RuntimeScriptValue Sc_Camera_GetY(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
-    API_OBJCALL_INT(ScriptCamera, Camera_GetY);
+    API_OBJCALL_FLOAT(ScriptCamera, Camera_GetY);
 }
 
 RuntimeScriptValue Sc_Camera_SetY(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
-    API_OBJCALL_VOID_PINT(ScriptCamera, Camera_SetY);
+    API_OBJCALL_VOID_PFLOAT(ScriptCamera, Camera_SetY);
 }
 
 RuntimeScriptValue Sc_Camera_GetWidth(void *self, const RuntimeScriptValue *params, int32_t param_count)

@@ -3060,7 +3060,7 @@ PViewport FindNearestViewport(int charid)
         auto cam = view->GetCamera();
         if (!cam)
             continue;
-        Rect camr = cam->GetRect();
+        Rect camr = cam->GetRect().ToRect();
         float dist = DistanceBetween(bbox, camr);
         if (dist == 0.f)
             return view;

@@ -2594,9 +2594,9 @@ builtin struct Speech {
 #ifdef SCRIPT_API_v3507
 builtin managed struct Camera {
   /// Gets/sets the X position of this camera in the room.
-  import attribute int X;
+  import attribute float X;
   /// Gets/sets the Y position of this camera in the room.
-  import attribute int Y;
+  import attribute float Y;
   /// Gets/sets the camera's capture width in room coordinates.
   import attribute int Width;
   /// Gets/sets the camera's capture height in room coordinates.

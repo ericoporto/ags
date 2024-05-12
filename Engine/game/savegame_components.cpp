@@ -185,11 +185,11 @@ void WriteCameraState(const Camera &cam, Stream *out)
     int flags = 0;
     if (cam.IsLocked()) flags |= kSvgCamPosLocked;
     out->WriteInt32(flags);
-    const Rect &rc = cam.GetRect();
-    out->WriteInt32(rc.Left);
-    out->WriteInt32(rc.Top);
-    out->WriteInt32(rc.GetWidth());
-    out->WriteInt32(rc.GetHeight());
+    const Rectf &rc = cam.GetRect();
+    out->WriteFloat32(rc.Left);
+    out->WriteFloat32(rc.Top);
+    out->WriteFloat32(rc.GetWidth());
+    out->WriteFloat32(rc.GetHeight());
 }
 
 void WriteViewportState(const Viewport &view, Stream *out)
@@ -250,10 +250,10 @@ void ReadCameraState(RestoredData &r_data, Stream *in)
     RestoredData::CameraData cam;
     cam.ID = r_data.Cameras.size();
     cam.Flags = in->ReadInt32();
-    cam.Left = in->ReadInt32();
-    cam.Top = in->ReadInt32();
-    cam.Width = in->ReadInt32();
-    cam.Height = in->ReadInt32();
+    cam.Left = in->ReadFloat32();
+    cam.Top = in->ReadFloat32();
+    cam.Width = in->ReadFloat32();
+    cam.Height = in->ReadFloat32();
     r_data.Cameras.push_back(cam);
 }
 

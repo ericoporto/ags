@@ -380,7 +380,7 @@ static void update_all_viewcams_with_newroom()
     for (int i = 0; i < play.GetRoomCameraCount(); ++i)
     {
         auto cam = play.GetRoomCamera(i);
-        const Rect old_pos = cam->GetRect();
+        const Rectf old_pos = cam->GetRect();
         cam->SetSize(old_pos.GetSize());
         cam->SetAt(old_pos.Left, old_pos.Top);
     }

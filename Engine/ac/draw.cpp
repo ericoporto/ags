@@ -2711,7 +2711,7 @@ static void construct_room_view()
             continue;
 
         const Rect &view_rc = viewport->GetRect();
-        const Rect &cam_rc = camera->GetRect();
+        const Rectf &cam_rc = camera->GetRect();
         const float view_sx = (float)view_rc.GetWidth() / (float)cam_rc.GetWidth();
         const float view_sy = (float)view_rc.GetHeight() / (float)cam_rc.GetHeight();
         const SpriteTransform view_trans(view_rc.Left, view_rc.Top, view_sx, view_sy);

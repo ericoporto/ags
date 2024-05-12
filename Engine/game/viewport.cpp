@@ -27,7 +27,7 @@ void Camera::SetID(int id)
 }
 
 // Returns Room camera position and size inside the room (in room coordinates)
-const Rect &Camera::GetRect() const
+const Rectf &Camera::GetRect() const
 {
     return _position;
 }
@@ -45,11 +45,11 @@ void Camera::SetSize(const Size cam_size)
     _position.SetWidth(real_size.Width);
     _position.SetHeight(real_size.Height);
     // readjust in case went off-room after size changed
-    int x = Math::Clamp(_position.Left, 0, thisroom.Width - _position.GetWidth());
-    int y = Math::Clamp(_position.Top, 0, thisroom.Height - _position.GetHeight());
+    float x = Math::Clamp(_position.Left, 0.f, thisroom.Width - _position.GetWidth());
+    float y = Math::Clamp(_position.Top, 0.f, thisroom.Height - _position.GetHeight());
     if (_position.Left != x || _position.Top != y)
     {
-        _position.MoveTo(Point(x, y));
+        _position.MoveTo(Pointf(x, y));
         _hasChangedPosition = true;
     }
     AdjustTransformations();
@@ -57,14 +57,14 @@ void Camera::SetSize(const Size cam_size)
 }
 
 // Puts room camera to the new location in the room
-void Camera::SetAt(int x, int y)
+void Camera::SetAt(float x, float y)
 {
-    x = Math::Clamp(x, 0, thisroom.Width - _position.GetWidth());
-    y = Math::Clamp(y, 0, thisroom.Height - _position.GetHeight());
+    x = Math::Clamp(x, 0.f, thisroom.Width - _position.GetWidth());
+    y = Math::Clamp(y, 0.f, thisroom.Height - _position.GetHeight());
     if (_position.Left == x && _position.Top == y)
         return;
 
-    _position.MoveTo(Point(x, y));
+    _position.MoveTo(Pointf(x, y));
     AdjustTransformations();
     _hasChangedPosition = true;
 }
@@ -105,9 +105,9 @@ void Camera::Lock()
 }
 
 // Similar to SetAt, but also locks camera preventing it from following player character
-void Camera::LockAt(int x, int y)
+void Camera::LockAt(float x, float y)
 {
-    debug_script_log("Room camera locked to %d,%d", x, y);
+    debug_script_log("Room camera locked to %f,%f", x, y);
     SetAt(x, y);
     _locked = true;
 }

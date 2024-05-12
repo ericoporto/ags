@@ -56,11 +56,11 @@ public:
     // Sets new camera ID
     void SetID(int id);
     // Returns Room camera position and size inside the room (in room coordinates)
-    const Rect &GetRect() const;
+    const Rectf &GetRect() const;
     // Sets explicit room camera's orthographic size
     void SetSize(const Size sz);
     // Puts room camera to the new location in the room
-    void SetAt(int x, int y);
+    void SetAt(float x, float y);
     // Returns camera's rotation, in degrees
     float GetRotation() const;
     // Sets camera's rotation, in degrees
@@ -70,7 +70,7 @@ public:
     // Locks room camera at its current position
     void Lock();
     // Similar to SetAt, but also locks camera preventing it from following player character
-    void LockAt(int x, int y);
+    void LockAt(float x, float y);
     // Releases camera lock, letting it follow player character
     void Release();
 
@@ -96,7 +96,7 @@ private:
 
     int _id = -1;
     // Actual position and orthographic size
-    Rect _position;
+    Rectf _position;
     // Rotation in degrees
     float _rotation = 0.0;
     // Locked or following player automatically
