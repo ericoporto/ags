@@ -545,7 +545,11 @@
     <ClCompile Include="..\..\Engine\ac\object.cpp" />
     <ClCompile Include="..\..\Engine\ac\overlay.cpp" />
     <ClCompile Include="..\..\Engine\ac\parser.cpp" />
+<<<<<<< HEAD
     <ClCompile Include="..\..\Engine\ac\pointer.cpp" />
+=======
+    <ClCompile Include="..\..\Engine\ac\touch.cpp" />
+>>>>>>> ce5e51336eeeb32fa713aa21c7697f190f2b44ea
     <ClCompile Include="..\..\Engine\ac\properties.cpp" />
     <ClCompile Include="..\..\Engine\ac\route_finder_impl.cpp" />
     <ClCompile Include="..\..\Engine\ac\scriptcontainers.cpp" />
@@ -793,7 +797,11 @@
     <ClInclude Include="..\..\Engine\ac\overlay.h" />
     <ClInclude Include="..\..\Engine\ac\parser.h" />
     <ClInclude Include="..\..\Engine\ac\path_helper.h" />
+<<<<<<< HEAD
     <ClInclude Include="..\..\Engine\ac\pointer.h" />
+=======
+    <ClInclude Include="..\..\Engine\ac\touch.h" />
+>>>>>>> ce5e51336eeeb32fa713aa21c7697f190f2b44ea
     <ClInclude Include="..\..\Engine\ac\properties.h" />
     <ClInclude Include="..\..\Engine\ac\route_finder_impl.h" />
     <ClInclude Include="..\..\Engine\ac\sys_events.h" />

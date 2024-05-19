@@ -19,11 +19,13 @@
 #include "core/platform.h"
 #include "ac/common.h"
 #include "ac/gamesetup.h"
+#include "ac/gamestate.h"
 #include "ac/joystick.h"
 #include "ac/gamesetupstruct.h"
 #include "ac/keycode.h"
 #include "ac/mouse.h"
 #include "ac/timer.h"
+#include "ac/touch.h"
 #include "device/mousew32.h"
 #include "gfx/graphicsdriver.h"
 #include "platform/base/agsplatformdriver.h"
@@ -796,12 +798,26 @@ static Point get_touch_to_pointer_pos(float x, float y) {
     const float h = static_cast<float>(ih);
     // Save real touch pos
 
+<<<<<<< HEAD
     int x_real = AGSMath::Clamp<int>(static_cast<int>(std::roundf(x * w)), 0, iw-1);
     int y_real = AGSMath::Clamp<int>(static_cast<int>(std::roundf(y * h)),0, ih-1);
 
     // duplicating code from Mouse::WindowToGame
     int p_x = GameScaling.X.UnScalePt(x_real) - play.GetMainViewport().Left;
     int p_y = GameScaling.Y.UnScalePt(y_real) - play.GetMainViewport().Top;
+=======
+    const int x_real = AGSMath::Clamp<int>(static_cast<int>(std::roundf(x * w)), 0, iw-1);
+    const int y_real = AGSMath::Clamp<int>(static_cast<int>(std::roundf(y * h)),0, ih-1);
+
+    const Rect bounds = GameScaling.ScaleRange(play.GetMainViewport());
+
+    const int x_real_bounded = Math::Clamp(x_real, bounds.Left, bounds.Right);
+    const int y_real_bounded = Math::Clamp(y_real, bounds.Top, bounds.Bottom);
+
+    // duplicating code from Mouse::WindowToGame
+    const int p_x = GameScaling.X.UnScalePt(x_real_bounded) - play.GetMainViewport().Left;
+    const int p_y = GameScaling.Y.UnScalePt(y_real_bounded) - play.GetMainViewport().Top;
+>>>>>>> ce5e51336eeeb32fa713aa21c7697f190f2b44ea
 
     return Point(p_x, p_y);
 }

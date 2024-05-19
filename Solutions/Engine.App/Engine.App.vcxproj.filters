@@ -324,7 +324,11 @@
     <ClCompile Include="..\..\Engine\ac\parser.cpp">
       <Filter>Source Files\ac</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="..\..\Engine\ac\pointer.cpp">
+=======
+    <ClCompile Include="..\..\Engine\ac\touch.cpp">
+>>>>>>> ce5e51336eeeb32fa713aa21c7697f190f2b44ea
       <Filter>Source Files\ac</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Engine\ac\properties.cpp">
@@ -953,7 +957,11 @@
     <ClInclude Include="..\..\Engine\ac\path_helper.h">
       <Filter>Header Files\ac</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="..\..\Engine\ac\pointer.h">
+=======
+    <ClInclude Include="..\..\Engine\ac\touch.h">
+>>>>>>> ce5e51336eeeb32fa713aa21c7697f190f2b44ea
       <Filter>Header Files\ac</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Engine\ac\properties.h">
