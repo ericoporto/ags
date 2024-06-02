@@ -69,6 +69,7 @@ inline const char *GetArgPtr(const RuntimeScriptValue *sc_args, va_list *varg_pt
 const char *ScriptSprintf(char *buffer, size_t buf_length, const char *format,
                           const RuntimeScriptValue *sc_args, int32_t sc_argc, va_list *varg_ptr)
 {
+    // Fix-me: Not sure what to do here yet, perhaps moving the internals to an impl and leaving this on outside?
     if (!buffer || buf_length == 0)
     {
         cc_error("Internal error in ScriptSprintf: buffer is null");
@@ -101,9 +102,12 @@ const char *ScriptSprintf(char *buffer, size_t buf_length, const char *format,
     char       *fmt_bufptr;
     char       *fmt_bufendptr = &fmtbuf[fmtbuf_size - 1];
 
-    char       *out_ptr    = buffer;
+    size_t total_length = 0;
+    bool calculate_length_only = (buffer == nullptr);
+    char dummy_buffer[1] = {0};
+    char       *out_ptr    = calculate_length_only ? dummy_buffer : buffer;
     // save 1 character for null terminator
-    const char *out_endptr = buffer + buf_length - 1;
+    const char *out_endptr = calculate_length_only ? dummy_buffer : (buffer + buf_length - 1);
     const char *fmt_ptr    = format;
     int32_t    arg_idx     = 0;
 
@@ -112,7 +116,7 @@ const char *ScriptSprintf(char *buffer, size_t buf_length, const char *format,
     FormatParseResult fmt_done;
 
     // Parse the format string, looking for argument placeholders
-    while (*fmt_ptr && out_ptr != out_endptr)
+    while (*fmt_ptr && (calculate_length_only || out_ptr != out_endptr))
     {
         // Try to put argument into placeholder
         if (*fmt_ptr == '%')
@@ -177,7 +181,14 @@ const char *ScriptSprintf(char *buffer, size_t buf_length, const char *format,
             if (fmt_done == kFormatParseLiteralPercent)
             {
                 // literal percent sign
-                *(out_ptr++) = '%';
+                if (!calculate_length_only)
+                {
+                    *(out_ptr++) = '%';
+                }
+                else
+                {
+                    total_length++;
+                }
                 continue;
             }
             else if (fmt_done >= kFormatParseArgFirst && fmt_done <= kFormatParseArgLast &&
@@ -190,15 +201,15 @@ const char *ScriptSprintf(char *buffer, size_t buf_length, const char *format,
                 switch (fmt_done)
                 {
                 case kFormatParseArgInteger:
-                    snprintf_res = snprintf(out_ptr, avail_outbuf + 1, fmtbuf, GetArgInt(sc_args, varg_ptr, arg_idx)); break;
+                    snprintf_res = snprintf(calculate_length_only ? nullptr : out_ptr, calculate_length_only ? 0 : (avail_outbuf + 1), fmtbuf, GetArgInt(sc_args, varg_ptr, arg_idx)); break;
                 case kFormatParseArgFloat:
-                    snprintf_res = snprintf(out_ptr, avail_outbuf + 1, fmtbuf, GetArgFloat(sc_args, varg_ptr, arg_idx)); break;
+                    snprintf_res = snprintf(calculate_length_only ? nullptr : out_ptr, calculate_length_only ? 0 : (avail_outbuf + 1), fmtbuf, GetArgFloat(sc_args, varg_ptr, arg_idx)); break;
                 case kFormatParseArgCharacter:
                 {
                     int chr = GetArgInt(sc_args, varg_ptr, arg_idx);
                     char cbuf[5]{};
                     usetc(cbuf, chr);
-                    snprintf_res = snprintf(out_ptr, avail_outbuf + 1, "%s", cbuf);
+                    snprintf_res = snprintf(calculate_length_only ? nullptr : out_ptr, calculate_length_only ? 0 : (avail_outbuf + 1), "%s", cbuf);
                     break;
                 }
                 case kFormatParseArgString:
@@ -223,12 +234,12 @@ const char *ScriptSprintf(char *buffer, size_t buf_length, const char *format,
                         cc_error("!ScriptSprintf: formatting argument %d is a pointer to output buffer", arg_idx + 1);
                         return "";
                     }
-                    snprintf_res = snprintf(out_ptr, avail_outbuf + 1, fmtbuf, p);
+                    snprintf_res = snprintf(calculate_length_only ? nullptr : out_ptr, calculate_length_only ? 0 : (avail_outbuf + 1), fmtbuf, p);
                     break;
                 }
                 case kFormatParseArgPointer:
-                    snprintf_res = snprintf(out_ptr, avail_outbuf + 1, fmtbuf, GetArgPtr(sc_args, varg_ptr, arg_idx)); break;
-                default: /* should not happen */ break;
+                    snprintf_res = snprintf(calculate_length_only ? nullptr : out_ptr, calculate_length_only ? 0 : (avail_outbuf + 1), fmtbuf, GetArgPtr(sc_args, varg_ptr, arg_idx)); break;
+                    default: /* should not happen */ break;
                 }
 
                 arg_idx++;
@@ -244,17 +255,37 @@ const char *ScriptSprintf(char *buffer, size_t buf_length, const char *format,
             // If format was not valid, or there are no available
             // parameters, just copy stored format buffer as it is
             size_t copy_len = std::min(std::min<ptrdiff_t>(fmt_bufptr - fmtbuf, fmtbuf_size - 1), avail_outbuf);
-            memcpy(out_ptr, fmtbuf, copy_len);
-            out_ptr += copy_len;
+            if (!calculate_length_only)
+            {
+                memcpy(out_ptr, fmtbuf, copy_len);
+                out_ptr += copy_len;
+            }
+            total_length += copy_len;
         }
         // If there's no placeholder, simply copy the character to output buffer
         else
         {
-            *(out_ptr++) = *(fmt_ptr++);
+            if (!calculate_length_only)
+            {
+                *(out_ptr++) = *(fmt_ptr++);
+            }
+            else
+            {
+                fmt_ptr++;
+                total_length++;
+            }
         }
     }
 
     // Terminate the string
-    *out_ptr = 0;
-    return buffer;
+    if (!calculate_length_only) {
+        *out_ptr = 0;
+        return buffer;
+    }
+    else
+    {
+        char *final_buffer = new char[total_length + 1];
+        ScriptSprintf(final_buffer, total_length + 1, format, sc_args, sc_argc, varg_ptr);
+        return final_buffer;
+    }
 }
