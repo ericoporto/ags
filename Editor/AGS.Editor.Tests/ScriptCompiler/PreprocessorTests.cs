@@ -359,6 +359,39 @@ Display(""FOO and BAR are defined"");
         }
 
         [Test]
+        public void IfDefElseNestedIfDefElse()
+        {
+            IPreprocessor preprocessor = CompilerFactory.CreatePreprocessor(AGS.Types.Version.AGS_EDITOR_VERSION);
+            string script = $@"
+#ifdef FOO
+Display(""FOO is defined"");
+#else
+#ifdef BAR
+Display(""BAR is defined, but not FOO"");
+#else
+Display(""Neither FOO or BAR is defined"");
+#endif
+#endif
+";
+            string res = preprocessor.Preprocess(script, "IfDefElseNestedIfDefElse");
+            Assert.That(preprocessor.Results.Count == 0);
+            string script_res = $@"""__NEWSCRIPTSTART_IfDefElseNestedIfDefElse""
+
+
+
+
+
+
+
+Display(""Neither FOO or BAR is defined"");
+
+
+";
+
+            AssertStringEqual(res, script_res);
+        }
+
+        [Test]
         public void EscapeCharacters()
         {
             IPreprocessor preprocessor = CompilerFactory.CreatePreprocessor(AGS.Types.Version.AGS_EDITOR_VERSION);
