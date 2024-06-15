@@ -403,7 +403,7 @@ function room_AfterFadeIn()
             Assert.That(scriptFunction.ParamList, Is.EqualTo("String stringToCheck"));
             Assert.That(scriptFunction.Type, Is.EqualTo("bool"));
             Assert.That(scriptFunction.Description, Is.EqualTo("Checks whether the supplied string is null or empty."));
-            
+
             scriptFunction = scriptStruct.FindMemberFunction("Append");
             Assert.That(scriptFunction, Is.Not.Null);
             Assert.That(scriptFunction.IsStatic, Is.False);
@@ -412,6 +412,27 @@ function room_AfterFadeIn()
             Assert.That(scriptFunction.ParamList, Is.EqualTo("const string appendText"));
             Assert.That(scriptFunction.Type, Is.EqualTo("String"));
             Assert.That(scriptFunction.Description, Is.EqualTo("Returns a new string with the specified string appended to this string."));
+        }
+
+
+        [Test]
+        public void CheckAutoCompletePreprocessorElse()
+        {
+            string scriptCode = $@"
+#ifdef FOO
+int i_food_defined;
+#else
+#ifdef BAR
+int i_bar_defined_not_foo;
+#else
+int i_not_bar_not_foo;
+#endif
+#endif
+";
+
+
+            Script scriptToTest = CachedAutoCompletedScriptFromCode(scriptCode);
+            Assert.That(scriptToTest.AutoCompleteData.Variables.Count, Is.EqualTo(1));
         }
     }
 }
