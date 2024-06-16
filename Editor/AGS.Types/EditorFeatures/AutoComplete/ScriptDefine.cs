@@ -6,11 +6,9 @@ namespace AGS.Types.AutoComplete
 {
     public class ScriptDefine : ScriptToken
     {
-        public ScriptDefine(string name, string ifDefOnly, string ifNDefOnly, int scriptCharacterIndex)
+        public ScriptDefine(string name, int scriptCharacterIndex)
         {
             Name = name;
-            IfDefOnly = ifDefOnly;
-            IfNDefOnly = ifNDefOnly;
             StartsAtCharacterIndex = scriptCharacterIndex;
         }
 

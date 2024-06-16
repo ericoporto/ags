@@ -6,13 +6,11 @@ namespace AGS.Types.AutoComplete
 {
     public class ScriptFunction : ScriptToken, IComparable<ScriptFunction>
     {
-        public ScriptFunction(string functionName, string type, string paramList, string ifDefOnly, string ifNDefOnly, bool returnsPointer, bool isStatic, bool isStaticOnly, bool noInherit, bool isProtected, bool isExtender, int scriptCharacterIndex)
+        public ScriptFunction(string functionName, string type, string paramList, bool returnsPointer, bool isStatic, bool isStaticOnly, bool noInherit, bool isProtected, bool isExtender, int scriptCharacterIndex)
         {
             FunctionName = functionName;
             ParamList = paramList;
             Type = type;
-            IfDefOnly = ifDefOnly;
-            IfNDefOnly = ifNDefOnly;
             ReturnsPointer = returnsPointer;
             IsStatic = isStatic;
             IsStaticOnly = isStaticOnly;

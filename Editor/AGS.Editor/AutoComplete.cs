@@ -146,6 +146,11 @@ namespace AGS.Editor
 
         public static void ConstructCache(Script scriptToCache, IEnumerable<Script> importScripts)
         {
+            IPreprocessor preprocessor = CompilerFactory.CreatePreprocessor(AGS.Types.Version.AGS_EDITOR_VERSION);
+            Factory.AGSEditor.DefineMacrosAccordingToGameSettings(preprocessor);
+
+            
+
             string originalText = scriptToCache.Text;
             ScriptAutoCompleteData newCache = new ScriptAutoCompleteData();
             List<ScriptVariable> variables = newCache.Variables;
@@ -158,7 +163,6 @@ namespace AGS.Editor
             defines.Clear();
             enums.Clear();
             structs.Clear();
-            FastString script = originalText;
             AutoCompleteParserState state = new AutoCompleteParserState();
             ScriptFunction lastFunction = null;
             // Struct lookup will have both local and imported types
@@ -166,8 +170,16 @@ namespace AGS.Editor
             if (importScripts != null)
             {
                 foreach (var import in importScripts)
+                {
                     structsLookup.AddRange(import.AutoCompleteData.Structs);
+                    foreach (var sdefines in import.AutoCompleteData.Defines)
+                    {
+                        
+                    }
+                }
             }
+
+            FastString script = originalText;
 
             while (script.Length > 0)
             {
@@ -209,7 +221,7 @@ namespace AGS.Editor
                 {
                     if (state.WordBeforeLast == "enum")
                     {
-                        state.InsideEnumDefinition = new ScriptEnum(state.LastWord, state.InsideIfDefBlock, state.InsideIfNDefBlock, state.CurrentScriptCharacterIndex);
+                        state.InsideEnumDefinition = new ScriptEnum(state.LastWord, state.CurrentScriptCharacterIndex);
                     }
                     else if (state.WordBeforeLast == "extends")
                     {
@@ -227,7 +239,7 @@ namespace AGS.Editor
                     }
                     else if (state.WordBeforeLast == "struct")
                     {
-                        state.InsideStructDefinition = new ScriptStruct(state.LastWord, state.InsideIfDefBlock, state.InsideIfNDefBlock, state.CurrentScriptCharacterIndex);
+                        state.InsideStructDefinition = new ScriptStruct(state.LastWord, state.CurrentScriptCharacterIndex);
                         functions = state.InsideStructDefinition.Functions;
                         variables = state.InsideStructDefinition.Variables;
                     }
@@ -384,7 +396,7 @@ namespace AGS.Editor
 
         private static ScriptStruct CreateInheritedStruct(ScriptStruct baseStruct, AutoCompleteParserState state)
         {
-            ScriptStruct newStruct = new ScriptStruct(state.WordBeforeWordBeforeLast, state.InsideIfDefBlock, state.InsideIfNDefBlock, state.CurrentScriptCharacterIndex);
+            ScriptStruct newStruct = new ScriptStruct(state.WordBeforeWordBeforeLast, state.CurrentScriptCharacterIndex);
             foreach (ScriptFunction func in baseStruct.Functions)
             {
                 if (!func.NoInherit)
@@ -412,59 +424,59 @@ namespace AGS.Editor
                 if (!string.IsNullOrEmpty(macroName) && (Char.IsLetter(macroName[0])) &&
                     (!DoesCurrentLineHaveToken(script, AUTO_COMPLETE_IGNORE)))
                 {
-                    defines.Add(new ScriptDefine(macroName, state.InsideIfDefBlock, state.InsideIfNDefBlock, state.CurrentScriptCharacterIndex));
+                    defines.Add(new ScriptDefine(macroName, state.CurrentScriptCharacterIndex));
                 }
             }
-            else if (preProcessorDirective == "undef")
-            {
-                string macroName = GetNextWord(ref script);
-                if (!string.IsNullOrEmpty(macroName) && Char.IsLetter(macroName[0]))
-                {
-                    foreach (ScriptDefine define in defines)
-                    {
-                        if (define.Name == macroName)
-                        {
-                            defines.Remove(define);
-                            break;
-                        }
-                    }
-                }
-            }
-            else if (preProcessorDirective == "ifndef")
-            {
-                string macroName = GetNextWord(ref script);
-                if (!string.IsNullOrEmpty(macroName) && Char.IsLetter(macroName[0]))
-                {
-                    state.InsideIfNDefBlock = macroName;
-                }
-            }
-            else if (preProcessorDirective == "ifdef")
-            {
-                string macroName = GetNextWord(ref script);
-                if (!string.IsNullOrEmpty(macroName) && Char.IsLetter(macroName[0]))
-                {
-                    state.InsideIfDefBlock = macroName;
-                }
-            }
-            else if (preProcessorDirective == "else")
-            {
-                // Negate previous condition
-                if (state.InsideIfDefBlock != null)
-                {
-                    state.InsideIfNDefBlock = state.InsideIfDefBlock;
-                    state.InsideIfDefBlock = null;
-                }
-                else if (state.InsideIfNDefBlock != null)
-                {
-                    state.InsideIfDefBlock = state.InsideIfNDefBlock;
-                    state.InsideIfNDefBlock = null;
-                }
-            }
-            else if (preProcessorDirective == "endif")
-            {
-                state.InsideIfNDefBlock = null;
-                state.InsideIfDefBlock = null;
-            }
+            //else if (preProcessorDirective == "undef")
+            //{
+            //    string macroName = GetNextWord(ref script);
+            //    if (!string.IsNullOrEmpty(macroName) && Char.IsLetter(macroName[0]))
+            //    {
+            //        foreach (ScriptDefine define in defines)
+            //        {
+            //            if (define.Name == macroName)
+            //            {
+            //                defines.Remove(define);
+            //                break;
+            //            }
+            //        }
+            //    }
+            //}
+            //else if (preProcessorDirective == "ifndef")
+            //{
+            //    string macroName = GetNextWord(ref script);
+            //    if (!string.IsNullOrEmpty(macroName) && Char.IsLetter(macroName[0]))
+            //    {
+            //        state.InsideIfNDefBlock = macroName;
+            //    }
+            //}
+            //else if (preProcessorDirective == "ifdef")
+            //{
+            //    string macroName = GetNextWord(ref script);
+            //    if (!string.IsNullOrEmpty(macroName) && Char.IsLetter(macroName[0]))
+            //    {
+            //        state.InsideIfDefBlock = macroName;
+            //    }
+            //}
+            //else if (preProcessorDirective == "else")
+            //{
+            //    // Negate previous condition
+            //    if (state.InsideIfDefBlock != null)
+            //    {
+            //        state.InsideIfNDefBlock = state.InsideIfDefBlock;
+            //        state.InsideIfDefBlock = null;
+            //    }
+            //    else if (state.InsideIfNDefBlock != null)
+            //    {
+            //        state.InsideIfDefBlock = state.InsideIfNDefBlock;
+            //        state.InsideIfNDefBlock = null;
+            //    }
+            //}
+            //else if (preProcessorDirective == "endif")
+            //{
+            //    state.InsideIfNDefBlock = null;
+            //    state.InsideIfDefBlock = null;
+            //}
             GoToNextLine(ref script);
             state.ClearPreviousWords();
         }
@@ -475,7 +487,7 @@ namespace AGS.Editor
             {
                 if (!DoesCurrentLineHaveToken(script, AUTO_COMPLETE_IGNORE))
                 {
-                    insideEnumDefinition.EnumValues.Add(new ScriptEnumValue(lastWord, insideEnumDefinition.Name, state.InsideIfDefBlock, state.InsideIfNDefBlock, state.CurrentScriptCharacterIndex));
+                    insideEnumDefinition.EnumValues.Add(new ScriptEnumValue(lastWord, insideEnumDefinition.Name, state.CurrentScriptCharacterIndex));
                 }
             }
         }
@@ -542,7 +554,7 @@ namespace AGS.Editor
                     {
                         string parameterList = script.Substring(0, parameterListEndIndex);
                         script = script.Substring(parameterListEndIndex + 1);
-                        ScriptFunction newFunc = new ScriptFunction(functionName, type, parameterList, state.InsideIfDefBlock, state.InsideIfNDefBlock, isPointer, isStatic, isStaticOnly, isNoInherit, isProtected, isExtenderMethod, state.CurrentScriptCharacterIndex - 1);
+                        ScriptFunction newFunc = new ScriptFunction(functionName, type, parameterList, isPointer, isStatic, isStaticOnly, isNoInherit, isProtected, isExtenderMethod, state.CurrentScriptCharacterIndex - 1);
                         if (!string.IsNullOrEmpty(state.PreviousComment))
                         {
                             newFunc.Description = state.PreviousComment;
@@ -612,7 +624,7 @@ namespace AGS.Editor
                     if (type != "struct")
                     {
                         //if (varName == "{") System.Diagnostics.Debugger.Break();
-                        ScriptVariable newVar = new ScriptVariable(varName, type, isArray, isPointer, state.InsideIfDefBlock, state.InsideIfNDefBlock, isStatic, isStaticOnly, isNoInherit, isProtected, state.CurrentScriptCharacterIndex);
+                        ScriptVariable newVar = new ScriptVariable(varName, type, isArray, isPointer, isStatic, isStaticOnly, isNoInherit, isProtected, state.CurrentScriptCharacterIndex);
 
                         if (!string.IsNullOrEmpty(state.PreviousComment))
                         {
@@ -743,7 +755,7 @@ namespace AGS.Editor
                         if (((nextWord == "=") || (nextWord == ";") || (nextWord == ",")) &&
                             (lastWord != "return") && (lastWord != "else"))
                         {
-							variables.Add(new ScriptVariable(variableName, lastWord, isArray, isPointer, null, null, false, false, false, false, (scriptToParse.Length - script.Length) + relativeCharacterIndex));
+							variables.Add(new ScriptVariable(variableName, lastWord, isArray, isPointer, false, false, false, false, (scriptToParse.Length - script.Length) + relativeCharacterIndex));
                         }
                         if (nextWord != ",")
                         {

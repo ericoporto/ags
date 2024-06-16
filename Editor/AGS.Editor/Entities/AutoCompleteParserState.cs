@@ -73,8 +73,8 @@ namespace AGS.Editor
         }
 
         public string[] PreviousWords = new string[MAX_WORDS];
-        public string InsideIfNDefBlock = null;
-        public string InsideIfDefBlock = null;
+        //public string InsideIfNDefBlock = null;
+        //public string InsideIfDefBlock = null;
         public ScriptEnum InsideEnumDefinition = null;
         public ScriptStruct InsideStructDefinition = null;
         public ScriptFunction InsideFunctionBody = null;

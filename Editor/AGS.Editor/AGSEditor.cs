@@ -790,7 +790,7 @@ namespace AGS.Editor
             Factory.Events.OnFileChangedInGameFolder(e.Name);
         }
 
-		private void DefineMacrosAccordingToGameSettings(IPreprocessor preprocessor)
+		public void DefineMacrosAccordingToGameSettings(IPreprocessor preprocessor)
 		{
 			preprocessor.DefineMacro("AGS_NEW_STRINGS", "1");
 			preprocessor.DefineMacro("AGS_SUPPORTS_IFVER", "1");

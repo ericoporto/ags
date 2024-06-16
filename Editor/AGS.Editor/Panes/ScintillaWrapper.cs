@@ -2029,88 +2029,88 @@ namespace AGS.Editor
 
         private bool ShouldShowThis(ScriptToken token, List<ScriptDefine> defines)
         {
-            Settings gameSettings = Factory.AGSEditor.CurrentGame.Settings;
-            if ((token.IfNDefOnly == "STRICT") && (gameSettings.EnforceObjectBasedScript))
-            {
-                return false;
-            }
-            if ((token.IfDefOnly == "STRICT") && (!gameSettings.EnforceObjectBasedScript))
-            {
-                return false;
-            }
-            if ((token.IfNDefOnly == "STRICT_STRINGS") && (gameSettings.EnforceNewStrings))
-            {
-                return false;
-            }
-            if ((token.IfDefOnly == "STRICT_STRINGS") && (!gameSettings.EnforceNewStrings))
-            {
-                return false;
-            }
-            if ((token.IfNDefOnly == "STRICT_AUDIO") && (gameSettings.EnforceNewAudio))
-            {
-                return false;
-            }
-            if ((token.IfDefOnly == "STRICT_AUDIO") && (!gameSettings.EnforceNewAudio))
-            {
-                return false;
-            }
-            if ((token.IfNDefOnly == "NEW_DIALOGOPTS_API") && (!gameSettings.UseOldCustomDialogOptionsAPI))
-            {
-                return false;
-            }
-            if ((token.IfDefOnly == "NEW_DIALOGOPTS_API") && (gameSettings.UseOldCustomDialogOptionsAPI))
-            {
-                return false;
-            }
-            if ((token.IfNDefOnly == "NEW_KEYINPUT_API") && (!gameSettings.UseOldKeyboardHandling))
-            {
-                return false;
-            }
-            if ((token.IfDefOnly == "NEW_KEYINPUT_API") && (gameSettings.UseOldKeyboardHandling))
-            {
-                return false;
-            }
-            if (token.IfNDefOnly != null && token.IfNDefOnly.StartsWith("SCRIPT_API_"))
-            {
-                ScriptAPIVersion? v = GetAPIVersionFromString(token.IfNDefOnly.Substring("SCRIPT_API_".Length));
-                if (v.HasValue && v <= gameSettings.ScriptAPIVersionReal)
-                    return false;
-            }
-            if (token.IfDefOnly != null && token.IfDefOnly.StartsWith("SCRIPT_API_"))
-            {
-                ScriptAPIVersion? v = GetAPIVersionFromString(token.IfDefOnly.Substring("SCRIPT_API_".Length));
-                if (v.HasValue && v > gameSettings.ScriptAPIVersionReal)
-                    return false;
-            }
-            if (token.IfNDefOnly != null && token.IfNDefOnly.StartsWith("SCRIPT_COMPAT_"))
-            {
-                ScriptAPIVersion? v = GetAPIVersionFromString(token.IfNDefOnly.Substring("SCRIPT_COMPAT_".Length));
-                if (v.HasValue && v >= gameSettings.ScriptCompatLevelReal)
-                    return false;
-            }
-            if (token.IfDefOnly != null && token.IfDefOnly.StartsWith("SCRIPT_COMPAT_"))
-            {
-                ScriptAPIVersion? v = GetAPIVersionFromString(token.IfDefOnly.Substring("SCRIPT_COMPAT_".Length));
-                if (v.HasValue && v < gameSettings.ScriptCompatLevelReal)
-                    return false;
-            }
-            // TODO: AutoComplete feature in AGS is implemented in confusing and messy way. Thus, it does not
-            // use same technique for knowing which parts of the script should be disabled (by ifdef/ifndef)
-            // as precompiler. Instead it makes its own parsing, and somewhat limits performance and capabilities.
-            // This is (one) reason why all those checks are made here explicitly, instead of relying on some
-            // prefetched macro list.
-            if (token.IfNDefOnly != null && token.IfNDefOnly.StartsWith("STRICT_IN_"))
-            {
-                ScriptAPIVersion? v = GetAPIVersionFromString(token.IfNDefOnly.Substring("STRICT_IN_".Length));
-                if (v.HasValue && (gameSettings.EnforceObjectBasedScript && v <= gameSettings.ScriptCompatLevelReal))
-                    return false;
-            }
-            if (token.IfDefOnly != null && token.IfDefOnly.StartsWith("STRICT_IN_"))
-            {
-                ScriptAPIVersion? v = GetAPIVersionFromString(token.IfDefOnly.Substring("STRICT_IN_".Length));
-                if (v.HasValue && !(gameSettings.EnforceObjectBasedScript && v <= gameSettings.ScriptCompatLevelReal))
-                    return false;
-            }
+            //Settings gameSettings = Factory.AGSEditor.CurrentGame.Settings;
+            //if ((token.IfNDefOnly == "STRICT") && (gameSettings.EnforceObjectBasedScript))
+            //{
+            //    return false;
+            //}
+            //if ((token.IfDefOnly == "STRICT") && (!gameSettings.EnforceObjectBasedScript))
+            //{
+            //    return false;
+            //}
+            //if ((token.IfNDefOnly == "STRICT_STRINGS") && (gameSettings.EnforceNewStrings))
+            //{
+            //    return false;
+            //}
+            //if ((token.IfDefOnly == "STRICT_STRINGS") && (!gameSettings.EnforceNewStrings))
+            //{
+            //    return false;
+            //}
+            //if ((token.IfNDefOnly == "STRICT_AUDIO") && (gameSettings.EnforceNewAudio))
+            //{
+            //    return false;
+            //}
+            //if ((token.IfDefOnly == "STRICT_AUDIO") && (!gameSettings.EnforceNewAudio))
+            //{
+            //    return false;
+            //}
+            //if ((token.IfNDefOnly == "NEW_DIALOGOPTS_API") && (!gameSettings.UseOldCustomDialogOptionsAPI))
+            //{
+            //    return false;
+            //}
+            //if ((token.IfDefOnly == "NEW_DIALOGOPTS_API") && (gameSettings.UseOldCustomDialogOptionsAPI))
+            //{
+            //    return false;
+            //}
+            //if ((token.IfNDefOnly == "NEW_KEYINPUT_API") && (!gameSettings.UseOldKeyboardHandling))
+            //{
+            //    return false;
+            //}
+            //if ((token.IfDefOnly == "NEW_KEYINPUT_API") && (gameSettings.UseOldKeyboardHandling))
+            //{
+            //    return false;
+            //}
+            //if (token.IfNDefOnly != null && token.IfNDefOnly.StartsWith("SCRIPT_API_"))
+            //{
+            //    ScriptAPIVersion? v = GetAPIVersionFromString(token.IfNDefOnly.Substring("SCRIPT_API_".Length));
+            //    if (v.HasValue && v <= gameSettings.ScriptAPIVersionReal)
+            //        return false;
+            //}
+            //if (token.IfDefOnly != null && token.IfDefOnly.StartsWith("SCRIPT_API_"))
+            //{
+            //    ScriptAPIVersion? v = GetAPIVersionFromString(token.IfDefOnly.Substring("SCRIPT_API_".Length));
+            //    if (v.HasValue && v > gameSettings.ScriptAPIVersionReal)
+            //        return false;
+            //}
+            //if (token.IfNDefOnly != null && token.IfNDefOnly.StartsWith("SCRIPT_COMPAT_"))
+            //{
+            //    ScriptAPIVersion? v = GetAPIVersionFromString(token.IfNDefOnly.Substring("SCRIPT_COMPAT_".Length));
+            //    if (v.HasValue && v >= gameSettings.ScriptCompatLevelReal)
+            //        return false;
+            //}
+            //if (token.IfDefOnly != null && token.IfDefOnly.StartsWith("SCRIPT_COMPAT_"))
+            //{
+            //    ScriptAPIVersion? v = GetAPIVersionFromString(token.IfDefOnly.Substring("SCRIPT_COMPAT_".Length));
+            //    if (v.HasValue && v < gameSettings.ScriptCompatLevelReal)
+            //        return false;
+            //}
+            //// TODO: AutoComplete feature in AGS is implemented in confusing and messy way. Thus, it does not
+            //// use same technique for knowing which parts of the script should be disabled (by ifdef/ifndef)
+            //// as precompiler. Instead it makes its own parsing, and somewhat limits performance and capabilities.
+            //// This is (one) reason why all those checks are made here explicitly, instead of relying on some
+            //// prefetched macro list.
+            //if (token.IfNDefOnly != null && token.IfNDefOnly.StartsWith("STRICT_IN_"))
+            //{
+            //    ScriptAPIVersion? v = GetAPIVersionFromString(token.IfNDefOnly.Substring("STRICT_IN_".Length));
+            //    if (v.HasValue && (gameSettings.EnforceObjectBasedScript && v <= gameSettings.ScriptCompatLevelReal))
+            //        return false;
+            //}
+            //if (token.IfDefOnly != null && token.IfDefOnly.StartsWith("STRICT_IN_"))
+            //{
+            //    ScriptAPIVersion? v = GetAPIVersionFromString(token.IfDefOnly.Substring("STRICT_IN_".Length));
+            //    if (v.HasValue && !(gameSettings.EnforceObjectBasedScript && v <= gameSettings.ScriptCompatLevelReal))
+            //        return false;
+            //}
             return true;
         }
 
@@ -2243,7 +2243,7 @@ namespace AGS.Editor
                 }
                 if ((paramName.Length > 0) && (paramType.Length > 0))
                 {
-                    variables.Add(new ScriptVariable(paramName, paramType, false, isPointer, null, null, false, false, false, false, func.StartsAtCharacterIndex));
+                    variables.Add(new ScriptVariable(paramName, paramType, false, isPointer, false, false, false, false, func.StartsAtCharacterIndex));
                 }
             }
         }
