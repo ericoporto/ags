@@ -38,6 +38,11 @@ namespace AGS.CScript.Compiler
 		/// files and then the main script in multiple calls.
 		/// </summary>
 		public string Preprocess(string script, string scriptName)
+        {
+			return Preprocess(script, scriptName, remove_comments: true);
+		}
+
+		public string Preprocess(string script, string scriptName, bool remove_comments)
 		{
 			StringBuilder output = new StringBuilder(script.Length);
 			output.AppendLine(Constants.NEW_SCRIPT_MARKER + scriptName.Replace(@"\", @"\\") + "\"");
@@ -48,7 +53,10 @@ namespace AGS.CScript.Compiler
 			while ((thisLine = reader.ReadLine()) != null)
 			{
 				_lineNumber++;
-				thisLine = RemoveComments(thisLine);
+				if (remove_comments)
+				{
+					thisLine = RemoveComments(thisLine);
+				}
 				if (thisLine.Length > 0)
 				{
 					if (thisLine[0] != '#')

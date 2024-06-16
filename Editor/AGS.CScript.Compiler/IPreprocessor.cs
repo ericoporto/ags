@@ -18,6 +18,8 @@ namespace AGS.CScript.Compiler
 		/// </summary>
 		string Preprocess(string script, string scriptName);
 
+		string Preprocess(string script, string scriptName, bool remove_comments);
+
 		/// <summary>
 		/// Gets the results of the preprocess operations so far.
 		/// </summary>
