@@ -163,56 +163,54 @@ const char* String_Truncate(const char *thisString, int length) {
     return CreateNewScriptString(std::move(buf));
 }
 
-const char * TrimBack(const char *nonSpaceFront, const char *end) {
+const char * TrimFront(const char *front, const char *back) {
     if (get_uformat() == U_UTF8) {
-        for (int c = ugetc(nonSpaceFront); nonSpaceFront != end && uisspace(c);) {
-            nonSpaceFront += ucwidth(c);
-            c = ugetc(nonSpaceFront);
+        for (int c = ugetc(front); front != back && uisspace(c);) {
+            front += ucwidth(c);
+            c = ugetc(front);
         }
     }
     else {
-        for (; nonSpaceFront != end && std::isspace(*nonSpaceFront); ++nonSpaceFront);
+        for (; front != back && std::isspace(*front); ++front);
     }
-    return nonSpaceFront;
+    return front;
 }
 
-const char * TrimFront(const char *front, const char *nonSpaceBack) {
+const char * TrimBack(const char *front, const char *back) {
     if (get_uformat() == U_UTF8) {
-        const char* prev = Utf8::BackOneChar(nonSpaceBack, front);
+        const char* prev = Utf8::BackOneChar(back, front);
         for (int c = ugetc(prev); prev != front && uisspace(c); ) {
-            nonSpaceBack = prev;
+            back = prev;
             prev = Utf8::BackOneChar(prev, front);
             c = ugetc(prev);
         }
     } else {
-        for (--nonSpaceBack; nonSpaceBack != front && std::isspace(*nonSpaceBack); --nonSpaceBack);
-        ++nonSpaceBack;
+        for (--back; back != front && std::isspace(*back); --back);
+        ++back;
     }
-    return nonSpaceBack;
+    return back;
 }
 
 const char* String_Trim(const char *thisString)
 {
     const auto &this_header = ScriptString::GetHeader(thisString);
     const char* front = thisString;
-    const char* nonSpaceFront = front;
-    const char* end = front + this_header.Length;
-    const char* nonSpaceBack = end;
+    const char* back = front + this_header.Length;
 
-    nonSpaceFront = TrimBack(nonSpaceFront, end);
+    front = TrimFront(front, back);
 
-    if (*nonSpaceFront == '\0')
+    if (*front == '\0')
         return CreateNewScriptString("");
 
-    nonSpaceBack = TrimFront(front, nonSpaceBack);
+    back = TrimBack(front, back);
 
-    size_t copylen = nonSpaceBack - nonSpaceFront;
+    size_t copylen = back - front;
     // if no trim happened, we can return the same string as AGS String is immutable
     if(copylen == this_header.Length)
         return thisString;
 
     auto buf = ScriptString::CreateBuffer(copylen, 0);
-    memcpy(buf.Get(), nonSpaceFront, copylen);
+    memcpy(buf.Get(), front, copylen);
     buf.Get()[copylen] = 0;
     return CreateNewScriptString(std::move(buf));
 }
@@ -339,19 +337,17 @@ void * String_Split(const char *thisString, const char *separator, int splitOpti
     if ((thisString[0] == 0) || (separator == nullptr) || (separator[0] == 0) || strlen(separator) > header.Length) {
         std::vector<DynObjectRef> objs{};
         const char* front = thisString;
-        const char* nonSpaceFront = front;
-        const char* end = thisString + header.Length;
-        const char* nonSpaceBack = end;
+        const char* back = thisString + header.Length;
 
         if(trim) {
-            nonSpaceFront = TrimBack(nonSpaceFront, end);
-            if (nonSpaceFront != end) {
-                nonSpaceBack = TrimFront(front, nonSpaceBack);
+            front = TrimFront(front, back);
+            if (front != back) {
+                back = TrimBack(front, back);
             }
         }
-        size_t len = nonSpaceBack - nonSpaceFront;
+        size_t len = back - front;
         auto buf = ScriptString::CreateBuffer(len, 0);
-        std::copy(nonSpaceFront, nonSpaceBack, buf.Get());
+        std::copy(front, back, buf.Get());
         buf.Get()[len] = 0;
         if(!(removeEmpty && len == 0)) {
             objs.push_back(ScriptString::Create(thisString));
@@ -372,29 +368,25 @@ void * String_Split(const char *thisString, const char *separator, int splitOpti
             found_cstr = end;
         }
 
-        const char* tk_front = ptr;
-        const char* nonSpaceFront = tk_front;
-        const char* tk_end = found_cstr;
-        const char* nonSpaceBack = tk_end;
+        const char* front = ptr;
+        const char* back = found_cstr;
 
         if(trim) {
-            nonSpaceFront = TrimBack(nonSpaceFront, tk_end);
-            if (nonSpaceFront != tk_end) {
-                nonSpaceBack = TrimFront(tk_front, nonSpaceBack);
+            front = TrimFront(front, back);
+            if (front != back) {
+                back = TrimBack(front, back);
             }
         }
 
-        len = nonSpaceBack - nonSpaceFront;
+        len = back - front;
 
         ptr = found_cstr + seplen;
         if(removeEmpty && len == 0) continue;
 
         auto buf = ScriptString::CreateBuffer(len, 0);
-        std::copy(nonSpaceFront, nonSpaceBack, buf.Get());
+        std::copy(front, back, buf.Get());
         buf.Get()[len] = 0;
         items.push_back(std::move(buf));
-
-        ptr = found_cstr + seplen;
     }
 
     DynObjectRef arr = DynamicArrayHelpers::CreateStringArrayFromBuffers(std::move(items));
