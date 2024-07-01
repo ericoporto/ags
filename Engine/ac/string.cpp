@@ -361,7 +361,7 @@ void * String_Split(const char *thisString, const char *separator, int splitOpti
     const char *ptr = thisString;
     const char *end = thisString + header.Length;
     size_t len = 0;
-    while (ptr < end)
+    while (ptr <= end)
     {
         const char *found_cstr = strstr(ptr, separator);
         if (!found_cstr) {
