@@ -327,16 +327,35 @@ const char* String_UpperCase(const char *thisString) {
     return CreateNewScriptString(std::move(buf));
 }
 
-void * String_Split(const char *thisString, const char *separator)
+void * String_Split(const char *thisString, const char *separator, int splitOptions)
 {
     if (thisString == nullptr)
         return nullptr;
 
+    bool removeEmpty = (splitOptions & 0x0001) != 0;
+    bool trim = (splitOptions & 0x0002) != 0;
     auto const &header = ScriptString::GetHeader((void*)thisString);
 
     if ((thisString[0] == 0) || (separator == nullptr) || (separator[0] == 0) || strlen(separator) > header.Length) {
         std::vector<DynObjectRef> objs{};
-        objs.push_back(ScriptString::Create(thisString));
+        const char* front = thisString;
+        const char* nonSpaceFront = front;
+        const char* end = thisString + header.Length;
+        const char* nonSpaceBack = end;
+
+        if(trim) {
+            nonSpaceFront = TrimBack(nonSpaceFront, end);
+            if (nonSpaceFront != end) {
+                nonSpaceBack = TrimFront(front, nonSpaceBack);
+            }
+        }
+        size_t len = nonSpaceBack - nonSpaceFront;
+        auto buf = ScriptString::CreateBuffer(len, 0);
+        std::copy(nonSpaceFront, nonSpaceBack, buf.Get());
+        buf.Get()[len] = 0;
+        if(!(removeEmpty && len == 0)) {
+            objs.push_back(ScriptString::Create(thisString));
+        }
         DynObjectRef arr = DynamicArrayHelpers::CreateScriptArray(std::move(objs));
         return arr.Obj;
     }
@@ -358,16 +377,17 @@ void * String_Split(const char *thisString, const char *separator)
         const char* tk_end = found_cstr;
         const char* nonSpaceBack = tk_end;
 
-        nonSpaceFront = TrimBack(nonSpaceFront, tk_end);
-
-        if (nonSpaceFront != tk_end) {
-            nonSpaceBack = TrimFront(tk_front, nonSpaceBack);
+        if(trim) {
+            nonSpaceFront = TrimBack(nonSpaceFront, tk_end);
+            if (nonSpaceFront != tk_end) {
+                nonSpaceBack = TrimFront(tk_front, nonSpaceBack);
+            }
         }
 
         len = nonSpaceBack - nonSpaceFront;
 
         ptr = found_cstr + seplen;
-        if(len == 0) continue;
+        if(removeEmpty && len == 0) continue;
 
         auto buf = ScriptString::CreateBuffer(len, 0);
         std::copy(nonSpaceFront, nonSpaceBack, buf.Get());
