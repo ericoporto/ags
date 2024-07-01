@@ -163,13 +163,7 @@ const char* String_Truncate(const char *thisString, int length) {
     return CreateNewScriptString(std::move(buf));
 }
 
-const char* String_Trim(const char *thisString)
-{
-    const auto &this_header = ScriptString::GetHeader(thisString);
-    const char* nonSpaceFront = thisString;
-    const char* end = thisString + this_header.Length;
-    const char* nonSpaceBack = end;
-
+const char * TrimBack(const char *nonSpaceFront, const char *end) {
     if (get_uformat() == U_UTF8) {
         for (int c = ugetc(nonSpaceFront); nonSpaceFront != end && uisspace(c);) {
             nonSpaceFront += ucwidth(c);
@@ -179,21 +173,38 @@ const char* String_Trim(const char *thisString)
     else {
         for (; nonSpaceFront != end && std::isspace(*nonSpaceFront); ++nonSpaceFront);
     }
+    return nonSpaceFront;
+}
+
+const char * TrimFront(const char *front, const char *nonSpaceBack) {
+    if (get_uformat() == U_UTF8) {
+        const char* prev = Utf8::BackOneChar(nonSpaceBack, front);
+        for (int c = ugetc(prev); prev != front && uisspace(c); ) {
+            nonSpaceBack = prev;
+            prev = Utf8::BackOneChar(prev, front);
+            c = ugetc(prev);
+        }
+    } else {
+        for (--nonSpaceBack; nonSpaceBack != front && std::isspace(*nonSpaceBack); --nonSpaceBack);
+        ++nonSpaceBack;
+    }
+    return nonSpaceBack;
+}
+
+const char* String_Trim(const char *thisString)
+{
+    const auto &this_header = ScriptString::GetHeader(thisString);
+    const char* front = thisString;
+    const char* nonSpaceFront = front;
+    const char* end = front + this_header.Length;
+    const char* nonSpaceBack = end;
+
+    nonSpaceFront = TrimBack(nonSpaceFront, end);
 
     if (*nonSpaceFront == '\0')
         return CreateNewScriptString("");
 
-    if (get_uformat() == U_UTF8) {
-        const char* prev = Utf8::BackOneChar(nonSpaceBack, thisString);
-        for (int c = ugetc(prev); prev != thisString && uisspace(c); ) {
-            nonSpaceBack = prev;
-            prev = Utf8::BackOneChar(prev, thisString);
-            c = ugetc(prev);
-        }
-    } else {
-        for (--nonSpaceBack; nonSpaceBack != thisString && std::isspace(*nonSpaceBack); --nonSpaceBack);
-        ++nonSpaceBack;
-    }
+    nonSpaceBack = TrimFront(front, nonSpaceBack);
 
     size_t copylen = nonSpaceBack - nonSpaceFront;
     // if no trim happened, we can return the same string as AGS String is immutable
@@ -342,9 +353,24 @@ void * String_Split(const char *thisString, const char *separator)
             found_cstr = end;
         }
 
-        len = found_cstr - ptr;
+        const char* tk_front = ptr;
+        const char* nonSpaceFront = tk_front;
+        const char* tk_end = found_cstr;
+        const char* nonSpaceBack = tk_end;
+
+        nonSpaceFront = TrimBack(nonSpaceFront, tk_end);
+
+        if (nonSpaceFront != tk_end) {
+            nonSpaceBack = TrimFront(tk_front, nonSpaceBack);
+        }
+
+        len = nonSpaceBack - nonSpaceFront;
+
+        ptr = found_cstr + seplen;
+        if(len == 0) continue;
+
         auto buf = ScriptString::CreateBuffer(len, 0);
-        std::copy(ptr, found_cstr, buf.Get());
+        std::copy(nonSpaceFront, nonSpaceBack, buf.Get());
         buf.Get()[len] = 0;
         items.push_back(std::move(buf));
 
