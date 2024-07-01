@@ -628,7 +628,7 @@ RuntimeScriptValue Sc_String_UpperCase(void *self, const RuntimeScriptValue *par
 // const char* [] (const char *thisString, const char* separator)
 RuntimeScriptValue Sc_String_Split(void *self, const RuntimeScriptValue *params, int32_t param_count)
 {
-    API_OBJCALL_OBJ_POBJ(const char, void, globalDynamicArray, String_Split, const char);
+    API_OBJCALL_OBJ_POBJ_PINT(const char, void, globalDynamicArray, String_Split, const char);
 }
 
 // FLOAT_RETURN_TYPE (const char *theString);
@@ -691,7 +691,7 @@ void RegisterStringAPI()
         { "String::Truncate^1",       API_FN_PAIR(String_Truncate) },
         { "String::Trim^0",           API_FN_PAIR(String_Trim) },
         { "String::UpperCase^0",      API_FN_PAIR(String_UpperCase) },
-        { "String::Split^1",          API_FN_PAIR(String_Split) },
+        { "String::Split^2",          API_FN_PAIR(String_Split) },
         { "String::get_AsFloat",      API_FN_PAIR(StringToFloat) },
         { "String::get_AsInt",        API_FN_PAIR(StringToInt) },
         { "String::geti_Chars",       API_FN_PAIR(String_GetChars) },
