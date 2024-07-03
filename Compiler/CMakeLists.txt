@@ -36,7 +36,7 @@ set(PREPROCESSOR_SOURCES
         preproc/preprocessor.h
 )
 
-set(COMPILER_SOURCES
+set(LEGACY_COMPILER_SOURCES
         fmem.cpp
         fmem.h
         script/cc_compiledscript.cpp
@@ -98,12 +98,16 @@ set(NEW_COMPILER_TEST_SOURCES
         test2/cc_scanner_test.cpp
         test2/cc_symboltable_test.cpp)
 
-set(COMPILER_SOURCES ${NEW_COMPILER_SOURCES})
-set(COMPILER_TEST_SOURCES ${NEW_COMPILER_TEST_SOURCES})
-
-target_compile_definitions(compiler PRIVATE
-    LEGACY_COMPILER=1
-)
+if(AGS_BUILD_LEGACY_COMPILER)
+    target_compile_definitions(compiler PRIVATE
+            LEGACY_COMPILER=1
+    )
+    set(COMPILER_SOURCES ${LEGACY_COMPILER_SOURCES})
+    set(COMPILER_TEST_SOURCES ${LEGACY_COMPILER_TEST_SOURCES})
+else ()
+    set(COMPILER_SOURCES ${NEW_COMPILER_SOURCES})
+    set(COMPILER_TEST_SOURCES ${NEW_COMPILER_TEST_SOURCES})
+endif ()
 
 target_sources(compiler PRIVATE
         ${COMPILER_SOURCES}
