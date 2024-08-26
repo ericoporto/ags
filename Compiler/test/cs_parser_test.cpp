@@ -650,3 +650,50 @@ TEST(Compile, AccessNonStaticMemberOfAStaticMember) {
     //printf("Error: %s\n", last_seen_cc_error());
     ASSERT_EQ(0, compileResult);
 }
+
+// Test for large code blocks
+TEST(Compile, LargeScript) {
+    ccCompiledScript *scrip = newScriptFixture();
+
+    std::string largeCode;
+    largeCode += "int LargeFunc(int x) { \n";
+    for (int i = 0; i < 10000; ++i) {
+        largeCode += "int temp" + std::to_string(i) + " = " + std::to_string(i) + "; \n";
+    }
+    largeCode += "return x; }\n";
+
+    clear_error();
+    int compileResult = cc_compile(largeCode.c_str(), scrip);
+    ASSERT_EQ(0, compileResult);
+}
+
+TEST(Compile, LargeArrayInitialization) {
+    ccCompiledScript *scrip = newScriptFixture();
+
+    std::string largeArrayCode;
+    largeArrayCode += "int ArrayFunc() { \n"
+                      "int arr[10000]; \n";
+    for (int i = 0; i < 10000; ++i) {
+        largeArrayCode += "arr[" + std::to_string(i) + "] = " + std::to_string(i) + "; \n";
+    }
+    largeArrayCode += "return arr[0]; }\n";
+
+    clear_error();
+    int compileResult = cc_compile(largeArrayCode.c_str(), scrip);
+    ASSERT_EQ(0, compileResult);
+}
+
+TEST(Compile, LargeNumberOfImports) {
+    ccCompiledScript *scrip = newScriptFixture();
+
+    std::string imports;
+    for (int i = 0; i < 10000; ++i) {
+        imports += "import int func" + std::to_string(i) + "(); \n";
+    }
+
+    std::string inpl = "int Test() { return 0; }\n" + imports;
+
+    clear_error();
+    int compileResult = cc_compile(inpl.c_str(), scrip);
+    ASSERT_EQ(0, compileResult);
+}

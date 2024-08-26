@@ -49,3 +49,38 @@ TEST(UTF8, GetCharBack) {
     TestGetCharBack(reinterpret_cast<const char*>(test_str3), reinterpret_cast<const char*>(first_char_bytes3));
     TestGetCharBack(reinterpret_cast<const char*>(test_str4), reinterpret_cast<const char*>(first_char_bytes4));
 }
+
+TEST(UTF8, GetLength) {
+    EXPECT_EQ(Utf8::GetLength("hello"), 5);
+    EXPECT_EQ(Utf8::GetLength("ñ"), 1);
+    EXPECT_EQ(Utf8::GetLength("𐍈"), 1);
+    EXPECT_EQ(Utf8::GetLength("AÄÖÜNÑDÚ"), 8);
+}
+
+TEST(UTF8, CStrToUpper) {
+    char str1[] = "hello world";
+    Utf8::CStrToUpper(str1);
+    EXPECT_STREQ(str1, "HELLO WORLD");
+
+    char str2[] = "aäöünñdú";
+    Utf8::CStrToUpper(str2);
+    EXPECT_STREQ(str2, "AÄÖÜNÑDÚ");
+
+    char str3[] = "a𐍈한𐍈한";
+    Utf8::CStrToUpper(str3);
+    EXPECT_STREQ(str3, "A𐍈한𐍈한");
+}
+
+TEST(UTF8, CStrToLower) {
+    char str1[] = "HELLO WORLD";
+    Utf8::CStrToLower(str1);
+    EXPECT_STREQ(str1, "hello world");
+
+    char str2[] = "AÄÖÜNÑDÚ";
+    Utf8::CStrToLower(str2);
+    EXPECT_STREQ(str2, "aäöünñdú");
+
+    char str3[] = "B𐍈한𐍈한";
+    Utf8::CStrToLower(str3);
+    EXPECT_STREQ(str3, "b𐍈한𐍈한");
+}
