@@ -7,6 +7,8 @@
 #include "generator_common.h"
 #include "ninja_generator.h"
 #include "makefile_generator.h"
+#include "util/file.h"
+#include "util/directory.h"
 
 using namespace AGS::Common;
 using namespace AGS::Common::CmdLineOpts;
@@ -106,6 +108,7 @@ String ExistingPathAsAbsolute(const String &path) {
 }
 #endif
 
+// TO-DO: make this return errors as needed
 void fill_options_from_project(GeneratorOptions& opt, const AGF::AGFReader &reader)
 {
     AGF::ReadScriptList(opt.ScriptFileList, reader.GetGameRoot());
@@ -124,6 +127,17 @@ void fill_options_from_project(GeneratorOptions& opt, const AGF::AGFReader &read
         opt.RoomFileList.push_back(String::FromFormat("room%d.crm", r));
 
     opt.HasDialogScripts = false;
+}
+
+bool tool_exists_in_path(const char* tool_path)
+{
+    String tool_exe = String::FromFormat("%s.exe", tool_path);
+    if(!(File::IsFile(tool_path) || File::IsFile(tool_exe)))
+    {
+        printf("Tool '%s' not found", tool_path);
+        return false;
+    }
+    return true;
 }
 
 int main(const int argc, const char* const argv[])
@@ -175,7 +189,50 @@ Copyright (c) 2024 AGS Team and contributors
     opt.ToolAgscc = "agscc";
     opt.ToolCrm2ash = "crm2ash";
 
+    if(!File::IsFile(opt.GameProjectFile))
+    {
+        printf("Game project file '%s' doesn't exist", opt.GameProjectFile.GetCStr());
+        return -1;
+    }
+    if(!File::IsDirectory(opt.OutputDir))
+    {
+        printf("Output directory '%s' doesn't exist", opt.OutputDir.GetCStr());
+        return -1;
+    }
+    if(!File::IsFile(opt.GameProjectFile))
+    {
+        printf("Game project file '%s' doesn't exist", opt.GameProjectFile.GetCStr());
+        return -1;
+    }
+    // skipping check for opt.AgsDefnsFile for now ...
+    if(!tool_exists_in_path(opt.ToolAgspak.GetCStr()))
+        return -1;
+    if(!tool_exists_in_path(opt.ToolTrac.GetCStr()))
+        return -1;
+    if(!tool_exists_in_path(opt.ToolAgfexport.GetCStr()))
+        return -1;
+    if(!tool_exists_in_path(opt.ToolAgf2dlgasc.GetCStr()))
+        return -1;
+    if(!tool_exists_in_path(opt.ToolAgscc.GetCStr()))
+        return -1;
+    if(!tool_exists_in_path(opt.ToolCrm2ash.GetCStr()))
+        return -1;
+
     fill_options_from_project(opt, reader);
+
+    // To build an AGS game from the command line you need to use some tools that generate some intermediary files
+    // (like headers and script files), these which you would like to put in some temp dir.
+    // Now all the tools if you pass a dir that doesn't exist, they won't create the directory and put the file inside,
+    // they will error because the directory doesn't exist.
+    // So the solution is simple, you create any necessary dir to store intermediate files before you need them.
+    // Of course doing this manually everytime may be annoying...
+    // But unfortunately make and ninja use timestamp to check if a dir was modified to trigger a rebuild of the rest
+    // so we can't have a directory as build dependency - or things would rebuild forever.
+    // We also can't put a dummy file and depend on that since there isn't a cross platform solution that wokrs in any
+    // shell/terminal environment.
+    // A good solution would be to have our own little minimalist ags busybox with minimal mkdir and touch support,
+    // and perhaps more as needed. For now, I have to do this here.
+    Directory::CreateDirectory(opt.TempDir);
 
     //-----------------------------------------------------------------------//
     // Generate build file
