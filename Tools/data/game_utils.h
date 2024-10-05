@@ -60,8 +60,90 @@ struct Variable
 // Game settings
 struct GameSettings
 {
-    String SayFunction; // Custom speech function name
-    String NarrateFunction; // Custom narrate function name
+    bool AllowRelativeAssetResolutions;
+    bool AlwaysDisplayTextAsSpeech;
+    int AndroidAppVersionCode;
+    String AndroidAppVersionName;
+    String AndroidApplicationId;
+    String AndroidBuildFormat;
+    bool AntiAliasFonts;
+    bool AntiGlideMode;
+    bool AttachDataToExe;
+    int AudioIndexer;
+    bool AutoMoveInWalkMode;
+    bool BackwardsText;
+    String BuildTargets;
+    bool ClipGUIControls;
+    String TrueColor;
+    String CompressSpritesType;
+    String CustomDataDir;
+    String CustomResolution;
+    bool DebugMode;
+    int DefaultRoomMaskResolution;
+    String Description;
+    String DeveloperName;
+    String DeveloperURL;
+    bool DialogOptionsBackwards;
+    int DialogOptionsBullet;
+    int DialogOptionsGUI;
+    int DialogOptionsGap;
+    String DialogScriptNarrateFunction; // Custom narrate function name
+    String DialogScriptSayFunction; // Custom speech function name
+    bool DisplayMultipleInventory;
+    bool EnforceNewAudio;
+    bool EnforceNewStrings;
+    bool EnforceObjectBasedScript;
+    String GUIAlphaStyle;
+    String GUIDAsString;
+    String GameFileName;
+    String GameName;
+    String GameTextEncoding;
+    String Genre;
+    int GlobalSpeechAnimationDelay;
+    bool HandleInvClicksInScript;
+    bool InventoryCursors;
+    unsigned int InventoryHotspotMarkerCrosshairColor;
+    unsigned int InventoryHotspotMarkerDotColor;
+    int InventoryHotspotMarkerSprite;
+    String InventoryHotspotMarkerStyle;
+    bool LeftToRightPrecedence;
+    bool LetterboxMode;
+    int MaximumScore;
+    bool MouseWheelEnabled;
+    String NumberDialogOptions;
+    bool OptimizeSpriteStorage;
+    bool PixelPerfect;
+    int PlaySoundOnScore;
+    String ReleaseDate;
+    String RenderAtScreenResolution;
+    String RoomTransition;
+    bool RunGameLoopsWhileDialogOptionsDisplayed;
+    String SaveGameFileExtension;
+    String SaveGameFolderName;
+    bool SaveScreenshots;
+    bool ScaleCharacterSpriteOffsets;
+    bool ScaleMovementSpeedWithMaskResolution;
+    String ScriptAPIVersion;
+    String ScriptCompatLevel;
+    String SkipSpeech;
+    String SpeechPortraitSide;
+    String SpeechStyle;
+    String SplitResources;
+    String SpriteAlphaStyle;
+    String TTFHeightDefinedBy;
+    String TTFMetricsFixup;
+    int TextWindowGUI;
+    int ThoughtGUI;
+    bool TurnBeforeFacing;
+    bool TurnBeforeWalking;
+    int UniqueID;
+    bool UseGlobalSpeechAnimationDelay;
+    bool UseLowResCoordinatesInScript;
+    bool UseOldCustomDialogOptionsAPI;
+    bool UseOldKeyboardHandling;
+    String Version;
+    bool WalkInLookMode;
+    String WhenInterfaceDisabled;
 };
 
 // GameRef contains only game data strictly necessary for generating scripts.
