@@ -320,8 +320,7 @@ void ReadGameSettings(DataUtil::GameSettings &opt, DocElem elem)
     AGF::Game p_game;
     AGF::GameSettings p_set;
     DocElem set_elem = p_game.GetSettings(elem);
-    opt.SayFunction = p_set.ReadSayFunction(set_elem);
-    opt.NarrateFunction = p_set.ReadNarrateFunction(set_elem);
+    p_set.ReadGameSettings(set_elem, opt);
 }
 
 void ReadGameRef(DataUtil::GameRef &game, AGFReader &reader)
