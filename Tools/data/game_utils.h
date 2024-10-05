@@ -42,11 +42,104 @@ struct DialogRef : EntityRef
     int OptionCount = 0;
 };
 
+struct GUIControlRef : EntityRef
+{
+    int Height{};
+    int Width{};
+    int Left{};
+    int Top{};
+    int ZOrder{};
+    int ID{};
+    String Name;
+    bool Clickable{};
+    bool Enabled{};
+    bool Visible{};
+    bool Translated{};
+};
+
+struct GUIButtonRef : GUIControlRef
+{
+    String ClickAction;
+    bool ClipImage{};
+    int Font{};
+    int Image{};
+    int MouseoverImage{};
+    int NewModeNumber{};
+    String OnClick;
+    int PushedImage{};
+    String Text;
+    String TextAlignment;
+    int TextColor{};
+};
+
+struct GUIInventoryRef : GUIControlRef
+{
+    int CharacterID{};
+    int ItemHeight{};
+    int ItemWidth{};
+};
+
+struct GUISliderRef : GUIControlRef
+{
+    int BackgroundImage{};
+    int HandleImage{};
+    int HandleOffset{};
+    int MaxValue{};
+    int MinValue{};
+    String OnChange;
+    int Value{};
+};
+
+struct GUILabelRef : GUIControlRef
+{
+    int Font{};
+    String Text;
+    String TextAlignment;
+    int TextColor{};
+};
+
+struct GUITextBoxRef : GUIControlRef
+{
+    int Font{};
+    String OnActivate;
+    bool ShowBorder{};
+    String Text;
+    int TextColor{};
+};
+
+struct GUIListBoxRef : GUIControlRef
+{
+    int Font{};
+    String OnSelectionChanged;
+    int SelectedBackgroundColor{};
+    int SelectedTextColor{};
+    bool ShowBorder{};
+    bool ShowScrollArrows{};
+    String TextAlignment;
+    int TextColor{};
+};
+
 // GUIRef contains only GUI data strictly necessary for generating scripts.
 // NOTE: replace with full GUI struct later if appears necessary
 struct GUIRef : EntityRef
 {
-    std::vector<EntityRef> Controls;
+    int BackgroundColor{};
+    int BackgroundImage{};
+    int BorderColor{};
+    bool Clickable{};
+    int Height{};
+    int ID{};
+    int Left{};
+    String Name;
+    String OnClick;
+    String PopupStyle;
+    int PopupYPos{};
+    int Top{};
+    int Transparency{};
+    int Visible{};
+    int Width{};
+    int ZOrder{};
+    std::vector<GUIControlRef> Controls;
 };
 
 // Game variable (for variables defined in the game project)
