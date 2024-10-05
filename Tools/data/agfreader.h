@@ -361,8 +361,93 @@ public:
     int    ReadID(DocElem elem) override { return -1; }
     String ReadScriptName(DocElem elem) override { return ""; }
 
-    String ReadSayFunction(DocElem elem) { return ReadString(elem, "DialogScriptSayFunction"); }
-    String ReadNarrateFunction(DocElem elem) { return ReadString(elem, "DialogScriptNarrateFunction"); }
+    void ReadGameSettings(DocElem elem, DataUtil::GameSettings& s)
+    {
+        s.AllowRelativeAssetResolutions = ReadBool(elem, "AllowRelativeAssetResolutions");
+        s.AlwaysDisplayTextAsSpeech = ReadBool(elem, "AlwaysDisplayTextAsSpeech");
+        s.AndroidAppVersionCode = ReadInt(elem, "AndroidAppVersionCode");
+        s.AndroidAppVersionName = ReadString(elem, "AndroidAppVersionName");
+        s.AndroidApplicationId = ReadString(elem, "AndroidApplicationId");
+        s.AndroidBuildFormat = ReadString(elem, "AndroidBuildFormat");
+        s.AntiAliasFonts = ReadBool(elem, "AntiAliasFonts");
+        s.AntiGlideMode = ReadBool(elem, "AntiGlideMode");
+        s.AttachDataToExe = ReadBool(elem, "AttachDataToExe");
+        s.AudioIndexer = ReadInt(elem, "AudioIndexer");
+        s.AutoMoveInWalkMode = ReadBool(elem, "AutoMoveInWalkMode");
+        s.BackwardsText = ReadBool(elem, "BackwardsText");
+        s.BuildTargets = ReadString(elem, "BuildTargets");
+        s.ClipGUIControls = ReadBool(elem, "ClipGUIControls");
+        s.TrueColor = ReadString(elem, "TrueColor");
+        s.CompressSpritesType = ReadString(elem, "CompressSpritesType");
+        s.CustomDataDir = ReadString(elem, "CustomDataDir");
+        s.CustomResolution = ReadString(elem, "CustomResolution");
+        s.DebugMode = ReadBool(elem, "DebugMode");
+        s.DefaultRoomMaskResolution = ReadInt(elem, "DefaultRoomMaskResolution");
+        s.Description = ReadString(elem, "Description");
+        s.DeveloperName = ReadString(elem, "DeveloperName");
+        s.DeveloperURL = ReadString(elem, "DeveloperURL");
+        s.DialogOptionsBackwards = ReadBool(elem, "DialogOptionsBackwards");
+        s.DialogOptionsBullet = ReadInt(elem, "DialogOptionsBullet");
+        s.DialogOptionsGUI = ReadInt(elem, "DialogOptionsGUI");
+        s.DialogOptionsGap = ReadInt(elem, "DialogOptionsGap");
+        s.DialogScriptNarrateFunction = ReadString(elem, "DialogScriptNarrateFunction");
+        s.DialogScriptSayFunction = ReadString(elem, "DialogScriptSayFunction");
+        s.DisplayMultipleInventory = ReadBool(elem, "DisplayMultipleInventory");
+        s.EnforceNewAudio = ReadBool(elem, "EnforceNewAudio");
+        s.EnforceNewStrings = ReadBool(elem, "EnforceNewStrings");
+        s.EnforceObjectBasedScript = ReadBool(elem, "EnforceObjectBasedScript");
+        s.GUIAlphaStyle = ReadString(elem, "GUIAlphaStyle");
+        s.GUIDAsString = ReadString(elem, "GUIDAsString");
+        s.GameFileName = ReadString(elem, "GameFileName");
+        s.GameName = ReadString(elem, "GameName");
+        s.GameTextEncoding = ReadString(elem, "GameTextEncoding");
+        s.Genre = ReadString(elem, "Genre");
+        s.GlobalSpeechAnimationDelay = ReadInt(elem, "GlobalSpeechAnimationDelay");
+        s.HandleInvClicksInScript = ReadBool(elem, "HandleInvClicksInScript");
+        s.InventoryCursors = ReadBool(elem, "InventoryCursors");
+        s.InventoryHotspotMarkerCrosshairColor = ReadInt(elem, "InventoryHotspotMarkerCrosshairColor");
+        s.InventoryHotspotMarkerDotColor = ReadInt(elem, "InventoryHotspotMarkerDotColor");
+        s.InventoryHotspotMarkerSprite = ReadInt(elem, "InventoryHotspotMarkerSprite");
+        s.InventoryHotspotMarkerStyle = ReadString(elem, "InventoryHotspotMarkerStyle");
+        s.LeftToRightPrecedence = ReadBool(elem, "LeftToRightPrecedence");
+        s.LetterboxMode = ReadBool(elem, "LetterboxMode");
+        s.MaximumScore = ReadInt(elem, "MaximumScore");
+        s.MouseWheelEnabled = ReadBool(elem, "MouseWheelEnabled");
+        s.NumberDialogOptions = ReadString(elem, "NumberDialogOptions");
+        s.OptimizeSpriteStorage = ReadBool(elem, "OptimizeSpriteStorage");
+        s.PixelPerfect = ReadBool(elem, "PixelPerfect");
+        s.PlaySoundOnScore = ReadInt(elem, "PlaySoundOnScore");
+        s.ReleaseDate = ReadString(elem, "ReleaseDate");
+        s.RenderAtScreenResolution = ReadString(elem, "RenderAtScreenResolution");
+        s.RoomTransition = ReadString(elem, "RoomTransition");
+        s.RunGameLoopsWhileDialogOptionsDisplayed = ReadBool(elem, "RunGameLoopsWhileDialogOptionsDisplayed");
+        s.SaveGameFileExtension = ReadString(elem, "SaveGameFileExtension");
+        s.SaveGameFolderName = ReadString(elem, "SaveGameFolderName");
+        s.SaveScreenshots = ReadBool(elem, "SaveScreenshots");
+        s.ScaleCharacterSpriteOffsets = ReadBool(elem, "ScaleCharacterSpriteOffsets");
+        s.ScaleMovementSpeedWithMaskResolution = ReadBool(elem, "ScaleMovementSpeedWithMaskResolution");
+        s.ScriptAPIVersion = ReadString(elem, "ScriptAPIVersion");
+        s.ScriptCompatLevel = ReadString(elem, "ScriptCompatLevel");
+        s.SkipSpeech = ReadString(elem, "SkipSpeech");
+        s.SpeechPortraitSide = ReadString(elem, "SpeechPortraitSide");
+        s.SpeechStyle = ReadString(elem, "SpeechStyle");
+        s.SplitResources = ReadString(elem, "SplitResources");
+        s.SpriteAlphaStyle = ReadString(elem, "SpriteAlphaStyle");
+        s.TTFHeightDefinedBy = ReadString(elem, "TTFHeightDefinedBy");
+        s.TTFMetricsFixup = ReadString(elem, "TTFMetricsFixup");
+        s.TextWindowGUI = ReadInt(elem, "TextWindowGUI");
+        s.ThoughtGUI = ReadInt(elem, "ThoughtGUI");
+        s.TurnBeforeFacing = ReadBool(elem, "TurnBeforeFacing");
+        s.TurnBeforeWalking = ReadBool(elem, "TurnBeforeWalking");
+        s.UniqueID = ReadInt(elem, "UniqueID");
+        s.UseGlobalSpeechAnimationDelay = ReadBool(elem, "UseGlobalSpeechAnimationDelay");
+        s.UseLowResCoordinatesInScript = ReadBool(elem, "UseLowResCoordinatesInScript");
+        s.UseOldCustomDialogOptionsAPI = ReadBool(elem, "UseOldCustomDialogOptionsAPI");
+        s.UseOldKeyboardHandling = ReadBool(elem, "UseOldKeyboardHandling");
+        s.Version = ReadString(elem, "Version");
+        s.WalkInLookMode = ReadBool(elem, "WalkInLookMode");
+        s.WhenInterfaceDisabled = ReadString(elem, "WhenInterfaceDisabled");
+    }
 };
 
 // Parses a description of an individual script file (header or body)
