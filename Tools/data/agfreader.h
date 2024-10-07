@@ -194,6 +194,13 @@ public:
     String ReadType(DocElem elem) override;
     int ReadID(DocElem elem) override { return ReadInt(elem, "ID", -1); }
     String ReadScriptName(DocElem elem) override { return ReadString(elem, "Name"); }
+    void ReadAllData(DocElem elem, DataUtil::GUIControlData& control_data);
+    void ReadButtonData(DocElem elem, DataUtil::GUIButtonData& button_data);
+    void ReadLabelData(DocElem elem, DataUtil::GUILabelData& label_data);
+    void ReadSliderData(DocElem elem, DataUtil::GUISliderData& slider_data);
+    void ReadInventoryData(DocElem elem, DataUtil::GUIInventoryData& inventory_data);
+    void ReadTextBoxData(DocElem elem, DataUtil::GUITextBoxData& textbox_data);
+    void ReadListBoxData(DocElem elem, DataUtil::GUIListBoxData& listbox_data);
 };
 
 // GUI data parser
@@ -203,6 +210,7 @@ public:
     String ReadType(DocElem elem) override { return "GUI"; }
     int ReadID(DocElem elem) override;
     String ReadScriptName(DocElem elem) override;
+    void ReadAllData(DocElem elem, DataUtil::GUIData& gui_data);
 
 private:
     DocElem GetNormalGUI(DocElem elem);

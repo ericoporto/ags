@@ -42,7 +42,7 @@ struct DialogRef : EntityRef
     int OptionCount = 0;
 };
 
-struct GUIControlRef : EntityRef
+struct GUIControlData : EntityRef
 {
     int Height{};
     int Width{};
@@ -57,7 +57,7 @@ struct GUIControlRef : EntityRef
     bool Translated{};
 };
 
-struct GUIButtonRef : GUIControlRef
+struct GUIButtonData : GUIControlData
 {
     String ClickAction;
     bool ClipImage{};
@@ -72,14 +72,14 @@ struct GUIButtonRef : GUIControlRef
     int TextColor{};
 };
 
-struct GUIInventoryRef : GUIControlRef
+struct GUIInventoryData : GUIControlData
 {
     int CharacterID{};
     int ItemHeight{};
     int ItemWidth{};
 };
 
-struct GUISliderRef : GUIControlRef
+struct GUISliderData : GUIControlData
 {
     int BackgroundImage{};
     int HandleImage{};
@@ -90,7 +90,7 @@ struct GUISliderRef : GUIControlRef
     int Value{};
 };
 
-struct GUILabelRef : GUIControlRef
+struct GUILabelData : GUIControlData
 {
     int Font{};
     String Text;
@@ -98,7 +98,7 @@ struct GUILabelRef : GUIControlRef
     int TextColor{};
 };
 
-struct GUITextBoxRef : GUIControlRef
+struct GUITextBoxData : GUIControlData
 {
     int Font{};
     String OnActivate;
@@ -107,7 +107,7 @@ struct GUITextBoxRef : GUIControlRef
     int TextColor{};
 };
 
-struct GUIListBoxRef : GUIControlRef
+struct GUIListBoxData : GUIControlData
 {
     int Font{};
     String OnSelectionChanged;
@@ -122,6 +122,11 @@ struct GUIListBoxRef : GUIControlRef
 // GUIRef contains only GUI data strictly necessary for generating scripts.
 // NOTE: replace with full GUI struct later if appears necessary
 struct GUIRef : EntityRef
+{
+    std::vector<EntityRef> Controls;
+};
+
+struct GUIData : EntityRef
 {
     int BackgroundColor{};
     int BackgroundImage{};
@@ -139,7 +144,7 @@ struct GUIRef : EntityRef
     int Visible{};
     int Width{};
     int ZOrder{};
-    std::vector<GUIControlRef> Controls;
+    std::vector<GUIControlData> Controls;
 };
 
 // Game variable (for variables defined in the game project)
