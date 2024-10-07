@@ -193,6 +193,29 @@ String GUIMain::ReadScriptName(DocElem elem)
     return ReadString(self, "Name");
 }
 
+void GUIMain::ReadAllData(DocElem elem, DataUtil::GUIData& gui_data)
+{
+    DocElem self = GetNormalGUI(elem);
+    if (!self)
+        self = GetTextWindow(elem);
+    if (!self)
+        return;
+    gui_data.Clickable = ReadBool(self, "Clickable");
+    gui_data.Height = ReadInt(self, "Height");
+    gui_data.Left = ReadInt(self, "Left");
+    gui_data.Top = ReadInt(self, "Top");
+    gui_data.Width = ReadInt(self, "Width");
+    gui_data.Transparency = ReadInt(self, "Transparency");
+    gui_data.Visible = ReadBool(self, "Visible");
+    gui_data.BackgroundColor = ReadInt(self, "BackgroundColor");
+    gui_data.BackgroundImage = ReadInt(self, "BackgroundImage");
+    gui_data.BorderColor = ReadInt(self, "BorderColor");
+    gui_data.OnClick = ReadString(self, "OnClick");
+    gui_data.PopupStyle = ReadString(self, "PopupStyle");
+    gui_data.ZOrder = ReadInt(self, "ZOrder");
+    gui_data.PopupYPos = ReadInt(self, "PopupYPos");
+}
+
 DocElem GUIMain::GetNormalGUI(DocElem elem)
 {
     return elem->FirstChildElement("NormalGUI");
@@ -219,6 +242,49 @@ String GUIControl::ReadType(DocElem elem)
     if (strcmp(name, "GUITextBox") == 0)
         return "TextBox";
     return "GUIControl";
+}
+
+void GUIControl::ReadAllData(DocElem elem, DataUtil::GUIControlData& control_data)
+{
+    control_data.Clickable = ReadBool(elem, "Clickable");
+    control_data.Height = ReadInt(elem, "Height");
+    control_data.Left = ReadInt(elem, "Left");
+    control_data.Top = ReadInt(elem, "Top");
+    control_data.Width = ReadInt(elem, "Width");
+    control_data.Enabled = ReadBool(elem, "Enabled");
+    control_data.Visible = ReadBool(elem, "Visible");
+    control_data.Translated = ReadBool(elem, "Translated");
+    control_data.ZOrder = ReadInt(elem, "ZOrder");
+}
+
+    void ReadButtonData(DocElem elem, DataUtil::GUIButtonData& button_data)
+{
+
+}
+
+void ReadLabelData(DocElem elem, DataUtil::GUILabelData& label_data)
+{
+
+}
+
+void ReadSliderData(DocElem elem, DataUtil::GUISliderData& slider_data)
+{
+
+}
+
+void ReadInventoryData(DocElem elem, DataUtil::GUIInventoryData& inventory_data)
+{
+
+}
+
+void ReadTextBoxData(DocElem elem, DataUtil::GUITextBoxData& textbox_data)
+{
+
+}
+
+void ReadListBoxData(DocElem elem, DataUtil::GUIListBoxData& listbox_data)
+{
+
 }
 
 void GlobalVariables::GetAll(DocElem root, std::vector<DocElem> &elems)
@@ -289,6 +355,59 @@ void ReadAllEntityRefs(std::vector<DataUtil::EntityRef> &ents, EntityListParser 
     }
 }
 
+static void ReadGUI(DataUtil::GUIData& gui_data, AGF::DocElem elem)
+{
+    AGF::GUIMain gui;
+    AGF::GUIControls controls;
+    AGF::GUIControl control;
+
+    ReadEntityRef(gui_data, gui, elem);
+    gui.ReadAllData(elem, gui_data);
+
+    std::vector<DocElem> elems;
+    controls.GetAll(elem, elems);
+    for (const auto &el : elems)
+    {
+        String type = control.ReadType(el);
+        if(type == "Button")
+        {
+            DataUtil::GUIButtonData button;
+            ReadEntityRef(button, control, el);
+            gui_data.Controls.push_back(button);
+        }
+        else if(type == "Label")
+        {
+            DataUtil::GUILabelData label;
+            ReadEntityRef(label, control, el);
+            gui_data.Controls.push_back(label);
+        }
+        else if(type == "InvWindow")
+        {
+            DataUtil::GUIInventoryData inventory;
+            ReadEntityRef(inventory, control, el);
+            gui_data.Controls.push_back(inventory);
+        }
+        else if(type == "ListBox")
+        {
+            DataUtil::GUIListBoxData listbox;
+            ReadEntityRef(listbox, control, el);
+            gui_data.Controls.push_back(listbox);
+        }
+        else if(type == "Slider")
+        {
+            DataUtil::GUISliderData slider;
+            ReadEntityRef(slider, control, el);
+            gui_data.Controls.push_back(slider);
+        }
+        else if(type == "TextBox")
+        {
+            DataUtil::GUITextBoxData textbox;
+            ReadEntityRef(textbox, control, el);
+            gui_data.Controls.push_back(textbox);
+        }
+    }
+}
+
 static void ReadDialog(DataUtil::DialogRef &dialog, AGF::DocElem elem)
 {
     AGF::Dialog p_dialog;
@@ -322,6 +441,8 @@ void ReadGameSettings(DataUtil::GameSettings &opt, DocElem elem)
     DocElem set_elem = p_game.GetSettings(elem);
     p_set.ReadGameSettings(set_elem, opt);
 }
+
+
 
 void ReadGameRef(DataUtil::GameRef &game, AGFReader &reader)
 {
