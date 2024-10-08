@@ -244,47 +244,79 @@ String GUIControl::ReadType(DocElem elem)
     return "GUIControl";
 }
 
-void GUIControl::ReadAllData(DocElem elem, DataUtil::GUIControlData& control_data)
+void GUIControl::ReadAllData(DocElem elem, DataUtil::GUIControlData& data)
 {
-    control_data.Clickable = ReadBool(elem, "Clickable");
-    control_data.Height = ReadInt(elem, "Height");
-    control_data.Left = ReadInt(elem, "Left");
-    control_data.Top = ReadInt(elem, "Top");
-    control_data.Width = ReadInt(elem, "Width");
-    control_data.Enabled = ReadBool(elem, "Enabled");
-    control_data.Visible = ReadBool(elem, "Visible");
-    control_data.Translated = ReadBool(elem, "Translated");
-    control_data.ZOrder = ReadInt(elem, "ZOrder");
+    data.Clickable = ReadBool(elem, "Clickable");
+    data.Height = ReadInt(elem, "Height");
+    data.Left = ReadInt(elem, "Left");
+    data.Top = ReadInt(elem, "Top");
+    data.Width = ReadInt(elem, "Width");
+    data.Enabled = ReadBool(elem, "Enabled");
+    data.Visible = ReadBool(elem, "Visible");
+    data.Translated = ReadBool(elem, "Translated");
+    data.ZOrder = ReadInt(elem, "ZOrder");
 }
 
-    void ReadButtonData(DocElem elem, DataUtil::GUIButtonData& button_data)
+void GUIControl::ReadButtonData(DocElem elem, DataUtil::GUIButtonData& data)
 {
-
+    data.ClickAction = ReadString(elem, "ClickAction");
+    data.ClipImage = ReadBool(elem, "ClipImage");
+    data.Font = ReadInt(elem, "Font");
+    data.Image = ReadInt(elem, "Image");
+    data.MouseoverImage = ReadInt(elem, "MouseoverImage");
+    data.NewModeNumber = ReadInt(elem, "NewModeNumber");
+    data.OnClick = ReadString(elem, "OnClick");
+    data.PushedImage = ReadInt(elem, "PushedImage");
+    data.Text = ReadString(elem, "Text");
+    data.TextAlignment = ReadString(elem, "TextAlignment");
+    data.TextColor = ReadInt(elem, "TextColor");
 }
 
-void ReadLabelData(DocElem elem, DataUtil::GUILabelData& label_data)
+void GUIControl::ReadLabelData(DocElem elem, DataUtil::GUILabelData& data)
 {
-
+    data.Font = ReadInt(elem, "Font");
+    data.Text = ReadString(elem, "Text");
+    data.TextAlignment = ReadString(elem, "TextAlignment");
+    data.TextColor = ReadInt(elem, "TextColor");
 }
 
-void ReadSliderData(DocElem elem, DataUtil::GUISliderData& slider_data)
+void GUIControl::ReadSliderData(DocElem elem, DataUtil::GUISliderData& data)
 {
-
+    data.BackgroundImage = ReadInt(elem, "BackgroundImage");
+    data.HandleImage = ReadInt(elem, "HandleImage");
+    data.HandleOffset = ReadInt(elem, "HandleOffset");
+    data.MaxValue = ReadInt(elem, "MaxValue");
+    data.MinValue = ReadInt(elem, "MinValue");
+    data.OnChange = ReadString(elem, "OnChange");
+    data.Value = ReadInt(elem, "Value");
 }
 
-void ReadInventoryData(DocElem elem, DataUtil::GUIInventoryData& inventory_data)
+void GUIControl::ReadInventoryData(DocElem elem, DataUtil::GUIInventoryData& data)
 {
-
+    data.CharacterID = ReadInt(elem, "CharacterID");
+    data.ItemHeight = ReadInt(elem, "ItemHeight");
+    data.ItemWidth = ReadInt(elem, "ItemWidth");
 }
 
-void ReadTextBoxData(DocElem elem, DataUtil::GUITextBoxData& textbox_data)
+void GUIControl::ReadTextBoxData(DocElem elem, DataUtil::GUITextBoxData& data)
 {
-
+    data.Font = ReadInt(elem, "Font");
+    data.OnActivate = ReadString(elem, "OnActivate");
+    data.ShowBorder = ReadBool(elem, "ShowBorder");
+    data.Text = ReadString(elem, "Text");
+    data.TextColor = ReadInt(elem, "TextColor");
 }
 
-void ReadListBoxData(DocElem elem, DataUtil::GUIListBoxData& listbox_data)
+void GUIControl::ReadListBoxData(DocElem elem, DataUtil::GUIListBoxData& data)
 {
-
+    data.Font = ReadInt(elem, "Font");
+    data.OnSelectionChanged = ReadString(elem, "OnSelectionChanged");
+    data.SelectedBackgroundColor = ReadInt(elem, "SelectedBackgroundColor");
+    data.SelectedTextColor = ReadInt(elem, "SelectedTextColor");
+    data.ShowBorder = ReadBool(elem, "ShowBorder");
+    data.ShowScrollArrows = ReadBool(elem, "ShowScrollArrows");
+    data.TextAlignment = ReadString(elem, "TextAlignment");
+    data.TextColor = ReadInt(elem, "TextColor");
 }
 
 void GlobalVariables::GetAll(DocElem root, std::vector<DocElem> &elems)
