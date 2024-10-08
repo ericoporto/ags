@@ -194,13 +194,13 @@ public:
     String ReadType(DocElem elem) override;
     int ReadID(DocElem elem) override { return ReadInt(elem, "ID", -1); }
     String ReadScriptName(DocElem elem) override { return ReadString(elem, "Name"); }
-    void ReadAllData(DocElem elem, DataUtil::GUIControlData& control_data);
-    void ReadButtonData(DocElem elem, DataUtil::GUIButtonData& button_data);
-    void ReadLabelData(DocElem elem, DataUtil::GUILabelData& label_data);
-    void ReadSliderData(DocElem elem, DataUtil::GUISliderData& slider_data);
-    void ReadInventoryData(DocElem elem, DataUtil::GUIInventoryData& inventory_data);
-    void ReadTextBoxData(DocElem elem, DataUtil::GUITextBoxData& textbox_data);
-    void ReadListBoxData(DocElem elem, DataUtil::GUIListBoxData& listbox_data);
+    void ReadAllData(DocElem elem, DataUtil::GUIControlData& data);
+    void ReadButtonData(DocElem elem, DataUtil::GUIButtonData& data);
+    void ReadLabelData(DocElem elem, DataUtil::GUILabelData& data);
+    void ReadSliderData(DocElem elem, DataUtil::GUISliderData& data);
+    void ReadInventoryData(DocElem elem, DataUtil::GUIInventoryData& data);
+    void ReadTextBoxData(DocElem elem, DataUtil::GUITextBoxData& data);
+    void ReadListBoxData(DocElem elem, DataUtil::GUIListBoxData& data);
 };
 
 // GUI data parser
