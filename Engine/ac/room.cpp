@@ -763,7 +763,7 @@ void load_new_room(int newnum, CharacterInfo*forchar) {
     new_room_loop = SCR_NO_VALUE;
     new_room_placeonwalkable = false;
 
-    if ((new_room_pos>0) & (forchar!=nullptr)) {
+    if ((new_room_pos>0) && (forchar!=nullptr)) {
         if (new_room_pos>=4000) {
             play.entered_edge = 3;
             forchar->y = thisroom.Edges.Top + get_fixed_pixel_size(1);
