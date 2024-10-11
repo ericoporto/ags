@@ -26,7 +26,7 @@
 
 // Constant used to define Alt+Key codes
 #define AGS_EXT_KEY_SHIFT  300
-#define AGS_EXT_KEY_ALPHA(key)  (AGS_EXT_KEY_SHIFT + (key - eAGSKeyCodeCtrlA) + 1)
+#define AGS_EXT_KEY_ALPHA(key)  (AGS_EXT_KEY_SHIFT + ((key) - eAGSKeyCodeCtrlA) + 1)
 
 // These are based on eKeyCode values in AGS Script.
 // The actual values are based on scan codes of the old backend (allegro 3 and/or 4),
