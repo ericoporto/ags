@@ -15,6 +15,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include "core/platform.h"
 
 char *ags_strlwr(char *s)
