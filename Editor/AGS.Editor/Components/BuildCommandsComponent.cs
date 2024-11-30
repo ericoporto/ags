@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using AGS.Editor.Preferences;
+using AGS.Editor.Utils;
 
 namespace AGS.Editor.Components
 {
@@ -20,6 +21,7 @@ namespace AGS.Editor.Components
         private const string OPEN_BUILD_FILE_EXPLORER_COMMAND = "OpenFileExplorerBuildGame";
         private const string TEST_GAME_COMMAND = "TestGame";
         private const string RUN_COMMAND = "RunGame";
+        private const string RUN_WEB_COMMAND = "WebRunGame";
         private const string STEP_INTO_COMMAND = "StepIntoDebug";
         private const string STOP_COMMAND = "StopDebug";
         private const string PAUSE_COMMAND = "PauseDebug";
@@ -27,6 +29,8 @@ namespace AGS.Editor.Components
         private List<MenuCommand> _debugToolbarCommands = new List<MenuCommand>();
         private DebugState _debuggerState = DebugState.NotRunning;
         private bool _testGameInProgress = false;
+        private MenuCommand _webRunCommand = null;
+        private WebGameHttpServer _webGameHttpServer = new WebGameHttpServer();
 
         public BuildCommandsComponent(GUIController guiController, AGSEditor agsEditor)
             : base(guiController, agsEditor)
@@ -51,10 +55,13 @@ namespace AGS.Editor.Components
             _guiController.RegisterIcon("MenuIconBuildEXE", Resources.ResourceManager.GetIcon("menu_file_built-exe.ico"));
             _guiController.RegisterIcon("MenuIconTest", Resources.ResourceManager.GetIcon("menu_build_runwithout.ico"));
 
+            _webRunCommand = new MenuCommand(RUN_WEB_COMMAND, "Run in &Web Browser", "RunMenuIcon");
+
             _guiController.AddMenu(this, DEBUG_MENU_ID, "&Build");
             MenuCommands debugCommands = new MenuCommands(DEBUG_MENU_ID, GUIController.FILE_MENU_ID);
             debugCommands.Commands.Add(new MenuCommand(RUN_COMMAND, "&Run", Keys.F5, "RunMenuIcon"));
             debugCommands.Commands.Add(new MenuCommand(TEST_GAME_COMMAND, "Run without &debugger", Keys.Control | Keys.F5, "MenuIconTest"));
+            debugCommands.Commands.Add(_webRunCommand);
             debugCommands.Commands.Add(new MenuCommand(STEP_INTO_COMMAND, "S&tep into", Keys.F11, "StepMenuIcon"));
             debugCommands.Commands.Add(new MenuCommand(PAUSE_COMMAND, "&Pause", "PauseMenuIcon"));
             debugCommands.Commands.Add(new MenuCommand(STOP_COMMAND, "&Stop", Keys.Shift | Keys.F5, "StopMenuIcon"));
@@ -243,6 +250,20 @@ namespace AGS.Editor.Components
             else if (controlID == TEST_GAME_COMMAND)
             {
                 TestGame(false);
+            }
+            else if (controlID == RUN_WEB_COMMAND)
+            {
+                if (_webGameHttpServer.IsRunning)
+                {
+                    _webGameHttpServer.Stop();
+                    _webRunCommand.Name = "Run in &Web Browser";
+                }
+                else
+                {
+                    string webGameDir = Path.Combine(_agsEditor.GameDirectory, "Compiled", BuildTargetWeb.WEB_DIR);
+                    _webGameHttpServer.Start(webGameDir);
+                    _webRunCommand.Name = "Stop &Web Server";
+                }
             }
         }
 
