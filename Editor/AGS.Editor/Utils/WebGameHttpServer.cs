@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace AGS.Editor.Utils
         private HttpListener _listener;
         private Thread _serverThread;
         private string _directoryPath;
-        private const string _servingURL = "http://localhost:8000";
+        private const string _servingURL = "http://localhost:8000/";
 
         public event Action<string> ServerStarted;
         public event Action<string> ServerStopped;
@@ -31,12 +32,31 @@ namespace AGS.Editor.Utils
 
         protected virtual void OnServerStarted()
         {
+            OpenWebBrowser();
             ServerStarted?.Invoke("Server started on " + _servingURL);
         }
 
         protected virtual void OnServerStopped()
         {
             ServerStopped?.Invoke("Server stopped.");
+        }
+
+        public void OpenWebBrowser()
+        {
+            Uri uri;
+            if (!Uri.TryCreate(_servingURL, UriKind.Absolute, out uri))
+            {
+                throw new Exception("An error occurred when creating url: " + _servingURL );
+            }
+
+            try
+            {
+                Process.Start(uri.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Failed to open the browser. Ensure a default browser is set.", ex);
+            }
         }
 
 
