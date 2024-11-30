@@ -435,6 +435,7 @@
     <Compile Include="Utils\ScriptGeneration.cs" />
     <Compile Include="Utils\StdConsoleWriter.cs" />
     <Compile Include="Utils\Validation.cs" />
+    <Compile Include="Utils\WebGameHttpServer.cs" />
     <EmbeddedResource Include="GUI\frmMain.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmMain.cs</DependentUpon>
