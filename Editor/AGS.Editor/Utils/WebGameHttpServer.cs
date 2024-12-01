@@ -18,9 +18,10 @@ namespace AGS.Editor.Utils
         private Thread _serverThread;
         private string _directoryPath;
         private const string _servingURL = "http://localhost:8000/";
+        private const string _exitFile = "force_exit.json";
 
-        public event Action<string> ServerStarted;
-        public event Action<string> ServerStopped;
+        public event Action ServerStarted;
+        public event Action ServerStopped;
 
         public bool IsRunning
         {
@@ -33,12 +34,12 @@ namespace AGS.Editor.Utils
         protected virtual void OnServerStarted()
         {
             OpenWebBrowser();
-            ServerStarted?.Invoke("Server started on " + _servingURL);
+            ServerStarted?.Invoke();
         }
 
         protected virtual void OnServerStopped()
         {
-            ServerStopped?.Invoke("Server stopped.");
+            ServerStopped?.Invoke();
         }
 
         public void OpenWebBrowser()
@@ -118,6 +119,7 @@ namespace AGS.Editor.Utils
 
         private void ProcessRequest(HttpListenerContext context)
         {
+            byte[] buffer;
             var request = context.Request;
             var response = context.Response;
 
@@ -126,34 +128,55 @@ namespace AGS.Editor.Utils
             response.Headers["Expires"] = "0";
 
             string requestedFile = Path.Combine(_directoryPath, request.Url.LocalPath.TrimStart('/'));
+            string fileName = Path.GetFileName(requestedFile);
 
-            if (Directory.Exists(requestedFile))
+            if(fileName == _exitFile)
             {
-                requestedFile = Path.Combine(_directoryPath, "index.html");
+                throw new HttpListenerException(0, "browser tab closed");
+                return;
             }
 
-            if (File.Exists(requestedFile))
+            if (Directory.Exists(requestedFile) && File.Exists(Path.Combine(_directoryPath, "index.html")))
             {
-                byte[] fileBytes = File.ReadAllBytes(requestedFile);
-                response.ContentType = GetMimeType(requestedFile);
-                response.ContentLength64 = fileBytes.Length;
+                // requested a directory, so try index.html instead
+                requestedFile = Path.Combine(_directoryPath, "index.html");
+                string fileContent = File.ReadAllText(requestedFile);
 
-                using (Stream output = response.OutputStream)
+                // FIX-ME: the pagehide event is not working, and unload is obsolete in current browsers.
+                // we will inject a fake file to exit the server when browser tab is closed
+                const string script = "<script>window.addEventListener('pagehide', function (e) {" +
+                    "e.preventDefault();" +
+                    "fetch('" + _servingURL + _exitFile + "', { method: 'GET' });}, false);" +
+                    "</script>";
+                int bodyIndex = fileContent.IndexOf("</body>", StringComparison.OrdinalIgnoreCase);
+                if (bodyIndex != -1)
                 {
-                    output.Write(fileBytes, 0, fileBytes.Length);
+                    fileContent = fileContent.Insert(bodyIndex, script);
                 }
+                else
+                {
+                    fileContent += script;
+                }
+
+                buffer = Encoding.UTF8.GetBytes(fileContent);
+                response.ContentType = GetMimeType(requestedFile);
+            }
+            else if (File.Exists(requestedFile))
+            {
+                buffer = File.ReadAllBytes(requestedFile);
+                response.ContentType = GetMimeType(requestedFile);
             }
             else
             {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
                 const string responseString = "<html><head><title>404 - File Not Found</title></head><body><h1>404 - File Not Found</h1></body></html>";
-                byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-                response.ContentLength64 = buffer.Length;
+                buffer = Encoding.UTF8.GetBytes(responseString);
+            }
 
-                using (Stream output = response.OutputStream)
-                {
-                    output.Write(buffer, 0, buffer.Length);
-                }
+            response.ContentLength64 = buffer.Length;
+            using (Stream output = response.OutputStream)
+            {
+                output.Write(buffer, 0, buffer.Length);
             }
         }
 
