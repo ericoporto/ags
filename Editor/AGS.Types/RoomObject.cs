@@ -261,10 +261,10 @@ namespace AGS.Types
 					wantProperties.Add(property);
 				}
 			}
-			return new PropertyDescriptorCollection(wantProperties.ToArray());
-		}
+			return _properties.AddCustomProperties(new PropertyDescriptorCollection(wantProperties.ToArray()));
+        }
 
-		public PropertyDescriptorCollection GetProperties()
+        public PropertyDescriptorCollection GetProperties()
 		{
 			PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(this, true);
 			return properties;

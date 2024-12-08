@@ -454,7 +454,8 @@ namespace AGS.Types
                     wantProperties.Add(property);
                 }
             }
-            return new PropertyDescriptorCollection(wantProperties.ToArray());
+            PropertyDescriptorCollection properties_res = new PropertyDescriptorCollection(wantProperties.ToArray());
+            return _properties.AddCustomProperties(properties_res);
         }
 
         public PropertyDescriptorCollection GetProperties()

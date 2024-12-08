@@ -90,6 +90,12 @@ namespace AGS.Types
             protected set { _properties = value; }
         }
 
+        public PropertyDescriptorCollection GetProperties(Attribute[] attributes)
+        {
+            PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(this, attributes, true);
+            return _properties.AddCustomProperties(properties);
+        }
+
         [AGSNoSerialize()]
         [Browsable(false)]
         public Interactions Interactions
