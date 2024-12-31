@@ -4,14 +4,11 @@ FROM ghcr.io/ericoporto/min-ags-dev-env:2.0.13
 # if no temp folder exists by default, create it
 RUN IF exist %TEMP%\nul ( echo %TEMP% ) ELSE ( mkdir %TEMP% )
 
-# Windows 10.0.10240 SDK (but only install the .NET 4.6 SDK)
-RUN pushd %TEMP% && \
-  curl -fLO https://download.microsoft.com/download/E/1/F/E1F1E61E-F3C6-4420-A916-FB7C47FBC89E/standalonesdk/sdksetup.exe && \
-  start /wait sdksetup /ceip off /features OptionID.NetFxSoftwareDevelopmentKit /quiet /norestart && \
-  popd && \
-  mkdir empty && \
-  robocopy empty %TEMP% /MIR > nul & \
-  rd /s /q empty
+# Install .NET 4.8
+RUN curl -fSLo dotnet-framework-installer.exe https://download.microsoft.com/download/6/4/2/642ec242-448b-49a1-8371-5d9c202eaa46/NDP48-DevPack-ENU.exe \
+    && ./dotnet-framework-installer.exe /q \
+    && del ./dotnet-framework-installer.exe \
+    && powershell Remove-Item -Force -Recurse ${Env:TEMP}/*
 
 ARG NUGET_VERSION=5.7.0
 ARG INNO_SETUP_VERSION=6.2.2
