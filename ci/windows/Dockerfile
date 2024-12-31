@@ -1,14 +1,8 @@
 # base will already have Chocolatey installed
-FROM ghcr.io/ericoporto/min-ags-dev-env:2.0.13
+FROM ghcr.io/ericoporto/min-ags-dev-env:2.0.14
 
 # if no temp folder exists by default, create it
 RUN IF exist %TEMP%\nul ( echo %TEMP% ) ELSE ( mkdir %TEMP% )
-
-# Install .NET 4.8
-RUN curl -fSLo dotnet-framework-installer.exe https://download.microsoft.com/download/6/4/2/642ec242-448b-49a1-8371-5d9c202eaa46/NDP48-DevPack-ENU.exe \
-    && ./dotnet-framework-installer.exe /q \
-    && del ./dotnet-framework-installer.exe \
-    && powershell Remove-Item -Force -Recurse ${Env:TEMP}/*
 
 ARG NUGET_VERSION=5.7.0
 ARG INNO_SETUP_VERSION=6.2.2
