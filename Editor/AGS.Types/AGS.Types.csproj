@@ -1,30 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{3EBBEDAB-214C-4201-BB5A-5152D56908DD}</ProjectGuid>
+    <TargetFramework>net46</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AGS.Types</RootNamespace>
-    <AssemblyName>AGS.Types</AssemblyName>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
+    <SccProjectName></SccProjectName>
+    <SccLocalPath></SccLocalPath>
+    <SccAuxPath></SccAuxPath>
+    <SccProvider></SccProvider>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -40,34 +22,19 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <DocumentationFile>bin\Debug\AGS.Types.XML</DocumentationFile>
     <NoWarn>1591</NoWarn>
     <LangVersion>6</LangVersion>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\AGS.Types.XML</DocumentationFile>
     <NoWarn>1591</NoWarn>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <LangVersion>6</LangVersion>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -76,216 +43,26 @@
     <AssemblyOriginatorKeyFile>AGS.Types.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DocumentationFile>bin\Debug\AGS.Types.XML</DocumentationFile>
     <NoWarn>1591</NoWarn>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
     <LangVersion>6</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
     <DocumentationFile>bin\Release\AGS.Types.XML</DocumentationFile>
-    <Optimize>true</Optimize>
     <NoWarn>1591</NoWarn>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
     <LangVersion>6</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Design" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\AGSNoSerializeAttribute.cs" />
-    <Compile Include="Attributes\AGSSerializeClassAttribute.cs" />
-    <Compile Include="Attributes\ScriptFunctionParametersAttribute.cs" />
-    <Compile Include="AudioClip.cs" />
-    <Compile Include="AudioClipFolder.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="DebugLog.cs" />
-    <Compile Include="EditorFeatures\AutoComplete\ScriptDefine.cs" />
-    <Compile Include="EditorFeatures\AutoComplete\ScriptEnum.cs" />
-    <Compile Include="EditorFeatures\AutoComplete\ScriptEnumValue.cs" />
-    <Compile Include="EditorFeatures\AutoComplete\ScriptFunction.cs" />
-    <Compile Include="EditorFeatures\AutoComplete\ScriptStruct.cs" />
-    <Compile Include="EditorFeatures\AutoComplete\ScriptToken.cs" />
-    <Compile Include="EditorFeatures\AutoComplete\ScriptVariable.cs" />
-    <Compile Include="Character.cs" />
-    <Compile Include="CustomProperties.cs" />
-    <Compile Include="CustomProperty.cs" />
-    <Compile Include="CustomPropertySchema.cs" />
-    <Compile Include="CustomPropertySchemaItem.cs" />
-    <Compile Include="Dialog.cs" />
-    <Compile Include="DialogOption.cs" />
-    <Compile Include="EditorFeatures\BaseTemplate.cs" />
-    <Compile Include="EditorFeatures\BeforeShowContextMenuEventArgs.cs" />
-    <Compile Include="EditorFeatures\ContentDocument.cs" />
-    <Compile Include="EditorFeatures\OpenScriptFunctionArgs.cs" />
-    <Compile Include="EditorFeatures\EditorContentPanel.cs">
+    <Compile Update="EditorFeatures\EditorContentPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="EditorFeatures\GetAboutDialogTextEventArgs.cs" />
-    <Compile Include="EditorFeatures\GetScriptHeaderListEventArgs.cs" />
-    <Compile Include="EditorFeatures\GetScriptModuleListEventArgs.cs" />
-    <Compile Include="EditorFeatures\MenuCommand.cs" />
-    <Compile Include="EditorFeatures\MenuCommands.cs" />
-    <Compile Include="EditorFeatures\MessageBoxIconType.cs" />
-    <Compile Include="EditorFeatures\RoomTemplate.cs" />
-    <Compile Include="Enums\AndroidBuildFormat.cs" />
-    <Compile Include="Enums\InputMotionMode.cs" />
-    <Compile Include="Enums\TouchToMouseEmulationType.cs" />
-    <Compile Include="Enums\FontAutoOutlineStyle.cs" />
-    <Compile Include="Enums\CrossfadeSpeed.cs" />
-    <Compile Include="Enums\CustomPropertyAppliesTo.cs" />
-    <Compile Include="Enums\CustomPropertyType.cs" />
-    <Compile Include="Enums\FontHeightDefinition.cs" />
-    <Compile Include="Enums\FontMetricsFixup.cs" />
-    <Compile Include="Enums\FontOutlineStyle.cs" />
-    <Compile Include="Enums\FrameAlignment.cs" />
-    <Compile Include="Enums\GameColorDepth.cs" />
-    <Compile Include="Enums\GameTextType.cs" />
-    <Compile Include="Enums\GraphicsDriver.cs" />
-    <Compile Include="Enums\GUIAlphaStyle.cs" />
-    <Compile Include="Enums\GUIPopupStyle.cs" />
-    <Compile Include="Enums\InterfaceDisabledAction.cs" />
-    <Compile Include="Enums\InventoryHotspotMarkerStyle.cs" />
-    <Compile Include="Enums\LipSyncType.cs" />
-    <Compile Include="Enums\LogGroup.cs" />
-    <Compile Include="Enums\LogLevel.cs" />
-    <Compile Include="Enums\PaletteColourType.cs" />
-    <Compile Include="Enums\RoomAreaMaskType.cs" />
-    <Compile Include="Enums\RoomResolution.cs" />
-    <Compile Include="Enums\RoomTransitionStyle.cs" />
-    <Compile Include="Enums\RoomVolumeAdjustment.cs" />
-    <Compile Include="Enums\ScreenRotationMode.cs" />
-    <Compile Include="Enums\SkipSpeechStyle.cs" />
-    <Compile Include="Enums\SpeechPortraitSide.cs" />
-    <Compile Include="Enums\SpeechStyle.cs" />
-    <Compile Include="Enums\SpriteCompression.cs" />
-    <Compile Include="Enums\SpriteImportTilingDirection.cs" />
-    <Compile Include="Enums\SpriteImportTransparency.cs" />
-    <Compile Include="Enums\SpriteImportResolution.cs" />
-    <Compile Include="Enums\TextParserWordType.cs" />
-    <Compile Include="Exceptions\CannotDeleteFileException.cs" />
-    <Compile Include="Exceptions\CompileError.cs" />
-    <Compile Include="Exceptions\CompileMessage.cs" />
-    <Compile Include="Exceptions\CompileMessages.cs" />
-    <Compile Include="Exceptions\CompileWarning.cs" />
-    <Compile Include="Exceptions\SpriteInUseException.cs" />
-    <Compile Include="Font.cs" />
-    <Compile Include="EditorFeatures\GameTemplate.cs" />
-    <Compile Include="GlobalVariable.cs" />
-    <Compile Include="GlobalVariables.cs" />
-    <Compile Include="GUIControlGroup.cs" />
-    <Compile Include="HelperTypes\FakeEnumerator.cs" />
-    <Compile Include="HelperTypes\SpriteInfo.cs" />
-    <Compile Include="Interfaces\IRePopulatableComponent.cs" />
-    <Compile Include="Interfaces\ILoadedRoom.cs" />
-    <Compile Include="InteractionSchema.cs" />
-    <Compile Include="Interfaces\IChangeNotification.cs" />
-    <Compile Include="Interfaces\ICompiledScript.cs" />
-    <Compile Include="Interfaces\IEditorComponent.cs" />
-    <Compile Include="Interfaces\IGame.cs" />
-    <Compile Include="Interfaces\IGUIController.cs" />
-    <Compile Include="Interfaces\IPersistUserData.cs" />
-    <Compile Include="Interfaces\IProjectTree.cs" />
-    <Compile Include="Interfaces\IProjectTreeItem.cs" />
-    <Compile Include="Interfaces\IRoom.cs" />
-    <Compile Include="Interfaces\IRoomController.cs" />
-    <Compile Include="Interfaces\IScriptEditorControl.cs" />
-    <Compile Include="Interfaces\ISourceControlIntegration.cs" />
-    <Compile Include="Interfaces\ISourceControlProvider.cs" />
-    <Compile Include="Interfaces\ISpriteFolder.cs" />
-    <Compile Include="Interfaces\IViewFolder.cs" />
-    <Compile Include="LipSync.cs" />
-    <Compile Include="LogGroups.cs" />
-    <Compile Include="OldInteractionVariable.cs" />
-    <Compile Include="Plugin.cs" />
-    <Compile Include="Plugins\IAGSEditor.cs" />
-    <Compile Include="Plugins\IAGSEditorPlugin.cs" />
-    <Compile Include="Plugins\RequiredAGSVersionAttribute.cs" />
-    <Compile Include="PropertyGridExtras\AudioClipSourceFileUIEditor.cs" />
-    <Compile Include="PropertyGridExtras\ColorUIEditor.cs" />
-    <Compile Include="PropertyGridExtras\CustomPropertiesUIEditor.cs" />
-    <Compile Include="PropertyGridExtras\CustomPropertyDescriptor.cs" />
-    <Compile Include="PropertyGridExtras\FontFileUIEditor.cs" />
-    <Compile Include="PropertyGridExtras\FontSizeTypeConverter.cs" />
-    <Compile Include="PropertyGridExtras\FontSizeUIEditor.cs" />
-    <Compile Include="PropertyGridExtras\InteractionPropertyDescriptor.cs" />
-    <Compile Include="PropertyGridExtras\InteractionEventPropertyDescriptor.cs" />
-    <Compile Include="PropertyGridExtras\MultilineStringUIEditor.cs" />
-    <Compile Include="PropertyGridExtras\PropertyTabInteractions.cs" />
-    <Compile Include="PropertyGridExtras\ReadOnlyConverter .cs" />
-    <Compile Include="PropertyGridExtras\RoomMaskResolutionTypeConverter.cs" />
-    <Compile Include="PropertyGridExtras\RoomMessagesUIEditor.cs" />
-    <Compile Include="PropertyGridExtras\ScriptListTypeConverter.cs" />
-    <Compile Include="PropertyGridExtras\SpriteFileNameEditor.cs" />
-    <Compile Include="PropertyGridExtras\SpriteSelectUIEditor.cs" />
-    <Compile Include="PropertyGridExtras\TextEncodingTypeConverter.cs" />
-    <Compile Include="PropertyGridExtras\ViewUIEditor.cs" />
-    <Compile Include="Room.cs" />
-    <Compile Include="RoomHotspot.cs" />
-    <Compile Include="RoomMessage.cs" />
-    <Compile Include="RoomObject.cs" />
-    <Compile Include="RoomRegion.cs" />
-    <Compile Include="RoomWalkableArea.cs" />
-    <Compile Include="RoomWalkBehind.cs" />
-    <Compile Include="EditorFeatures\AutoComplete\ScriptAutoCompleteData.cs" />
-    <Compile Include="ScriptsAndHeaders.cs" />
-    <Compile Include="Translation.cs" />
-    <Compile Include="UnloadedRoom.cs" />
-    <Compile Include="TextParser.cs" />
-    <Compile Include="TextParserWord.cs" />
-    <Compile Include="Utilities.cs" />
-    <Compile Include="ViewFrame.cs" />
-    <Compile Include="ViewLoop.cs" />
-    <Compile Include="MouseCursor.cs" />
-    <Compile Include="PropertyGridExtras\AGSEventPropertyAttribute.cs" />
-    <Compile Include="PropertyGridExtras\EnumTypeConverter.cs" />
-    <Compile Include="PropertyGridExtras\ScriptFunctionUIEditor.cs" />
-    <Compile Include="Exceptions\AGSEditorException.cs" />
-    <Compile Include="Game.cs" />
-    <Compile Include="Enums\GameResolutions.cs" />
-    <Compile Include="GUITextWindowEdge.cs" />
-    <Compile Include="Interactions.cs" />
-    <Compile Include="NormalGUI.cs" />
-    <Compile Include="GUI.cs" />
-    <Compile Include="GUIButton.cs" />
-    <Compile Include="Enums\GUIClickAction.cs" />
-    <Compile Include="GUIControl.cs" />
-    <Compile Include="GUIInventory.cs" />
-    <Compile Include="GUILabel.cs" />
-    <Compile Include="GUIListBox.cs" />
-    <Compile Include="GUISlider.cs" />
-    <Compile Include="GUITextBox.cs" />
-    <Compile Include="Enums\GUIVisibility.cs" />
-    <Compile Include="Exceptions\InvalidDataException.cs" />
-    <Compile Include="InventoryHotspotMarker.cs" />
-    <Compile Include="InventoryItem.cs" />
-    <Compile Include="PaletteEntry.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PropertyGridExtras\PropertyTabEvents.cs" />
-    <Compile Include="Script.cs" />
-    <Compile Include="Scripts.cs" />
-    <Compile Include="SerializeUtils.cs" />
-    <Compile Include="Settings.cs" />
-    <Compile Include="Sprite.cs" />
-    <Compile Include="SpriteFolder.cs" />
-    <Compile Include="TextWindowGUI.cs" />
-    <Compile Include="View.cs" />
-    <Compile Include="ViewFolder.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="PropertyGridExtras\event.bmp" />
@@ -297,69 +74,9 @@
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AGSColor.cs" />
-    <Compile Include="Attributes\DeserializeConvertValueAttribute.cs" />
-    <Compile Include="AudioClipType.cs" />
-    <Compile Include="BaseFolderCollection.cs" />
-    <Compile Include="BuildTargetsInfo.cs" />
-    <Compile Include="Enums\BuildConfiguration.cs" />
-    <Compile Include="Enums\DialogOptionsNumbering.cs" />
-    <Compile Include="Enums\GameScaling.cs" />
-    <Compile Include="Enums\RenderAtScreenResolution.cs" />
-    <Compile Include="Enums\RuntimeAudioDriver.cs" />
-    <Compile Include="Enums\ScriptAPIVersion.cs" />
-    <Compile Include="Enums\SpriteAlphaStyle.cs" />
-    <Compile Include="HelperTypes\BindingListWithRemoving.cs" />
-    <Compile Include="CharacterFolder.cs" />
-    <Compile Include="DialogFolder.cs" />
-    <Compile Include="EditorFeatures\AutoComplete\ScriptTokenReference.cs" />
-    <Compile Include="EditorFeatures\DockData.cs" />
-    <Compile Include="Enums\AudioClipFileType.cs" />
-    <Compile Include="Enums\AudioClipPriority.cs" />
-    <Compile Include="Enums\AudioFileBundlingType.cs" />
-    <Compile Include="Enums\InheritableBool.cs" />
-    <Compile Include="Enums\LookInDocumentType.cs" />
-    <Compile Include="FolderHelper.cs" />
-    <Compile Include="HelperTypes\FolderListHybrid.cs" />
-    <Compile Include="GUIFolder.cs" />
-    <Compile Include="HelperTypes\FolderChangeEventArgs.cs" />
-    <Compile Include="Interfaces\Docking\IDockingContent.cs" />
-    <Compile Include="Interfaces\Docking\IDockingPane.cs" />
-    <Compile Include="Interfaces\Docking\IDockingPanel.cs" />
-    <Compile Include="Interfaces\Docking\IFloatWindow.cs" />
-    <Compile Include="Interfaces\IBuildTarget.cs" />
-    <Compile Include="Interfaces\IColorMapper.cs" />
-    <Compile Include="Interfaces\Docking\IDockingContainer.cs" />
-    <Compile Include="Interfaces\IGlobalVariablesController.cs" />
-    <Compile Include="Interfaces\IProjectTreeSingleClickHandler.cs" />
-    <Compile Include="Interfaces\IScript.cs" />
-    <Compile Include="Interfaces\IScriptEditor.cs" />
-    <Compile Include="Interfaces\ISpriteController.cs" />
-    <Compile Include="Interfaces\IToXml.cs" />
-    <Compile Include="InventoryItemFolder.cs" />
-    <Compile Include="PropertyGridExtras\ExclusiveEnumTypeConverter.cs" />
-    <Compile Include="PropertyGridExtras\GraphicsFilterTypeConverter.cs" />
-    <Compile Include="PropertyGridExtras\TranslationListTypeConverter.cs" />
-    <Compile Include="RuntimeSetup.cs" />
-    <Compile Include="WorkspaceState.cs" />
-    <Compile Include="PropertyGridExtras\AudioClipTypeConverter.cs" />
-    <Compile Include="PropertyGridExtras\AudioClipTypeTypeConverter.cs" />
-    <Compile Include="PropertyGridExtras\BaseListSelectTypeConverter.cs" />
-    <Compile Include="PropertyGridExtras\BuildTargetUIEditor.cs" />
-    <Compile Include="PropertyGridExtras\CustomResolutionTypeConverter.cs" />
-    <Compile Include="PropertyGridExtras\CustomResolutionUIEditor.cs" />
-    <Compile Include="PropertyGridExtras\FontTypeConverter.cs" />
-    <Compile Include="PropertyGridExtras\RoomListTypeConverter.cs" />
-    <Compile Include="PropertyGridExtras\StringListUIEditor.cs" />
-    <Compile Include="PropertyGridExtras\StringListUIEditorControl.cs">
+    <Compile Update="PropertyGridExtras\StringListUIEditorControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="PropertyGridExtras\StringListUIEditorControl.Designer.cs">
-      <DependentUpon>StringListUIEditorControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ScriptAndHeader.cs" />
-    <Compile Include="ScriptFolder.cs" />
-    <Compile Include="UnloadedRoomFolder.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -373,19 +90,5 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="AGS.Types.snk" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
+  <PropertyGroup />
 </Project>
