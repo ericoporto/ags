@@ -4,7 +4,7 @@ FROM ghcr.io/ericoporto/min-ags-dev-env:2.0.13
 # if no temp folder exists by default, create it
 RUN IF exist %TEMP%\nul ( echo %TEMP% ) ELSE ( mkdir %TEMP% )
 
-ARG NUGET_VERSION=5.7.0
+ARG NUGET_VERSION=6.12.1
 ARG INNO_SETUP_VERSION=6.2.2
 RUN choco install nuget.commandline --version %NUGET_VERSION% -y && \
   choco install innosetup --version %INNO_SETUP_VERSION% -y && \
