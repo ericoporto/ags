@@ -7,7 +7,7 @@ RUN IF exist %TEMP%\nul ( echo %TEMP% ) ELSE ( mkdir %TEMP% )
 # Windows 10.0.19041.1 SDK (but only install the .NET 4.8 SDK)
 RUN pushd %TEMP% && \
   curl -fLO https://download.microsoft.com/download/1/c/3/1c3d5161-d9e9-4e4b-9b43-b70fe8be268c/windowssdk/winsdksetup.exe && \
-  start /wait sdksetup /ceip off /features OptionID.NetFxSoftwareDevelopmentKit /quiet /norestart && \
+  start /wait winsdksetup /ceip off /features OptionID.NetFxSoftwareDevelopmentKit /quiet /norestart && \
   popd && \
   mkdir empty && \
   robocopy empty %TEMP% /MIR > nul & \
