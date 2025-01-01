@@ -17,6 +17,8 @@ ARG NUGET_VERSION=6.12.1
 ARG INNO_SETUP_VERSION=6.2.2
 RUN choco install nuget.commandline --version %NUGET_VERSION% -y && \
   choco install innosetup --version %INNO_SETUP_VERSION% -y && \
+  choco install dotnet -y && \
+  choco install dotnet-8.0-sdk -y && \
   mkdir empty && \
   robocopy empty %TEMP% /MIR > nul & \
   rd /s /q empty
