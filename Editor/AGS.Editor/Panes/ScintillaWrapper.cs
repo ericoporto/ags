@@ -629,6 +629,47 @@ namespace AGS.Editor
             scintillaControl1.EndUndoAction();
         }
 
+        List<int> GetAllRegionHeadersLines()
+        {
+            List<int> regionLines = new List<int>();
+            int lineCount = scintillaControl1.Lines.Count;
+
+            for (int i = 0; i < lineCount; i++)
+            {
+                string lineText = scintillaControl1.Lines[i].Text.TrimStart();
+                if (lineText.StartsWith("#region", StringComparison.OrdinalIgnoreCase))
+                {
+                    regionLines.Add(i);
+                }
+            }
+
+            return regionLines;
+        }
+
+        public void CollapseAllRegions()
+        {
+            var regionHeaders = GetAllRegionHeadersLines();
+            foreach (int line in regionHeaders)
+            {
+                if (scintillaControl1.Lines[line].Expanded)
+                {
+                    scintillaControl1.Lines[line].ToggleFold();
+                }
+            }
+        }
+
+        public void ExpandAllRegions()
+        {
+            var regionHeaders = GetAllRegionHeadersLines();
+            foreach (int line in regionHeaders)
+            {
+                if (!scintillaControl1.Lines[line].Expanded)
+                {
+                    scintillaControl1.Lines[line].ToggleFold();
+                }
+            }
+        }
+
         public void GoToPosition(int newPos)
         {
             int lineNum = scintillaControl1.LineFromPosition(newPos);
