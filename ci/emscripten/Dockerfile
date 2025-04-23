@@ -1,6 +1,6 @@
 # This Dockerfile is heavily based on the official EMSDK Dockerfile 
 # For more information, see https://github.com/emscripten-core/emsdk/tree/main/docker
-FROM ubuntu:jammy
+FROM ubuntu:noble
 
 # The current used version of emsdk
 ARG EMSCRIPTEN_VERSION=3.1.74
