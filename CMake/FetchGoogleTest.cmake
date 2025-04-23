@@ -37,4 +37,7 @@ endif()
 if(LINUX_OLD_GCC)
     target_compile_options(gtest PRIVATE -Wno-undef -Wno-missing-noreturn -Wno-inline)
     target_compile_options(gtest_main PRIVATE -Wno-undef -Wno-missing-noreturn -Wno-inline)
+    # this is because we are building an old googletest before gmock was absorbed by it
+    target_compile_options(gmock PRIVATE -Wno-undef -Wno-missing-noreturn -Wno-inline)
+    target_compile_options(gmock_main PRIVATE -Wno-undef -Wno-missing-noreturn -Wno-inline)
 endif()
