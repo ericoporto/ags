@@ -13,6 +13,11 @@ cmake_minimum_required(VERSION 3.7.2 FATAL_ERROR)
 # Build options
 #
 
+# We will check_ipo_supported before applying it
+if(POLICY CMP0069)
+    cmake_policy(SET CMP0069 NEW)
+endif()
+
 # Set the project name.
 project(ALLEGRO C CXX)
 
