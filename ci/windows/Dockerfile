@@ -104,3 +104,30 @@ RUN mkdir Lib\SDL_sound && \
   copy Lib\SDL_sound\build_x86\Release\SDL2_sound-static.lib Lib\SDL_sound\lib\x86\SDL2_sound-static.lib && \
   copy Lib\SDL_sound\build_x64\Release\SDL2_sound-static.lib Lib\SDL_sound\lib\x64\SDL2_sound-static.lib
 
+ARG SDL_TTF_VERSION=db1e6d14494bfffe464c50667a26941cc3a36324
+RUN mkdir Lib\SDL_ttf && \
+  pushd Lib && \
+  git clone --branch SDL2 --recurse-submodules https://github.com/libsdl-org/SDL_ttf.git SDL_ttf && \
+  popd && \
+  pushd Lib\SDL_ttf && \
+  git checkout --recurse-submodules %SDL_TTF_VERSION% && \
+  popd && \
+  mkdir Lib\SDL_ttf\build_x86 && \
+  mkdir Lib\SDL_ttf\build_x64 && \
+  set SDL2_DIR=%cd%\Lib\SDL2 && \
+  call "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/Tools/VsDevCmd.bat" && \
+  cmake -S Lib\SDL_ttf -B Lib\SDL_ttf\build_x86 -G "Visual Studio 17 2022" -T"v142" -A"Win32" -DCMAKE_PREFIX_PATH=Lib\SDL2 -DSDL2TTF_SAMPLES=0 -DBUILD_SHARED_LIBS=0 && \
+  pushd Lib\SDL_ttf\build_x86 && \
+  msbuild SDL2_ttf.sln /p:PlatformToolset=v142 /p:Configuration=Release /p:Platform=Win32 /maxcpucount /nologo && \
+  popd && \
+  call "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/Tools/VsDevCmd.bat" && \
+  cmake -S Lib\SDL_ttf -B Lib\SDL_ttf\build_x64 -G "Visual Studio 17 2022" -T"v142" -A"x64" -DCMAKE_PREFIX_PATH=Lib\SDL2 -DSDL2TTF_SAMPLES=0 -DBUILD_SHARED_LIBS=0 && \
+  pushd Lib\SDL_ttf\build_x64 && \
+  msbuild SDL2_ttf.sln /p:PlatformToolset=v142 /p:Configuration=Release /p:Platform=x64 /maxcpucount /nologo && \
+  popd && \
+  mkdir Lib\SDL_ttf\lib && \
+  mkdir Lib\SDL_ttf\lib\x86 && \
+  mkdir Lib\SDL_ttf\lib\x64 && \
+  copy Lib\SDL_ttf\build_x86\Release\SDL2_ttf.lib Lib\SDL_ttf\lib\x86\SDL2_ttf.lib && \
+  copy Lib\SDL_ttf\build_x64\Release\SDL2_ttf.lib Lib\SDL_ttf\lib\x64\SDL2_ttf.lib
+

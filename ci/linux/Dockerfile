@@ -91,16 +91,6 @@ RUN curl -fLsS "https://github.com/xiph/vorbis/releases/download/v${LIBVORBIS_VE
   rm -r /tmp/libvorbis-${LIBVORBIS_VERSION} && \
   rm /tmp/libvorbis-${LIBVORBIS_VERSION}.tar.gz 
 
-# Build and install SDL2
-ARG SDL_VERSION=release-2.30.11
-RUN curl -fLsS "https://github.com/libsdl-org/SDL/archive/refs/tags/${SDL_VERSION}.tar.gz" | tar -f - -xvzC /tmp && \
-  cd /tmp/SDL-${SDL_VERSION} && \
-  ./configure --enable-shared --enable-loadso --enable-pulseaudio-shared --enable-sndio-shared --enable-x11-shared --enable-oss=no --enable-libsamplerate-shared --enable-video-wayland=no --enable-directfb-shared --enable-rpath=no && \
-  make -j$(getconf _NPROCESSORS_ONLN) && make install && \
-  ldconfig -n /usr/local/lib && \
-  mkdir -p /usr/local/share/doc/libSDL2-2.0/ && cp /tmp/SDL-${SDL_VERSION}/LICENSE.txt /usr/local/share/doc/libSDL2-2.0/copyright && \
-  rm -r /tmp/SDL-${SDL_VERSION}
-  
 # Build newer libtheora - note that encoding support is disabled AND it's directory uses GH repo name instead
 ARG LIBTHEORA_VERSION=1.1.1
 RUN curl -fLsS "https://github.com/xiph/theora/archive/refs/tags/v${LIBTHEORA_VERSION}.tar.gz" --output /tmp/libtheora-${LIBTHEORA_VERSION}.tar.gz && \
@@ -111,6 +101,27 @@ RUN curl -fLsS "https://github.com/xiph/theora/archive/refs/tags/v${LIBTHEORA_VE
   make install && \
   rm -r /tmp/theora-${LIBTHEORA_VERSION} && \
   rm /tmp/libtheora-${LIBTHEORA_VERSION}.tar.gz 
+
+ARG FREETYPE_VERSION=2-13-3
+RUN cd /tmp && \
+  curl -fLsS "https://github.com/freetype/freetype/archive/refs/tags/VER-$FREETYPE_VERSION.tar.gz" --output Freetype.tar.gz && \
+  tar -xvzf Freetype.tar.gz && \
+  mv freetype-VER-$FREETYPE_VERSION Freetype &&  \
+  cd /tmp/Freetype  && \
+  mkdir /tmp/Freetype/build && \
+  cd /tmp/Freetype/build && \
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=1 -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=1 -DCMAKE_DISABLE_FIND_PACKAGE_PNG=1 -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=1 -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=1 ..  && make -j$(getconf _NPROCESSORS_ONLN) && make install && \
+  rm -r /tmp/Freetype
+
+# Build and install SDL2
+ARG SDL_VERSION=release-2.30.11
+RUN curl -fLsS "https://github.com/libsdl-org/SDL/archive/refs/tags/${SDL_VERSION}.tar.gz" | tar -f - -xvzC /tmp && \
+  cd /tmp/SDL-${SDL_VERSION} && \
+  ./configure --enable-shared --enable-loadso --enable-pulseaudio-shared --enable-sndio-shared --enable-x11-shared --enable-oss=no --enable-libsamplerate-shared --enable-video-wayland=no --enable-directfb-shared --enable-rpath=no && \
+  make -j$(getconf _NPROCESSORS_ONLN) && make install && \
+  ldconfig -n /usr/local/lib && \
+  mkdir -p /usr/local/share/doc/libSDL2-2.0/ && cp /tmp/SDL-${SDL_VERSION}/LICENSE.txt /usr/local/share/doc/libSDL2-2.0/copyright && \
+  rm -r /tmp/SDL-${SDL_VERSION}
 
 # Build and install SDL_sound
 ARG SDL2_SOUND_VERSION=474dbf755a1b67ebe7a55467b4f65e033f268aff
@@ -124,5 +135,16 @@ RUN cd /tmp && \
   cmake -DSDL2_DIR=/usr/local/lib/cmake/SDL2  -DSDLSOUND_DECODER_MIDI=1 ..  && make -j$(getconf _NPROCESSORS_ONLN) && make install && \
   rm /usr/local/lib/libSDL2_sound.*so* && \
   rm -r /tmp/SDL_sound
+
+ARG SDL2_TTF_VERSION=db1e6d14494bfffe464c50667a26941cc3a36324
+RUN cd /tmp && \
+  curl -fLsS "https://github.com/libsdl-org/SDL_ttf/archive/$SDL2_TTF_VERSION.tar.gz" --output SDL_ttf.tar.gz && \
+  tar -xvzf SDL_ttf.tar.gz && \
+  mv SDL_ttf-$SDL2_TTF_VERSION SDL_ttf && \
+  mkdir /tmp/SDL_ttf/build && \
+  cd /tmp/SDL_ttf/build && \
+  cmake -DSDL2_DIR=/usr/local/lib/cmake/SDL2 -DSDL2TTF_SAMPLES=0 -DBUILD_SHARED_LIBS=0 .. && \
+  make -j$(getconf _NPROCESSORS_ONLN) && make install && \
+  rm -r /tmp/SDL_ttf
 
 RUN ldconfig -v
