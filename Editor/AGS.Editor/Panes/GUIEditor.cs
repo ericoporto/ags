@@ -315,30 +315,7 @@ namespace AGS.Editor
                 {
                     foreach (GUIControl _gc in _selected)
                     {
-                        Rectangle _topleft = new Rectangle(_state.GUIXToWindow(_gc.Left), _state.GUIYToWindow(_gc.Top), 2, 2);
-                        Rectangle _topright = new Rectangle(_state.GUIXToWindow(_gc.Left + _gc.Width - 1), _state.GUIYToWindow(_gc.Top), 2, 2);
-                        Rectangle _bottomleft = new Rectangle(_state.GUIXToWindow(_gc.Left), _state.GUIYToWindow(_gc.Top + _gc.Height - 1), 2, 2);
-                        Rectangle _bottomright = new Rectangle(_state.GUIXToWindow(_gc.Left + _gc.Width - 1), _state.GUIYToWindow(_gc.Top + _gc.Height - 1), 2, 2);
-                        Pen _pen;
-                        if (_gc == _selectedControl) _pen = _drawSelectedPen;
-                        else _pen = _drawRectanglePen;
-                        e.Graphics.DrawRectangle(_pen, _topleft);
-                        e.Graphics.DrawRectangle(_pen, _topright);
-                        e.Graphics.DrawRectangle(_pen, _bottomleft);
-                        e.Graphics.DrawRectangle(_pen, _bottomright);
-
-                        //draw cross if locked
-                        if (_gc.Locked)
-                        {
-                            Point center = new Point(_gc.Left + (_gc.Width / 2), _gc.Top + (_gc.Height / 2));
-                            center.X = _state.GUIXToWindow(center.X);
-                            center.Y = _state.GUIYToWindow(center.Y);
-
-                            e.Graphics.DrawLine(_pen, center.X - 3, center.Y - 3, center.X + 3, center.Y + 3);
-                            e.Graphics.DrawLine(_pen, center.X - 3, center.Y + 3, center.X + 3, center.Y - 3);
-                            
-                        }
-
+                        DrawSelectionHandles(e, _gc);
                     }
                 }
 
@@ -371,6 +348,32 @@ namespace AGS.Editor
 
             }
             base.OnPaint(e);
+        }
+
+        private void DrawSelectionHandles(PaintEventArgs e, GUIControl gc)
+        {
+            Rectangle _topleft = new Rectangle(_state.GUIXToWindow(gc.Left), _state.GUIYToWindow(gc.Top), 2, 2);
+            Rectangle _topright = new Rectangle(_state.GUIXToWindow(gc.Left + gc.Width - 1), _state.GUIYToWindow(gc.Top), 2, 2);
+            Rectangle _bottomleft = new Rectangle(_state.GUIXToWindow(gc.Left), _state.GUIYToWindow(gc.Top + gc.Height - 1), 2, 2);
+            Rectangle _bottomright = new Rectangle(_state.GUIXToWindow(gc.Left + gc.Width - 1), _state.GUIYToWindow(gc.Top + gc.Height - 1), 2, 2);
+            Pen pen;
+            if (gc == _selectedControl) pen = _drawSelectedPen;
+            else pen = _drawRectanglePen;
+            e.Graphics.DrawRectangle(pen, _topleft);
+            e.Graphics.DrawRectangle(pen, _topright);
+            e.Graphics.DrawRectangle(pen, _bottomleft);
+            e.Graphics.DrawRectangle(pen, _bottomright);
+
+            //draw cross if locked
+            if (gc.Locked)
+            {
+                Point center = new Point(gc.Left + (gc.Width / 2), gc.Top + (gc.Height / 2));
+                center.X = _state.GUIXToWindow(center.X);
+                center.Y = _state.GUIYToWindow(center.Y);
+
+                e.Graphics.DrawLine(pen, center.X - 3, center.Y - 3, center.X + 3, center.Y + 3);
+                e.Graphics.DrawLine(pen, center.X - 3, center.Y + 3, center.X + 3, center.Y - 3);
+            }
         }
 
         private bool AboutToAddControl()
