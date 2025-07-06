@@ -11,7 +11,7 @@ For community forums, games and more, go to the website: [www.adventuregamestudi
 
 The latest stable version of AGS Editor may be found here: [https://www.adventuregamestudio.co.uk/site/ags/](https://www.adventuregamestudio.co.uk/site/ags/)
 
-For the full list of releases, both stable, betas and others, see our repository's [Releases page](https://github.com/adventuregamestudio/ags/releases).
+For the full list of releases, both stable, betas, and others, see our repository's [Releases page](https://github.com/adventuregamestudio/ags/releases).
 
 Please be aware that, unlike the runtime engine, AGS Editor is only supported on MS Windows (and Windows emulators such as WINE).
 
@@ -22,13 +22,13 @@ The [`master`][master-br] branch is where the next planned version is being de
 
 Currently, `master` corresponds to 3.\* generation of the engine/IDE and maintains backward compatibility with previous releases - see also [Compatibility](#ags-game-compatibility). According to current plans, this branch should only receive improvements to the backend, system support, and performance. Changes to data formats and game script should be kept to a strict minimum necessary to fill in the critical gaps in the engine's functionality.
 
-There's an [`ags4`][ags4-br] branch also active where we develop a future version AGS 4.0. There we introduce greater changes and cut much of the old version support.
+There's an [`ags4`][ags4-br] branch also active where we develop a future version, AGS 4.0. There we introduce greater changes and cut much of the old version support.
 
-According to our plans, in the future `master` branch will be merged with `ags4`, while the backward compatible generation will remain as the `ags3` branch and only receive fixes and minor enhancements. But there's still some work to do in AGS 3.\*, so the exact moment that happens is unknown.
+According to our plans, in the future, the `master` branch will be merged with `ags4`, while the backward compatible generation will remain as the `ags3` branch and only receive fixes and minor enhancements. But there's still some work to do in AGS 3.\*, so the exact moment that happens is unknown.
 
 For "official" releases we create `release-X.X.X` branches, that is to prepare the code for the final release and continue making patches to that release if a need arises. 
 
-Because of the low number of active developers we tend to only update the one latest release branch. If bugs are found in one of the older versions, then we advise you to update to the latest version first.
+Because of the low number of active developers, we tend to only update the latest release branch. If bugs are found in one of the older versions, then we advise you to update to the latest version first.
 
 Please note that while the `master` branch may contain changes to game data format and new script functions, we cannot guarantee that these will remain unchanged until the actual release. We only support data formats and script APIs that are in published releases. For that reason, it's best to use one of the actual releases if you'd like to make your own game with this tool.
 
@@ -49,11 +49,11 @@ To get started building the AGS engine, see the platform-specific instructions o
 No longer actively supported, but may work with older code revisions:
 -    [PSP](PSP/README.md) ([Forum thread](https://www.adventuregamestudio.co.uk/forums/index.php?topic=43998.0))
 
-On desktop systems launching a game is done by either placing an engine executable in the same directory where the game data is and starting the engine up or passing game location as a command-line argument.
+On desktop systems launching a game is done by either placing an engine executable in the same directory where the game data is and starting the engine up or passing the game location as a command-line argument.
 
 For Android, we have a game launcher app that may run any game, but it's also possible to make a signed APK for your own game (see instructions linked above).
 
-Game configuration is usually found in the `acsetup.cfg` file. On Windows you may also invoke a setup dialog by running the engine with `--setup` argument.
+Game configuration is usually found in the `acsetup.cfg` file. On Windows, you may also invoke a setup dialog by running the engine with `--setup` argument.
 
 For the list of available config options and command-line arguments, please refer to [OPTIONS.md](OPTIONS.md).
 
@@ -68,9 +68,9 @@ This repository now holds two generations of AGS, referred to as "AGS 3" and "AG
 
 - Supports (imports into the editor and runs by the engine) all versions of AGS games made with AGS 2.50 and up. Note that there may still be compatibility issues with very old games that were not uncovered and fixed yet.
 
-- If you try to run an unsupported game, you will receive an error message reporting the original version of AGS it was made in and data format index, which may be used for reference e.g. when reporting the problem.
+- If you try to run an unsupported game, you will receive an error message reporting the original version of AGS it was made in and the data format index, which may be used for reference e.g. when reporting the problem.
 
-- Game saves are compatible between the different platforms if they are created with the same version of the engine. Latest 3.\* engine should normally read saves made by engine 3.2.0 and above, but that has not been tested for a while.
+- Game saves are compatible between the different platforms if they are created with the same version of the engine. The latest 3.\* engine should normally read saves made by engine 3.2.0 and above, but that has not been tested for a while.
 
 - Certain games may require engine plugins. If there's no plugin version for a particular platform or a platform-independent replacement, then the game will not load on that platform.
 
@@ -94,7 +94,7 @@ There are other repositories which contain additional resources and may be of in
 
 If you would like to contribute to the project, please read the [CONTRIBUTING.md](CONTRIBUTING.md). Below is a brief summary of the process.
 
-* For the bug fixes or minor code improvements, you need only create a fork of the repository, commit your changes to a branch, and submit a pull request. We will review your commits and may ask you to make alterations to your code if needed before merging it into our repository.
+* For bug fixes or minor code improvements, you need only create a fork of the repository, commit your changes to a branch, and submit a pull request. We will review your commits and may ask you to make alterations to your code if needed before merging it into our repository.
 
 * For new features or other larger contributions, please first open an issue in the [Issue Tracker](https://github.com/adventuregamestudio/ags/issues). There we can discuss the proposed changes with the development team to ensure that they will be consistent with existing program behavior and future development plans.
 
