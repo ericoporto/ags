@@ -127,9 +127,9 @@ RUN cd /tmp && \
 
 ARG SDL2_TTF_VERSION=db1e6d14494bfffe464c50667a26941cc3a36324
 RUN cd /tmp && \
-  curl -fLsS "https://github.com/libsdl-org/SDL_ttf/archive/$SDL2_TTF_VERSION.tar.gz" --output SDL_ttf.tar.gz && \
-  tar -xvzf SDL_ttf.tar.gz && \
-  mv SDL_ttf-$SDL2_TTF_VERSION SDL_ttf && \
+  git clone --branch SDL2 --recurse-submodules https://github.com/libsdl-org/SDL_ttf.git SDL_ttf && \
+  cd /tmp/SDL_ttf && \
+  git checkout --recurse-submodules %SDL_TTF_VERSION% && \
   mkdir /tmp/SDL_ttf/build && \
   cd /tmp/SDL_ttf/build && \
   cmake -DSDL2_DIR=/usr/local/lib/cmake/SDL2 -DSDL2TTF_SAMPLES=0 -DBUILD_SHARED_LIBS=0 -DSDL2TTF_VENDORED=1 .. && \
