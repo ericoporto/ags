@@ -116,12 +116,12 @@ RUN mkdir Lib\SDL_ttf && \
   mkdir Lib\SDL_ttf\build_x64 && \
   set SDL2_DIR=%cd%\Lib\SDL2 && \
   call "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/Tools/VsDevCmd.bat" && \
-  cmake -S Lib\SDL_ttf -B Lib\SDL_ttf\build_x86 -G "Visual Studio 17 2022" -T"v142" -A"Win32" -DCMAKE_PREFIX_PATH=Lib\SDL2 -DSDL2TTF_SAMPLES=0 -DBUILD_SHARED_LIBS=0 && \
+  cmake -S Lib\SDL_ttf -B Lib\SDL_ttf\build_x86 -G "Visual Studio 17 2022" -T"v142" -A"Win32" -DCMAKE_PREFIX_PATH=Lib\SDL2 -DSDL2TTF_SAMPLES=0 -DBUILD_SHARED_LIBS=0 -DSDL2TTF_VENDORED=1 && \
   pushd Lib\SDL_ttf\build_x86 && \
   msbuild SDL2_ttf.sln /p:PlatformToolset=v142 /p:Configuration=Release /p:Platform=Win32 /maxcpucount /nologo && \
   popd && \
   call "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/Tools/VsDevCmd.bat" && \
-  cmake -S Lib\SDL_ttf -B Lib\SDL_ttf\build_x64 -G "Visual Studio 17 2022" -T"v142" -A"x64" -DCMAKE_PREFIX_PATH=Lib\SDL2 -DSDL2TTF_SAMPLES=0 -DBUILD_SHARED_LIBS=0 && \
+  cmake -S Lib\SDL_ttf -B Lib\SDL_ttf\build_x64 -G "Visual Studio 17 2022" -T"v142" -A"x64" -DCMAKE_PREFIX_PATH=Lib\SDL2 -DSDL2TTF_SAMPLES=0 -DBUILD_SHARED_LIBS=0 -DSDL2TTF_VENDORED=1 && \
   pushd Lib\SDL_ttf\build_x64 && \
   msbuild SDL2_ttf.sln /p:PlatformToolset=v142 /p:Configuration=Release /p:Platform=x64 /maxcpucount /nologo && \
   popd && \

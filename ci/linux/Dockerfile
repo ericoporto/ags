@@ -102,17 +102,6 @@ RUN curl -fLsS "https://github.com/xiph/theora/archive/refs/tags/v${LIBTHEORA_VE
   rm -r /tmp/theora-${LIBTHEORA_VERSION} && \
   rm /tmp/libtheora-${LIBTHEORA_VERSION}.tar.gz 
 
-ARG FREETYPE_VERSION=2-13-3
-RUN cd /tmp && \
-  curl -fLsS "https://github.com/freetype/freetype/archive/refs/tags/VER-$FREETYPE_VERSION.tar.gz" --output Freetype.tar.gz && \
-  tar -xvzf Freetype.tar.gz && \
-  mv freetype-VER-$FREETYPE_VERSION Freetype &&  \
-  cd /tmp/Freetype  && \
-  mkdir /tmp/Freetype/build && \
-  cd /tmp/Freetype/build && \
-  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=1 -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=1 -DCMAKE_DISABLE_FIND_PACKAGE_PNG=1 -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=1 -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=1 ..  && make -j$(getconf _NPROCESSORS_ONLN) && make install && \
-  rm -r /tmp/Freetype
-
 # Build and install SDL2
 ARG SDL_VERSION=release-2.30.11
 RUN curl -fLsS "https://github.com/libsdl-org/SDL/archive/refs/tags/${SDL_VERSION}.tar.gz" | tar -f - -xvzC /tmp && \
@@ -143,7 +132,7 @@ RUN cd /tmp && \
   mv SDL_ttf-$SDL2_TTF_VERSION SDL_ttf && \
   mkdir /tmp/SDL_ttf/build && \
   cd /tmp/SDL_ttf/build && \
-  cmake -DSDL2_DIR=/usr/local/lib/cmake/SDL2 -DSDL2TTF_SAMPLES=0 -DBUILD_SHARED_LIBS=0 .. && \
+  cmake -DSDL2_DIR=/usr/local/lib/cmake/SDL2 -DSDL2TTF_SAMPLES=0 -DBUILD_SHARED_LIBS=0 -DSDL2TTF_VENDORED=1 .. && \
   make -j$(getconf _NPROCESSORS_ONLN) && make install && \
   rm -r /tmp/SDL_ttf
 
