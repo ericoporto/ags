@@ -13,8 +13,10 @@ build_windows_task:
     AGS_LIBVORBIS_LIB_VS19: C:\Lib\Xiph\x86
     AGS_SDL_INCLUDE: C:\Lib\SDL2\include
     AGS_SDL_SOUND_INCLUDE: C:\Lib\SDL_sound\src
+    AGS_SDL_TTF_INCLUDE: C:\Lib\SDL_ttf
     AGS_SDL_LIB: C:\Lib\SDL2\lib\x86
     AGS_SDL_SOUND_LIB_VS19: C:\Lib\SDL_sound\lib\x86
+    AGS_SDL_TTF_LIB_VS19: C:\Lib\SDL_ttf\lib\x86
   build_debug_script: >
     "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/Tools/VsDevCmd.bat" &&
     cd Solutions &&
@@ -303,6 +305,8 @@ build_editor_task:
   env:
     AGS_SDL_INCLUDE: C:\Lib\SDL2\include
     AGS_SDL_LIB: C:\Lib\SDL2\lib\x86
+    AGS_SDL_TTF_INCLUDE: C:\Lib\SDL_ttf
+    AGS_SDL_TTF_LIB_VS19: C:\Lib\SDL_ttf\lib\x86
   nuget_packages_cache:
     folder: Solutions\packages
     fingerprint_script:
