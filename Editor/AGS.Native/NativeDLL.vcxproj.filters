@@ -208,6 +208,9 @@
     <ClCompile Include="SpriteFileReader_NET.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="playsound.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="agsnative.h">
