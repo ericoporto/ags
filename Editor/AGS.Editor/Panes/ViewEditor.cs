@@ -1,4 +1,5 @@
 using AGS.Types;
+using ScintillaNET;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -11,6 +12,7 @@ namespace AGS.Editor
     {
         private const string MENU_ITEM_COPY_FRAME = "CopyFrame";
         private const string MENU_ITEM_CUT_FRAME = "CutFrame";
+        private const string MENU_ITEM_PASTE_FRAME_AFTER = "PasteFrameAfter";
         private const string MENU_ITEM_DELETE_FRAMES = "DeleteFrames";
         private const string MENU_ITEM_FLIP_FRAMES = "FlipFrames";
 
@@ -24,6 +26,8 @@ namespace AGS.Editor
         private List<ViewFrame> _selectedFrames = new List<ViewFrame>();
         private int _lastSelectedLoop = -1;
         private int _lastSelectedFrame = -1;
+        // Menus
+        private MenuCommands _extraMenu = new MenuCommands("&Edit", GUIController.FILE_MENU_ID);
 
         // A clipboard shared among all the view editors and view loop editors
         private static ViewEditClipboard _clipboard = new ViewEditClipboard();
@@ -42,6 +46,10 @@ namespace AGS.Editor
 			viewPreview.DynamicUpdates = true;
 			chkShowPreview.Checked = Factory.AGSEditor.Settings.ShowViewPreviewByDefault;
 			UpdateWhetherPreviewIsShown();
+
+            _extraMenu.Commands.Add(new MenuCommand(MENU_ITEM_CUT_FRAME, "Cut", Keys.Control | Keys.X, "CutMenuIcon"));
+            _extraMenu.Commands.Add(new MenuCommand(MENU_ITEM_COPY_FRAME, "Copy", Keys.Control | Keys.C, "CopyMenuIcon"));
+            _extraMenu.Commands.Add(new MenuCommand(MENU_ITEM_PASTE_FRAME_AFTER, "Paste", Keys.Control | Keys.V, "PasteMenuIcon"));
         }
 
         protected override void OnPropertyChanged(string propertyName, object oldValue)
@@ -290,6 +298,10 @@ namespace AGS.Editor
             viewPreview.ViewUpdated();
             _processingSelection = false;
         }
+        public MenuCommands ExtraMenu
+        {
+            get { return _extraMenu; }
+        }
 
         private void loopPane_OnContextMenu(object sender, ViewLoopContextMenuArgs e)
         {
@@ -304,6 +316,23 @@ namespace AGS.Editor
                 // NOTE: Simple keys like 'F' or 'R' does not work as a menu item shortkey for some reason, so we handle it in OnKeyPressed
                 menu.Items.Add(new ToolStripMenuItem("&Flip selected frame(s)", null, onClick, MENU_ITEM_FLIP_FRAMES));
                 menu.Items.Add(ToolStripExtensions.CreateMenuItem("Delete selected frame(s)", null, onClick, MENU_ITEM_DELETE_FRAMES, Keys.Delete));
+            }
+        }
+
+        protected override void OnCommandClick(string command)
+        {
+            ViewLoopEditor lastPane = _loopPanes[_lastSelectedLoop];
+            if (command == MENU_ITEM_CUT_FRAME)
+            {
+                lastPane.OnCutFrames(null, null);
+            }
+            else if (command == MENU_ITEM_COPY_FRAME)
+            {
+                lastPane.OnCopyFrames(null, null);
+            }
+            else if (command == MENU_ITEM_PASTE_FRAME_AFTER)
+            {
+                lastPane.OnPasteFramesAfter(null, null);
             }
         }
 

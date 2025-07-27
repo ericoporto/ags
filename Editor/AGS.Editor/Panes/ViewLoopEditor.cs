@@ -489,7 +489,7 @@ namespace AGS.Editor
             }
         }
 
-        private void OnCopyFrames(object sender, EventArgs e)
+        public void OnCopyFrames(object sender, EventArgs e)
         {
             List<ViewFrame> frames = new List<ViewFrame>();
             foreach (var i in _selectedFrames)
@@ -497,7 +497,7 @@ namespace AGS.Editor
             _clipboard.CopiedFrames = frames.ToArray();
         }
 
-        private void OnCutFrames(object sender, EventArgs e)
+        public void OnCutFrames(object sender, EventArgs e)
         {
             OnCopyFrames(sender, e);
             DeleteSelectedFrames();
@@ -509,7 +509,7 @@ namespace AGS.Editor
             InsertNewFrames(selectedFrame - 1, _clipboard.CopiedFrames.Select(f => f.Clone()).ToArray(), areBlankFrames: false);
         }
 
-        private void OnPasteFramesAfter(object sender, EventArgs e)
+        public void OnPasteFramesAfter(object sender, EventArgs e)
         {
             int selectedFrame = _selectedFrames.Count > 0 ? _selectedFrames[_selectedFrames.Count - 1] : -1;
             InsertNewFrames(selectedFrame, _clipboard.CopiedFrames.Select(f => f.Clone()).ToArray(), areBlankFrames: false);

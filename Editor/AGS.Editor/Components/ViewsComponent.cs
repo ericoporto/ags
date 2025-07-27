@@ -148,9 +148,11 @@ namespace AGS.Editor.Components
 			if (!_documents.TryGetValue(chosenItem, out document)
                 || document.Control.IsDisposed)
 			{
-                document = new ContentDocument(new ViewEditor(chosenItem), chosenItem.WindowTitle, this,
+                ViewEditor viewEditor = new ViewEditor(chosenItem);
+                document = new ContentDocument(viewEditor, chosenItem.WindowTitle, this,
                     ICON_KEY, null);
                 _documents[chosenItem] = document;
+                _documents[chosenItem].MainMenu = viewEditor.ExtraMenu;
                 document.SelectedPropertyGridObject = chosenItem;
 			}
             document.TreeNodeID = GetNodeID(chosenItem);
