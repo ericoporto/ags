@@ -104,6 +104,7 @@ jobs:
     - name: Test (Emscripten in headless Chrome)
       if: ${{ matrix.platform.name == 'Emscripten' }}
       run: |
+        echo "var gamefiles = ['ags3-auto-test.ags'];" > "${{github.workspace}}/build/my_game_files.js"
         npx http-server "${{github.workspace}}/build" -p 8080 & SERVER_PID=$!
         sleep 5
         google-chrome --headless --disable-gpu --no-sandbox \
