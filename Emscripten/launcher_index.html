@@ -237,7 +237,11 @@
 <!-- ######################### BODY ############################# -->
 <body>
 <div class="bluecup rotate" id=bcup></div>
-<div class=emscripten id=status>Downloading...</div>
+<div class=emscripten id=status>Downloading...
+  <div id="progress-container" style="width:80%;max-width:400px;margin:auto;position:absolute;top:70%;left:50%;transform:translateX(-50%);">
+    <div id="progress-bar" style="height:20px;background:#2A7FFF;width:0%;transition:width 0.2s;"></div>
+  </div>
+</div>
 <div id="cfgModal" class="modal">
   <div class="modal-content">
     <div class="modal-header">
@@ -427,6 +431,10 @@
     Module['FS_mount'](IDBFS, {}, saved_games_path);
     Module['FS_syncfs'](true, callback);
   }
+  
+  function updateProgressBar(percent) {
+    document.getElementById("progress-bar").style.width = percent + "%";
+  }
 
   function doPostRun() {
     initializeFullscreenControlHandling();
@@ -444,7 +452,9 @@
         oReq.responseType = "arraybuffer";
         oReq.onprogress = function(e) {
           if (e.lengthComputable) {
-            writeMsgOnCanvas('loading ' + file_being_loaded + ' ' + Math.round((e.loaded / e.total) * 100) + '% ...');
+            var percent = Math.round((e.loaded / e.total) * 100);
+            writeMsgOnCanvas('loading ' + file_being_loaded + ' ' + percent + '% ...');
+            updateProgressBar(percent);
           }
         }
         oReq.onload = function(oEvent) {
