@@ -570,7 +570,7 @@
           t_rs_id = setTimeout(function() {
             var fs_w = Module['_ext_gfxmode_get_width']();
             var fs_h = Module['_ext_gfxmode_get_height']();
-            if(Module.canvas.width == fs_w && Module.canvas.height == fs_h) return;
+            if(Module.canvas.width === fs_w && Module.canvas.height === fs_h) return;
 
             Module.canvas.width = fs_w;
             Module.canvas.height = fs_h;
