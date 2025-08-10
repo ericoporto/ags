@@ -451,9 +451,9 @@
     }
     if(!delete_saved_games()) {
       Module['FS_syncfs'](false, function(err){});
-      alert('Files removed sucessfully.');
+      alert('Files removed successfully.');
     } else {
-      alert('Some errors ocurred when removing files, try again after reloading the game web page.');
+      alert('Some errors occurred when removing files, try again after reloading the game web page.');
     }
   }
 
