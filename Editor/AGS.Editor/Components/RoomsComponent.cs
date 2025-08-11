@@ -10,6 +10,7 @@ using System.Xml;
 using AGS.Types;
 using WeifenLuo.WinFormsUI.Docking;
 using System.Threading;
+using System.Reflection;
 
 namespace AGS.Editor.Components
 {
@@ -200,15 +201,19 @@ namespace AGS.Editor.Components
 
         private void ShowGoToRoomDialog()
         {
-            GoToRoomDialog goToRoomDialog = new GoToRoomDialog()
+            GoToNumberDialog goToRoomDialog = new GoToNumberDialog()
             {
                 Minimum = 0,
                 Maximum = 999,
-                RoomNumber = 0,
-                Rooms = _agsEditor.CurrentGame.Rooms.ToList(),
+                Number = 0,
+                Text = "Go To Room",
+                NodeTypeName = "Room",
+                List = _agsEditor.CurrentGame.Rooms
+                    .Select(r => Tuple.Create(r.Number, r.Description))
+                    .ToList()
             };
             if (goToRoomDialog.ShowDialog() != DialogResult.OK) return;
-            int roomNumber = goToRoomDialog.RoomNumber;
+            int roomNumber = goToRoomDialog.Number;
             SelectRoomByNumber(roomNumber);
         }
 

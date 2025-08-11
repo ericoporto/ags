@@ -1,6 +1,6 @@
 ﻿namespace AGS.Editor
 {
-    partial class GoToRoomDialog
+    partial class GoToNumberDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -28,33 +28,33 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.lblRoomNumber = new System.Windows.Forms.Label();
-            this.upDownRoomNumber = new System.Windows.Forms.NumericUpDown();
+            this.lblNodeNumberRange = new System.Windows.Forms.Label();
+            this.upDownNumber = new System.Windows.Forms.NumericUpDown();
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.lstRooms = new System.Windows.Forms.ListBox();
-            ((System.ComponentModel.ISupportInitialize)(this.upDownRoomNumber)).BeginInit();
+            this.lstNodes = new System.Windows.Forms.ListBox();
+            ((System.ComponentModel.ISupportInitialize)(this.upDownNumber)).BeginInit();
             this.SuspendLayout();
             // 
-            // lblRoomNumber
+            // lblNodeNumberRange
             // 
-            this.lblRoomNumber.AutoSize = true;
-            this.lblRoomNumber.Location = new System.Drawing.Point(15, 11);
-            this.lblRoomNumber.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lblRoomNumber.Name = "lblRoomNumber";
-            this.lblRoomNumber.Size = new System.Drawing.Size(174, 16);
-            this.lblRoomNumber.TabIndex = 0;
-            this.lblRoomNumber.Text = "Select or type room number:";
+            this.lblNodeNumberRange.AutoSize = true;
+            this.lblNodeNumberRange.Location = new System.Drawing.Point(15, 11);
+            this.lblNodeNumberRange.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblNodeNumberRange.Name = "lblNodeNumberRange";
+            this.lblNodeNumberRange.Size = new System.Drawing.Size(174, 16);
+            this.lblNodeNumberRange.TabIndex = 0;
+            this.lblNodeNumberRange.Text = "Select or type room number:";
             // 
-            // upDownRoomNumber
+            // upDownNumber
             // 
-            this.upDownRoomNumber.Location = new System.Drawing.Point(19, 42);
-            this.upDownRoomNumber.Margin = new System.Windows.Forms.Padding(4);
-            this.upDownRoomNumber.Name = "upDownRoomNumber";
-            this.upDownRoomNumber.Size = new System.Drawing.Size(249, 22);
-            this.upDownRoomNumber.TabIndex = 1;
-            this.upDownRoomNumber.ValueChanged += new System.EventHandler(this.upDownRoomNumber_ValueChanged);
-            this.upDownRoomNumber.KeyUp += new System.Windows.Forms.KeyEventHandler(this.upDownRoomNumber_KeyUp);
+            this.upDownNumber.Location = new System.Drawing.Point(19, 42);
+            this.upDownNumber.Margin = new System.Windows.Forms.Padding(4);
+            this.upDownNumber.Name = "upDownNumber";
+            this.upDownNumber.Size = new System.Drawing.Size(249, 22);
+            this.upDownNumber.TabIndex = 1;
+            this.upDownNumber.ValueChanged += new System.EventHandler(this.upDownNumber_ValueChanged);
+            this.upDownNumber.KeyUp += new System.Windows.Forms.KeyEventHandler(this.upDownNumber_KeyUp);
             // 
             // btnOk
             // 
@@ -78,39 +78,39 @@
             this.btnCancel.Text = "&Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
-            // lstRooms
+            // lstNodes
             // 
-            this.lstRooms.FormattingEnabled = true;
-            this.lstRooms.ItemHeight = 16;
-            this.lstRooms.Location = new System.Drawing.Point(18, 72);
-            this.lstRooms.Name = "lstRooms";
-            this.lstRooms.Size = new System.Drawing.Size(250, 100);
-            this.lstRooms.TabIndex = 4;
-            this.lstRooms.SelectedIndexChanged += new System.EventHandler(this.lstRooms_SelectedIndexChanged);
-            this.lstRooms.Format += new System.Windows.Forms.ListControlConvertEventHandler(this.lstRooms_Format);
-            this.lstRooms.SelectedValueChanged += new System.EventHandler(this.lstRooms_SelectedValueChanged);
+            this.lstNodes.FormattingEnabled = true;
+            this.lstNodes.ItemHeight = 16;
+            this.lstNodes.Location = new System.Drawing.Point(18, 72);
+            this.lstNodes.Name = "lstNodes";
+            this.lstNodes.Size = new System.Drawing.Size(250, 100);
+            this.lstNodes.TabIndex = 4;
+            this.lstNodes.SelectedIndexChanged += new System.EventHandler(this.lstNodes_SelectedIndexChanged);
+            this.lstNodes.Format += new System.Windows.Forms.ListControlConvertEventHandler(this.lstNodes_Format);
+            this.lstNodes.SelectedValueChanged += new System.EventHandler(this.lstNodes_SelectedValueChanged);
             // 
-            // GoToRoomDialog
+            // GoToNumberDialog
             // 
             this.AcceptButton = this.btnOk;
             this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(282, 225);
-            this.Controls.Add(this.lstRooms);
+            this.Controls.Add(this.lstNodes);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
-            this.Controls.Add(this.upDownRoomNumber);
-            this.Controls.Add(this.lblRoomNumber);
+            this.Controls.Add(this.upDownNumber);
+            this.Controls.Add(this.lblNodeNumberRange);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "GoToRoomDialog";
+            this.Name = "GoToNumberDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Go To Room";
+            this.Text = "Go To Number";
             this.TopMost = true;
-            ((System.ComponentModel.ISupportInitialize)(this.upDownRoomNumber)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.upDownNumber)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -118,10 +118,10 @@
 
         #endregion
 
-        private System.Windows.Forms.Label lblRoomNumber;
-        private System.Windows.Forms.NumericUpDown upDownRoomNumber;
+        private System.Windows.Forms.Label lblNodeNumberRange;
+        private System.Windows.Forms.NumericUpDown upDownNumber;
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.ListBox lstRooms;
+        private System.Windows.Forms.ListBox lstNodes;
     }
 }
