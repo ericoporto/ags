@@ -176,9 +176,9 @@ namespace AGS.Editor.Components
             }
         }
 
-        private IRoom GetRoomByNumber(int roomNumber)
+        public static IRoom GetRoomByNumber(int roomNumber)
         {
-            List<IRoom> matchingRooms = _agsEditor.CurrentGame.Rooms.Where(r => r.Number == roomNumber).ToList();
+            List<IRoom> matchingRooms = Factory.AGSEditor.CurrentGame.Rooms.Where(r => r.Number == roomNumber).ToList();
             IRoom selectedRoom = null;
             if (matchingRooms.Count > 0)
             {
@@ -208,6 +208,7 @@ namespace AGS.Editor.Components
                 Minimum = 0,
                 Maximum = 999,
                 RoomNumber = 0,
+                Rooms = _agsEditor.CurrentGame.Rooms.ToList(),
             };
             if (goToRoomDialog.ShowDialog() != DialogResult.OK) return;
             int roomNumber = goToRoomDialog.RoomNumber;
