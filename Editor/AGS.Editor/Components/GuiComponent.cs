@@ -24,6 +24,7 @@ namespace AGS.Editor.Components
         private const string COMMAND_EXPORT_GUI = "ExportGUI";
         private const string COMMAND_CHANGE_ID = "ChangeGUIID";
         private const string COMMAND_FIND_ALL_USAGES = "FindAllUsages";
+        private const string COMMAND_GO_TO_GUI_NUMBER = "GoToGUINumber";
         private const string ICON_KEY = "GUIsIcon";
         
         internal const string MODE_SELECT_CONTROLS = "SelectControls";
@@ -149,6 +150,10 @@ namespace AGS.Editor.Components
                 GetFlatList().Swap(oldNumber, newNumber);
                 OnItemIDOrNameChanged(_guiRightClicked, oldNumber, false);
             }
+            else if (controlID == COMMAND_GO_TO_GUI_NUMBER)
+            {
+                ShowGoToGUIDialog();
+            }
             else if ((!controlID.StartsWith(NODE_ID_PREFIX_FOLDER)) &&
                      (controlID != TOP_LEVEL_COMMAND_ID))
             {
@@ -156,6 +161,28 @@ namespace AGS.Editor.Components
                     (Convert.ToInt32(controlID.Substring(ITEM_COMMAND_PREFIX.Length)), true);
                 ShowOrAddPane(chosenGui);
             }
+        }
+
+        private void ShowGoToGUIDialog()
+        {
+            IList<Types.GUI> guis = Factory.AGSEditor.CurrentGame.GUIFlatList;
+            GoToNumberDialog goToGUIDialog = new GoToNumberDialog()
+            {
+                Minimum = 0,
+                Maximum = guis.Max(g => g.ID),
+                Number = 0,
+                Text = "Go To GUI",
+                NodeTypeName = "GUI",
+                List = guis
+                    .Select(g => Tuple.Create(g.ID, g.Name))
+                    .ToList()
+            };
+            if (goToGUIDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+
+            int guiNumber = goToGUIDialog.Number;
+            Types.GUI gui = guis.Where(i => i.ID == guiNumber).First();
+            _guiController.ProjectTree.SelectNode(this, GetNodeID(gui));
+            ShowOrAddPane(gui);
         }
 
         private void DeleteGUI(GUI guiToDelete)
@@ -277,7 +304,11 @@ namespace AGS.Editor.Components
 
         protected override void AddExtraCommandsToFolderContextMenu(string controlID, IList<MenuCommand> menu)
         {
-            // No more commands in this menu
+            if (controlID == TOP_LEVEL_COMMAND_ID)
+            {
+                menu.Add(MenuCommand.Separator);
+                menu.Add(new MenuCommand(COMMAND_GO_TO_GUI_NUMBER, "Go to GUI...", null));
+            }
         }
 
         public override IList<MenuCommand> GetContextMenu(string controlID)
