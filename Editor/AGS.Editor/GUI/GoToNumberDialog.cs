@@ -162,5 +162,17 @@ namespace AGS.Editor
                 e.Value = "Unknown item!";
             }
         }
+
+        private void lstNodes_DoubleClick(object sender, EventArgs e)
+        {
+            // as far as I can tell, when a double click event triggers it already
+            // select the thing the mouse was over in the first of the two clicks
+            // so we will sync the upDown control to match the number and then click OK.
+            syncFromListBoxToUpDown();
+            if (btnOk.Enabled)
+            {
+                btnOk.PerformClick();
+            }
+        }
     }
 }

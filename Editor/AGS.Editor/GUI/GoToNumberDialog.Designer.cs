@@ -89,6 +89,7 @@
             this.lstNodes.SelectedIndexChanged += new System.EventHandler(this.lstNodes_SelectedIndexChanged);
             this.lstNodes.Format += new System.Windows.Forms.ListControlConvertEventHandler(this.lstNodes_Format);
             this.lstNodes.SelectedValueChanged += new System.EventHandler(this.lstNodes_SelectedValueChanged);
+            this.lstNodes.DoubleClick += new System.EventHandler(this.lstNodes_DoubleClick);
             // 
             // GoToNumberDialog
             // 
@@ -103,7 +104,6 @@
             this.Controls.Add(this.upDownNumber);
             this.Controls.Add(this.lblNodeNumberRange);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "GoToNumberDialog";
