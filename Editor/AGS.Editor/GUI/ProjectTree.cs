@@ -22,15 +22,23 @@ namespace AGS.Editor
         private TreeNode _lastAddedNode = null;
 		private DateTime _expandedAtTime = DateTime.MinValue;
         private string _selectedNode;
+        private TreeNode _mouseOverNode = null;
+        private Button _btnElipsis = null;
 
 
-        public ProjectTree(TreeViewWithDragDrop projectTree)
+        public ProjectTree(ProjectPanel projectPanel)
         {
+            TreeViewWithDragDrop projectTree = projectPanel.projectTree;
+            Button btnElipsis = projectPanel.btnElipsis;
             Factory.GUIController.RegisterIcon(DEFAULT_ICON_KEY, Resources.ResourceManager.GetIcon("iconplug.ico"));
             projectTree.ImageKey = DEFAULT_ICON_KEY;
             projectTree.SelectedImageKey = DEFAULT_ICON_KEY;
 
+            projectPanel.MouseLeave += _projectPanel_MouseLeave;
+
             _projectTree = projectTree;
+            _btnElipsis = btnElipsis;
+            _btnElipsis.Click += _btnElipsis_Click;
             _treeNodes = new Dictionary<string, IEditorComponent>();
 
             _projectTree.MouseClick += new System.Windows.Forms.MouseEventHandler(this.projectTree_MouseClick);
@@ -46,6 +54,57 @@ namespace AGS.Editor
 			_projectTree.ItemTryDrag += projectTree_ItemTryDrag;
             _projectTree.ItemDragOver += _projectTree_ItemDragOver;
             _projectTree.ItemDragDrop += _projectTree_ItemDragDrop;
+            _projectTree.MouseMove += _projectTree_MouseMove;
+        }
+
+        private void _projectPanel_MouseLeave(object sender, EventArgs e)
+        {
+            HideElipsisButton();
+        }
+
+        private void _btnElipsis_Click(object sender, EventArgs e)
+        {
+            if (_mouseOverNode != null)
+            {
+                Rectangle nodeBounds = _mouseOverNode.Bounds;
+                int clickX = nodeBounds.Left + nodeBounds.Width / 2;
+                int clickY = nodeBounds.Top + nodeBounds.Height / 2;
+                MouseEventArgs simulatedRightClick = new MouseEventArgs(MouseButtons.Right, 1, clickX, clickY, 0);
+                projectTree_MouseClick(_projectTree, simulatedRightClick);
+            }
+        }
+
+        private void _projectTree_MouseMove(object sender, MouseEventArgs e)
+        {
+            TreeNode node = _projectTree.HitTest(e.Location).Node;
+            if (node != _mouseOverNode)
+            {
+                _mouseOverNode = node;
+                MovedOverDifferentNode(node);
+            }
+        }
+
+        private void HideElipsisButton()
+        {
+            _btnElipsis.Visible = false;
+            _btnElipsis.Enabled = false;
+        }
+
+        private void MovedOverDifferentNode(TreeNode node)
+        {
+            if (node != null)
+            {
+                Rectangle nodeBounds = node.Bounds;
+                int btnX = _projectTree.ClientSize.Width - _btnElipsis.Width - 2;
+                int btnY = nodeBounds.Top + (nodeBounds.Height - _btnElipsis.Height)/2;
+                _btnElipsis.Location = new Point(btnX, btnY);
+                _btnElipsis.Visible = true;
+                _btnElipsis.Enabled = true;
+            }
+            else
+            {
+                HideElipsisButton();
+            }
         }
 
         private void _projectTree_BeforeCollapse(object sender, TreeViewCancelEventArgs e)

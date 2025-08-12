@@ -29,8 +29,20 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProjectPanel));
+            this.btnElipsis = new System.Windows.Forms.Button();
             this.projectTree = new AGS.Editor.TreeViewWithDragDrop();
             this.SuspendLayout();
+            // 
+            // btnElipsis
+            // 
+            this.btnElipsis.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnElipsis.Location = new System.Drawing.Point(242, 12);
+            this.btnElipsis.Name = "btnElipsis";
+            this.btnElipsis.Size = new System.Drawing.Size(38, 25);
+            this.btnElipsis.TabIndex = 3;
+            this.btnElipsis.Text = "...";
+            this.btnElipsis.UseVisualStyleBackColor = true;
+            this.btnElipsis.Visible = false;
             // 
             // projectTree
             // 
@@ -39,16 +51,17 @@
             this.projectTree.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.projectTree.HideSelection = false;
             this.projectTree.LabelEdit = true;
-            this.projectTree.Location = new System.Drawing.Point(1, 20);
+            this.projectTree.Location = new System.Drawing.Point(0, 0);
             this.projectTree.Name = "projectTree";
-            this.projectTree.Size = new System.Drawing.Size(290, 239);
+            this.projectTree.Size = new System.Drawing.Size(292, 260);
             this.projectTree.TabIndex = 2;
             // 
             // ProjectPanel
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(292, 260);
+            this.Controls.Add(this.btnElipsis);
             this.Controls.Add(this.projectTree);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -61,5 +74,6 @@
         #endregion
 
         internal AGS.Editor.TreeViewWithDragDrop projectTree;
+        public System.Windows.Forms.Button btnElipsis;
     }
 }

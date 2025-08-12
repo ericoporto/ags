@@ -23,6 +23,8 @@ namespace AGS.Editor
             t.SetColor("project-panel/project-tree/background", c => projectTree.BackColor = c);
             t.SetColor("project-panel/project-tree/foreground", c => projectTree.ForeColor = c);
             t.SetColor("project-panel/project-tree/line", c => projectTree.LineColor = c);
+            t.SetColor("project-panel/project-tree/background", c => btnElipsis.BackColor = c);
+            t.SetColor("project-panel/project-tree/foreground", c => btnElipsis.ForeColor = c);
         }
 
         private void ProjectPanel_Load(object sender, EventArgs e)
