@@ -995,13 +995,13 @@ namespace AGS.Editor.Components
             menu.Add(MenuCommand.Separator);
             menu.Add(new MenuCommand(COMMAND_REPLACE_AUDIO_SOURCE_FOLDER, "Replace source paths for audio clips...", null));
             menu.Add(new MenuCommand(COMMAND_REIMPORT_ALL, "Force reimport all file(s)", null));
-            menu.Add(MenuCommand.Separator);
-            menu.Add(new MenuCommand(COMMAND_PROPERTIES, "Properties", null));
             if (controlID == TOP_LEVEL_COMMAND_ID)
             {
                 menu.Add(MenuCommand.Separator);
                 menu.Add(new MenuCommand(COMMAND_GO_TO_CLIP_NUMBER, "Go to Audio Clip...", null));
             }
+            menu.Add(MenuCommand.Separator);
+            menu.Add(new MenuCommand(COMMAND_PROPERTIES, "Properties", null));
         }
 
         protected override string GetFolderDeleteConfirmationText()
