@@ -128,6 +128,8 @@ namespace AGS.Editor.Components
         private void ShowGoToCharacterDialog()
         {
             IList<Types.Character> characters = Factory.AGSEditor.CurrentGame.CharacterFlatList;
+            if (characters.Count == 0) return;
+
             GoToNumberDialog goToCharacterDialog = new GoToNumberDialog()
             {
                 Text = "Go To Character",

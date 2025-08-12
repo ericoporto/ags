@@ -166,6 +166,8 @@ namespace AGS.Editor.Components
         private void ShowGoToGUIDialog()
         {
             IList<Types.GUI> guis = Factory.AGSEditor.CurrentGame.GUIFlatList;
+            if (guis.Count == 0) return;
+
             GoToNumberDialog goToGUIDialog = new GoToNumberDialog()
             {
                 Text = "Go To GUI",

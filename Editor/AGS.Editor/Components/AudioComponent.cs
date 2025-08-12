@@ -204,6 +204,8 @@ namespace AGS.Editor.Components
         private void ShowGoToAudioClipDialog()
         {
             IList<Types.AudioClip> audioClips = Factory.AGSEditor.CurrentGame.AudioClipFlatList;
+            if (audioClips.Count == 0) return;
+
             GoToNumberDialog goToAudioClipDialog = new GoToNumberDialog()
             {
                 Text = "Go To Audio Clip",

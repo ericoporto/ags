@@ -102,6 +102,8 @@ namespace AGS.Editor.Components
         private void ShowGoToItemDialog()
         {
             IList<InventoryItem> items = GetFlatList();
+            if (items.Count == 0) return;
+
             GoToNumberDialog goToItemDialog = new GoToNumberDialog()
             {
                 Text = "Go To Inventory Item",

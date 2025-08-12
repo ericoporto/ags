@@ -106,6 +106,8 @@ namespace AGS.Editor.Components
         private void ShowGoToDialogDialog()
         {
             IList<Types.Dialog> dialogs = Factory.AGSEditor.CurrentGame.DialogFlatList;
+            if (dialogs.Count == 0) return;
+
             GoToNumberDialog goToDialogDialog = new GoToNumberDialog()
             {
                 Text = "Go To Dialog",

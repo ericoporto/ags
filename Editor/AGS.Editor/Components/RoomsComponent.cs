@@ -205,6 +205,7 @@ namespace AGS.Editor.Components
         private void ShowGoToRoomDialog()
         {
             IList<Types.IRoom> rooms = Factory.AGSEditor.CurrentGame.Rooms;
+            if (rooms.Count == 0) return;
 
             GoToNumberDialog goToRoomDialog = new GoToNumberDialog()
             {
