@@ -168,9 +168,6 @@ namespace AGS.Editor.Components
             IList<Types.GUI> guis = Factory.AGSEditor.CurrentGame.GUIFlatList;
             GoToNumberDialog goToGUIDialog = new GoToNumberDialog()
             {
-                Minimum = 0,
-                Maximum = guis.Max(g => g.ID),
-                Number = 0,
                 Text = "Go To GUI",
                 NodeTypeName = "GUI",
                 List = guis

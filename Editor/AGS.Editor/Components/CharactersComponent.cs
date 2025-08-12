@@ -130,9 +130,6 @@ namespace AGS.Editor.Components
             IList<Types.Character> characters = Factory.AGSEditor.CurrentGame.CharacterFlatList;
             GoToNumberDialog goToCharacterDialog = new GoToNumberDialog()
             {
-                Minimum = 0,
-                Maximum = characters.Max(c => c.ID),
-                Number = 0,
                 Text = "Go To Character",
                 NodeTypeName = "Character",
                 List = characters

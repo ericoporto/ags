@@ -204,14 +204,13 @@ namespace AGS.Editor.Components
 
         private void ShowGoToRoomDialog()
         {
+            IList<Types.IRoom> rooms = Factory.AGSEditor.CurrentGame.Rooms;
+
             GoToNumberDialog goToRoomDialog = new GoToNumberDialog()
             {
-                Minimum = 0,
-                Maximum = 999,
-                Number = 0,
                 Text = "Go To Room",
                 NodeTypeName = "Room",
-                List = _agsEditor.CurrentGame.Rooms
+                List = rooms
                     .Select(r => Tuple.Create(r.Number, r.Description))
                     .ToList()
             };

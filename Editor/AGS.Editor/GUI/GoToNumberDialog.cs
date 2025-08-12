@@ -75,6 +75,11 @@ namespace AGS.Editor
                 {
                     lstNodes.Items.Add(item);
                 }
+                int min = _list.Min(i => i.Item1);
+                int max = _list.Max(i => i.Item1);
+                Minimum = min;
+                Maximum = max;
+                Number = min;
             }
         }
 

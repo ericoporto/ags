@@ -116,11 +116,9 @@ namespace AGS.Editor.Components
         private void ShowGoToViewDialog()
         {
             IList<Types.View> views = Factory.AGSEditor.CurrentGame.ViewFlatList;
+
             GoToNumberDialog goToViewDialog = new GoToNumberDialog()
             {
-                Minimum = 0,
-                Maximum = views.Max(v => v.ID),
-                Number = 0,
                 Text = "Go To View",
                 NodeTypeName = "View",
                 List = views

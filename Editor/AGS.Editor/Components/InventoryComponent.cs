@@ -104,9 +104,6 @@ namespace AGS.Editor.Components
             IList<InventoryItem> items = GetFlatList();
             GoToNumberDialog goToItemDialog = new GoToNumberDialog()
             {
-                Minimum = 0,
-                Maximum = 300,
-                Number = 0,
                 Text = "Go To Inventory Item",
                 NodeTypeName = "Inventory Item",
                 List = items

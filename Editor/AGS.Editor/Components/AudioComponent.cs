@@ -206,9 +206,6 @@ namespace AGS.Editor.Components
             IList<Types.AudioClip> audioClips = Factory.AGSEditor.CurrentGame.AudioClipFlatList;
             GoToNumberDialog goToAudioClipDialog = new GoToNumberDialog()
             {
-                Minimum = 0,
-                Maximum = audioClips.Max(d => d.ID),
-                Number = 0,
                 Text = "Go To Audio Clip",
                 NodeTypeName = "Audio Clip",
                 List = audioClips

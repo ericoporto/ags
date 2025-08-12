@@ -108,9 +108,6 @@ namespace AGS.Editor.Components
             IList<Types.Dialog> dialogs = Factory.AGSEditor.CurrentGame.DialogFlatList;
             GoToNumberDialog goToDialogDialog = new GoToNumberDialog()
             {
-                Minimum = 0,
-                Maximum = dialogs.Max(d => d.ID),
-                Number = 0,
                 Text = "Go To Dialog",
                 NodeTypeName = "Dialog",
                 List = dialogs
