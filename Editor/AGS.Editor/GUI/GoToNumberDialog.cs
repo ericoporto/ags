@@ -14,6 +14,7 @@ namespace AGS.Editor
     public partial class GoToNumberDialog : Form
     {
         private string _nodeTypeName;
+        private string _currentFilter;
         private List<Tuple<int, string>> _list;
 
         public GoToNumberDialog()
@@ -64,17 +65,24 @@ namespace AGS.Editor
             set { _nodeTypeName = value; }
         }
 
+        private void FillListBox(List<Tuple<int, string>> list)
+        {
+            lstNodes.BeginUpdate();
+            lstNodes.Items.Clear();
+            foreach (Tuple<int, string> item in list)
+            {
+                lstNodes.Items.Add(item);
+            }
+            lstNodes.EndUpdate();
+        }
+
         public List<Tuple<int, string>> List
         {
             get { return _list; }
             set 
             {
-                _list = value; 
-                lstNodes.Items.Clear();
-                foreach (Tuple<int, string> item in _list)
-                {
-                    lstNodes.Items.Add(item);
-                }
+                _list = value;
+                FillListBox(_list);
                 int min = _list.Min(i => i.Item1);
                 int max = _list.Max(i => i.Item1);
                 Minimum = min;
@@ -142,6 +150,7 @@ namespace AGS.Editor
 
         private void upDownNumber_KeyUp(object sender, KeyEventArgs e)
         {
+            ClearFilter();
             syncFromUpDownToListBox();
         }
 
@@ -179,5 +188,36 @@ namespace AGS.Editor
                 btnOk.PerformClick();
             }
         }
+
+        private void ClearFilter()
+        {
+            _currentFilter = string.Empty;
+            textBoxFilter.Text = string.Empty;
+            FillListBox(_list);
+        }
+
+        private void textBoxFilter_TextChanged(object sender, EventArgs e)
+        {
+            _currentFilter = textBoxFilter.Text.Trim();
+
+            if (string.IsNullOrEmpty(_currentFilter))
+            {
+                ClearFilter();
+                return;
+            }
+            
+            var filteredList = _list
+                .Where(i => i.Item2.IndexOf(_currentFilter, StringComparison.OrdinalIgnoreCase) >= 0)
+                .ToList();
+
+            FillListBox(filteredList);
+
+            // If just one element is shown, we will automatically select it
+            if (filteredList.Count == 1)
+            {
+                lstNodes.SelectedIndex = 0;
+            }
+        }
+
     }
 }
