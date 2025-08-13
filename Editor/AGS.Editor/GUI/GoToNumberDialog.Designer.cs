@@ -60,6 +60,7 @@
             this.upDownNumber.Size = new System.Drawing.Size(100, 20);
             this.upDownNumber.TabIndex = 1;
             this.upDownNumber.ValueChanged += new System.EventHandler(this.upDownNumber_ValueChanged);
+            this.upDownNumber.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.upDownNumber_KeyPress);
             this.upDownNumber.KeyUp += new System.Windows.Forms.KeyEventHandler(this.upDownNumber_KeyUp);
             // 
             // btnOk

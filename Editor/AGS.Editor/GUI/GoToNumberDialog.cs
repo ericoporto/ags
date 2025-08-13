@@ -20,7 +20,7 @@ namespace AGS.Editor
         public GoToNumberDialog()
         {
             InitializeComponent();
-            (this.upDownNumber.Controls[1] as TextBox).Enter += upDownNumber_Controls1_Enter;
+            (upDownNumber.Controls[1] as TextBox).Enter += upDownNumber_Controls1_Enter;
         }
 
         private delegate void Action();
@@ -29,7 +29,8 @@ namespace AGS.Editor
         {
             BeginInvoke((Action)(() =>
             {
-                (this.upDownNumber.Controls[1] as TextBox).SelectAll();
+                upDownNumber.Focus();
+                (upDownNumber.Controls[1] as TextBox).SelectAll();
             }));
         }
 
@@ -88,6 +89,7 @@ namespace AGS.Editor
                 Minimum = min;
                 Maximum = max;
                 Number = min;
+                upDownNumber.Focus();
             }
         }
 
@@ -146,12 +148,20 @@ namespace AGS.Editor
         private void upDownNumber_ValueChanged(object sender, EventArgs e)
         {
             syncFromUpDownToListBox();
+            var box = (TextBox)upDownNumber.Controls[1];
+            box.Focus();
+            box.SelectionLength = 0;
+            box.SelectionStart = box.TextLength;
         }
 
         private void upDownNumber_KeyUp(object sender, KeyEventArgs e)
         {
             ClearFilter();
             syncFromUpDownToListBox();
+            var box = (TextBox)upDownNumber.Controls[1];
+            box.Focus();
+            box.SelectionLength = 0;
+            box.SelectionStart = box.TextLength;
         }
 
         private void lstNodes_SelectedValueChanged(object sender, EventArgs e)
@@ -216,8 +226,21 @@ namespace AGS.Editor
             if (filteredList.Count == 1)
             {
                 lstNodes.SelectedIndex = 0;
+                textBoxFilter.Focus();
             }
         }
 
+        private void upDownNumber_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // below is a way to redirect a letter to the filter so you can type
+            // letters as soon as the dialog opens and start to filter
+            if(!char.IsControl(e.KeyChar) || !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+                textBoxFilter.Text += e.KeyChar.ToString();
+                textBoxFilter.Focus();
+                textBoxFilter.SelectionStart = textBoxFilter.Text.Length;
+            }
+        }
     }
 }
