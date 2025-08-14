@@ -18,6 +18,7 @@ namespace AGS.Editor.Components
         private const string COMMAND_CHANGE_ID = "ChangeViewID";
         private const string COMMAND_FIND_ALL_USAGES = "FindAllUsages";
         private const string COMMAND_GO_TO_VIEW_NUMBER = "GoToViewNumber";
+        private const string COMMAND_OVERVIEW_VIEW = "OverviewViews";
         private const string ICON_KEY = "ViewsIcon";
         
         private Dictionary<View, ContentDocument> _documents;
@@ -105,12 +106,51 @@ namespace AGS.Editor.Components
             {
                 ShowGoToViewDialog();
             }
+            else if (controlID == COMMAND_OVERVIEW_VIEW)
+            {
+                ShowOverviewDialog();
+            }
             else if ((!controlID.StartsWith(NODE_ID_PREFIX_FOLDER)) &&
                      (controlID != TOP_LEVEL_COMMAND_ID))
             {
                 View chosenItem = _items[controlID];
                 ShowOrAddPane(chosenItem);
             }
+        }
+
+        private int GetViewAsSprite(Types.View view)
+        {
+            int spriteNum = 0;
+
+            if (view != null && view.Loops.Count > 0)
+            {
+                if (view.Loops[0].Frames.Count > 0)
+                {
+                    ViewFrame thisFrame = view.Loops[0].Frames[0];
+                    spriteNum = thisFrame.Image;
+                }
+            }
+            return spriteNum;
+        }
+
+        private void ShowOverviewDialog()
+        {
+            IList<Types.View> views = Factory.AGSEditor.CurrentGame.ViewFlatList;
+            if (views.Count == 0) return;
+
+            OverviewDialog dialog = new OverviewDialog()
+            {
+                Text = "Overview of Views",
+                List = views
+                    .Select(v => new NodeItemInfoWithSprite(v.ID, v.Name, null, GetViewAsSprite(v)))
+                    .ToList(),
+            };
+            if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+
+            int viewNumber = dialog.Number;
+            Types.View view = views.Where(i => i.ID == viewNumber).First();
+            _guiController.ProjectTree.SelectNode(this, GetNodeID(view));
+            ShowOrAddPane(view);
         }
 
         private void ShowGoToViewDialog()
@@ -372,6 +412,9 @@ namespace AGS.Editor.Components
                 MenuCommand goToCommand = new MenuCommand(COMMAND_GO_TO_VIEW_NUMBER, "Go to View...", System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G);
                 goToCommand.Enabled = Factory.AGSEditor.CurrentGame.ViewFlatList.Count > 0;
                 menu.Add(goToCommand);
+                MenuCommand overviewCommand = new MenuCommand(COMMAND_OVERVIEW_VIEW, "Overview...", System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O);
+                overviewCommand.Enabled = Factory.AGSEditor.CurrentGame.ViewFlatList.Count > 0;
+                menu.Add(overviewCommand);
             }
         }
 

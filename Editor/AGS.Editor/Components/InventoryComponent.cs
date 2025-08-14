@@ -18,6 +18,7 @@ namespace AGS.Editor.Components
         private const string COMMAND_CHANGE_ID = "ChangeInventoryID";
         private const string COMMAND_FIND_ALL_USAGES = "FindAllUsages";
         private const string COMMAND_GO_TO_ITEM_NUMBER = "GoToItemNumber";
+        private const string COMMAND_OVERVIEW_ITEMS = "OverviewItems";
         private const string ICON_KEY = "InventorysIcon";
         
         private Dictionary<InventoryItem, ContentDocument> _documents;
@@ -91,12 +92,38 @@ namespace AGS.Editor.Components
             {
                 ShowGoToItemDialog();
             }
+            else if (controlID == COMMAND_OVERVIEW_ITEMS)
+            {
+                ShowOverviewDialog();
+            }
             else if (controlID != TOP_LEVEL_COMMAND_ID && !IsFolderNode(controlID))
             {
                 InventoryItem chosenItem = _agsEditor.CurrentGame.RootInventoryItemFolder.FindInventoryItemByID(
                     Convert.ToInt32(controlID.Substring(ITEM_COMMAND_PREFIX.Length)), true);
                 ShowOrAddPane(chosenItem);
             }
+        }
+
+        private void ShowOverviewDialog()
+        {
+            IList<InventoryItem> items = GetFlatList();
+            if (items.Count == 0) return;
+
+            OverviewDialog dialog = new OverviewDialog()
+            {
+                Text = "Overview of Inventory Items",
+                List = items
+                    .Select(i => new NodeItemInfoWithSprite(i.ID, i.Name, i.Description, i.Image))
+                    .ToList(),
+            };
+            if (dialog.ShowDialog() != DialogResult.OK) return;
+
+            int itemNumber = dialog.Number;
+            if (itemNumber < 0) return;
+
+            InventoryItem item = items.Where(i => i.ID == itemNumber).First();
+            _guiController.ProjectTree.SelectNode(this, GetNodeID(item));
+            ShowOrAddPane(item);
         }
 
         private void ShowGoToItemDialog()
@@ -221,6 +248,9 @@ namespace AGS.Editor.Components
                 MenuCommand goToCommand = new MenuCommand(COMMAND_GO_TO_ITEM_NUMBER, "Go to Inventory Item...", Keys.Control | Keys.G);
                 goToCommand.Enabled = Factory.AGSEditor.CurrentGame.InventoryFlatList.Count > 0;
                 menu.Add(goToCommand);
+                MenuCommand overviewCommand = new MenuCommand(COMMAND_OVERVIEW_ITEMS, "Overview...", Keys.Control | Keys.O);
+                overviewCommand.Enabled = Factory.AGSEditor.CurrentGame.InventoryFlatList.Count > 0;
+                menu.Add(overviewCommand);
             }
         }
 

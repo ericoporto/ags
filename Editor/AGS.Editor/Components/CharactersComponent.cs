@@ -20,6 +20,7 @@ namespace AGS.Editor.Components
         private const string COMMAND_CHANGE_ID = "ChangeCharacterID";
         private const string COMMAND_FIND_ALL_USAGES = "FindAllUsages";
         private const string COMMAND_GO_TO_CHARACTER_NUMBER = "GoToCharacterNumber";
+        private const string COMMAND_OVERVIEW_CHARACTER = "OverviewCharacters";
         private const string ICON_KEY = "CharactersIcon";
         
         private const string CHARACTER_EXPORT_FILE_FILTER = "AGS 3.1+ exported characters (*.chr)|*.chr|AGS 2.72/3.0 exported characters (*.cha)|*.cha";
@@ -117,12 +118,55 @@ namespace AGS.Editor.Components
             {
                 ShowGoToCharacterDialog();
             }
+            else if (controlID == COMMAND_OVERVIEW_CHARACTER)
+            {
+                ShowOverviewDialog();
+            }
             else if ((!controlID.StartsWith(NODE_ID_PREFIX_FOLDER)) &&
                      (controlID != TOP_LEVEL_COMMAND_ID))
             {
                 Character chosenItem = _items[controlID];
                 ShowOrAddPane(chosenItem);
             }
+        }
+
+        private int GetCharacterSprite(Types.Character character)
+        {
+            Types.View view = Factory.AGSEditor.CurrentGame.FindViewByID(character.NormalView);
+
+            int spriteNum = 0;
+
+            if (view != null && view.Loops.Count > 0)
+            {
+                if (view.Loops[0].Frames.Count > 0)
+                {
+                    ViewFrame thisFrame = view.Loops[0].Frames[0];
+                    spriteNum = thisFrame.Image;
+                }
+            }
+            return spriteNum;
+        }
+
+        private void ShowOverviewDialog()
+        {
+            IList<Types.Character> characters = Factory.AGSEditor.CurrentGame.CharacterFlatList;
+            if (characters.Count == 0) return;
+
+            OverviewDialog dialog = new OverviewDialog()
+            {
+                Text = "Overview of Characters",
+                List = characters
+                    .Select(c => new NodeItemInfoWithSprite(c.ID, c.ScriptName, c.RealName, GetCharacterSprite(c)))
+                    .ToList(),
+            };
+            if (dialog.ShowDialog() != DialogResult.OK) return;
+
+            int characterNumber = dialog.Number;
+            if (characterNumber < 0) return;
+
+            Types.Character character = characters.Where(i => i.ID == characterNumber).First();
+            _guiController.ProjectTree.SelectNode(this, GetNodeID(character));
+            ShowOrAddPane(character);
         }
 
         private void ShowGoToCharacterDialog()
@@ -387,6 +431,9 @@ namespace AGS.Editor.Components
                 MenuCommand goToCommand = new MenuCommand(COMMAND_GO_TO_CHARACTER_NUMBER, "Go to Character...", Keys.Control | Keys.G);
                 goToCommand.Enabled = Factory.AGSEditor.CurrentGame.CharacterFlatList.Count > 0;
                 menu.Add(goToCommand);
+                MenuCommand overviewCommand = new MenuCommand(COMMAND_OVERVIEW_CHARACTER, "Overview...", Keys.Control | Keys.O);
+                overviewCommand.Enabled = Factory.AGSEditor.CurrentGame.CharacterFlatList.Count > 0;
+                menu.Add(overviewCommand);
             }
         }
 

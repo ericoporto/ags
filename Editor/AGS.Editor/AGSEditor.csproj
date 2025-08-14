@@ -154,6 +154,8 @@
     <Compile Include="Entities\CharacterRoomChangedEventArgs.cs" />
     <Compile Include="Entities\CompilationStepArgs.cs" />
     <Compile Include="Entities\CompileWarningEx.cs" />
+    <Compile Include="Entities\NodeItemInfo.cs" />
+    <Compile Include="Entities\NodeItemInfoWithSprite.cs" />
     <Compile Include="Entities\TreeItemDragEventArgs.cs" />
     <Compile Include="Entities\ExistingScriptHeaderToAdd.cs" />
     <Compile Include="Entities\ExistingFileToAdd.cs" />
@@ -232,6 +234,12 @@
       <DependentUpon>NumberEntryWithInfoDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\OutputPanelItem.cs" />
+    <Compile Include="GUI\OverviewDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\OverviewDialog.Designer.cs">
+      <DependentUpon>OverviewDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\Progress.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -485,6 +493,9 @@
     <EmbeddedResource Include="GUI\NumberEntryWithInfoDialog.resx">
       <DependentUpon>NumberEntryWithInfoDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\OverviewDialog.resx">
+      <DependentUpon>OverviewDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Progress.resx">
       <DependentUpon>Progress.cs</DependentUpon>
