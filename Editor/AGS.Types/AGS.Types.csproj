@@ -188,10 +188,12 @@
     <Compile Include="Font.cs" />
     <Compile Include="EditorFeatures\GameTemplate.cs" />
     <Compile Include="GlobalVariable.cs" />
+    <Compile Include="GlobalVariableFolder.cs" />
     <Compile Include="GlobalVariables.cs" />
     <Compile Include="GUIControlGroup.cs" />
     <Compile Include="HelperTypes\FakeEnumerator.cs" />
     <Compile Include="HelperTypes\SpriteInfo.cs" />
+    <Compile Include="Interfaces\IGlobalVariableFolder.cs" />
     <Compile Include="Interfaces\IRePopulatableComponent.cs" />
     <Compile Include="Interfaces\ILoadedRoom.cs" />
     <Compile Include="InteractionSchema.cs" />
