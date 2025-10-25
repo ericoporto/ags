@@ -12,6 +12,8 @@ namespace AGS.Editor.Components
         private const string TOP_LEVEL_COMMAND_ID = "CustomProperties";
         private const string ICON_KEY = "CustomPropertiesIcon";
         private const string COMMAND_SHOW_CUSTOM_PROPERTY_SCHEMA_EDITOR = "ShowCustomPropertySchemaEditor";
+        private const string COMMAND_IMPORT_CUSTOM_PROPERTIES = "ImportCustomProperties";
+        private const string COMMAND_EXPORT_CUSTOM_PROPERTIES = "ExportCustomProperties";
 
         public CustomPropertiesComponent(GUIController guiController, AGSEditor agsEditor)
            : base(guiController, agsEditor)
@@ -27,11 +29,36 @@ namespace AGS.Editor.Components
             schemaEditor.Dispose();
         }
 
+        private void Export()
+        {
+            CustomPropertySchema schema = _agsEditor.CurrentGame.PropertySchema;
+            Game game = _agsEditor.CurrentGame;
+            string filename = "example.xml";
+            ImportExport.ExportCustomPropertiesSchemaToFile(schema, filename, game);
+        }
+
+        private void Import()
+        {
+            Game game = _agsEditor.CurrentGame;
+            string filename = "example.xml";
+            CustomPropertySchema schema = ImportExport.ImportCustomPropertiesSchemaFromFile(filename, game);
+        }
+
         public override void CommandClick(string controlID)
         {
-            // for now there is only one command, so either double clicking
-            // or the context menu will do the same, so we don't need an if check
-            ShowSchemaEditor();
+            if (controlID == TOP_LEVEL_COMMAND_ID || controlID == COMMAND_SHOW_CUSTOM_PROPERTY_SCHEMA_EDITOR)
+            {
+                // should show schema editor on either double click or selecting edit schema in right click menu
+                ShowSchemaEditor();
+            }
+            else if (controlID == COMMAND_IMPORT_CUSTOM_PROPERTIES)
+            {
+                Import();
+            }
+            else if (controlID == COMMAND_EXPORT_CUSTOM_PROPERTIES)
+            {
+                Export();
+            }
         }
 
         public override IList<MenuCommand> GetContextMenu(string controlID)
@@ -40,6 +67,9 @@ namespace AGS.Editor.Components
             if (controlID == TOP_LEVEL_COMMAND_ID)
             {
                 menu.Add(new MenuCommand(COMMAND_SHOW_CUSTOM_PROPERTY_SCHEMA_EDITOR, "Edit Schema...", null));
+                menu.Add(MenuCommand.Separator);
+                menu.Add(new MenuCommand(COMMAND_IMPORT_CUSTOM_PROPERTIES, "Import...", null));
+                menu.Add(new MenuCommand(COMMAND_EXPORT_CUSTOM_PROPERTIES, "Export...", null));
             }
             return menu;
         }

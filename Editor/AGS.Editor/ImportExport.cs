@@ -1329,6 +1329,24 @@ namespace AGS.Editor
             writer.Close();
         }
 
+        public static void ExportCustomPropertiesSchemaToFile(CustomPropertySchema schema, string fileName, Game game)
+        {
+            Utilities.TryDeleteFile(fileName);
+            XmlTextWriter writer = new XmlTextWriter(fileName, game.TextEncoding);
+            writer.WriteProcessingInstruction("xml", "version=\"1.0\" encoding=\"" + game.TextEncoding.WebName + "\"");
+            schema.ToXml(writer);
+            writer.Close();
+        }
+
+        public static CustomPropertySchema ImportCustomPropertiesSchemaFromFile(string fileName, Game game)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.Load(fileName);
+            CustomPropertySchema schema = new CustomPropertySchema();
+            schema.FromXml(doc);
+            return schema;
+        }
+
         private static void ExportAllSpritesOnGUI(GUI gui, XmlTextWriter writer)
         {
             WriteSpriteToXML(gui.BackgroundImage, writer);
