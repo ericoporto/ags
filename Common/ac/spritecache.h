@@ -87,7 +87,7 @@ public:
 
     SpriteCache(std::vector<SpriteInfo>& sprInfos);
     SpriteCache(std::vector<SpriteInfo> &sprInfos, const Callbacks &callbacks);
-    ~SpriteCache() = default;
+    virtual ~SpriteCache() = default;
 
     // Loads sprite reference information and inits sprite stream
     HError      InitFile(std::unique_ptr<Stream> &&sprite_file,
