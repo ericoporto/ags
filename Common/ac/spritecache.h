@@ -85,6 +85,7 @@ public:
     };
 
 
+    SpriteCache(std::vector<SpriteInfo>& sprInfos);
     SpriteCache(std::vector<SpriteInfo> &sprInfos, const Callbacks &callbacks);
     ~SpriteCache() = default;
 
@@ -93,6 +94,8 @@ public:
                          std::unique_ptr<Stream> &&index_file);
     // Saves current cache contents to the file
     HError      SaveToFile(const String &filename, int store_flags, SpriteCompression compress, SpriteFileIndex &index);
+    // Saves current cache contents to the provided stream
+    HError      SaveToFile(std::unique_ptr<Stream>&& out, int store_flags, SpriteCompression compress, SpriteFileIndex& index);
     // Closes an active sprite file stream
     void        DetachFile();
 
@@ -197,6 +200,11 @@ private:
     void        RemapSpriteToPlaceholder(sprkey_t index);
     // Initialize the empty sprite slot
     void        InitNullSprite(sprkey_t index);
+    // Prepares bitmap data of all available and known sprites;
+    // returns a list of pairs, where first element tells whether the sprite
+    // exists at all (either in a cache or a sprite file).
+    std::vector<std::pair<bool, BitmapData>> PrepareSpriteData();
+
     //
     // Dummy no-op variants for callbacks
     //
