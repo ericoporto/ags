@@ -124,6 +124,8 @@ public:
     inline bool IsAutoFreeMemEnabled() const { return ResourceCache::IsAutoFreeMemEnabled(); }
     // Returns number of sprite slots in the bank (this includes both actual sprites and free slots)
     size_t      GetSpriteSlotCount() const;
+    // Returns the topmost valid sprite number
+    sprkey_t    GetTopmostSprite() const;
     // Tells if the sprite storage still has unoccupied slots to put new sprites in
     bool        HasFreeSlots() const;
     // Tells if the given slot is reserved for the asset sprite, that is a "static"

@@ -3413,6 +3413,10 @@ builtin struct Game {
   import static attribute int InventoryCursorHotspotColor;
   /// Gets/sets color number used to draw the inventory cursor's hotspot marker's crosshair (0 to not draw a crosshair).
   import static attribute int InventoryCursorHotspotCrossColor;
+  /// Gets the topmost existing sprite number.
+  import static readonly attribute int TopSpriteNumber;
+  /// Gets whether the given sprite is a dynamic sprite created in script (otherwise it is a regular sprite stored in game data).
+  import static readonly attribute bool IsSpriteDynamic[];
 #endif // SCRIPT_API_v363
 };
 

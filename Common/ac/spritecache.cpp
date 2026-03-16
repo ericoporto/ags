@@ -70,8 +70,23 @@ size_t SpriteCache::GetSpriteSlotCount() const
     return _spriteData.size();
 }
 
+sprkey_t SpriteCache::GetTopmostSprite() const
+{
+    if (_spriteData.empty())
+        return -1;
+
+    // FIXME: optimize this, might require keeping record when adding new sprites
+    for (size_t i = _spriteData.size() - 1; i >= 0; ++i)
+    {
+        if (DoesSpriteExist(i))
+            return i;
+    }
+    return -1;
+}
+
 bool SpriteCache::HasFreeSlots() const
 {
+    // FIXME: this is entirely wrong!! this does not account for empty slots!!
     return !((_spriteData.size() == SIZE_MAX) || (_spriteData.size() > MAX_SPRITE_INDEX));
 }
 
