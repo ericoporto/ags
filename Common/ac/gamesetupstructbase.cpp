@@ -116,8 +116,8 @@ void GameSetupStructBase::ReadFromFile(Stream *in, GameDataVersion game_ver, Ser
     color_depth = in->ReadInt32();
     target_win = in->ReadInt32();
     dialog_bullet = in->ReadInt32();
-    hotdot = static_cast<uint16_t>(in->ReadInt16());
-    hotdotouter = static_cast<uint16_t>(in->ReadInt16());
+    inv_hot_color = static_cast<uint16_t>(in->ReadInt16());
+    inv_hot_cross_color = static_cast<uint16_t>(in->ReadInt16());
     uniqueid = in->ReadInt32();
     numgui = in->ReadInt32();
     numcursors = in->ReadInt32();
@@ -131,7 +131,7 @@ void GameSetupStructBase::ReadFromFile(Stream *in, GameDataVersion game_ver, Ser
     SetDefaultResolution(resolution_type, game_size);
 
     default_lipsync_frame = in->ReadInt32();
-    invhotdotsprite = in->ReadInt32();
+    inv_hot_sprite = in->ReadInt32();
     in->ReadArrayOfInt32(reserved, NUM_INTS_RESERVED);
 
     info.ExtensionOffset = static_cast<uint32_t>(in->ReadInt32());
@@ -166,8 +166,8 @@ void GameSetupStructBase::WriteToFile(Stream *out, const SerializeInfo &info) co
     out->WriteInt32(color_depth);
     out->WriteInt32(target_win);
     out->WriteInt32(dialog_bullet);
-    out->WriteInt16(static_cast<uint16_t>(hotdot));
-    out->WriteInt16(static_cast<uint16_t>(hotdotouter));
+    out->WriteInt16(static_cast<uint16_t>(inv_hot_color));
+    out->WriteInt16(static_cast<uint16_t>(inv_hot_cross_color));
     out->WriteInt32(uniqueid);
     out->WriteInt32(numgui);
     out->WriteInt32(numcursors);
@@ -178,7 +178,7 @@ void GameSetupStructBase::WriteToFile(Stream *out, const SerializeInfo &info) co
         out->WriteInt32(_defGameResolution.Height);
     }
     out->WriteInt32(default_lipsync_frame);
-    out->WriteInt32(invhotdotsprite);
+    out->WriteInt32(inv_hot_sprite);
     out->WriteArrayOfInt32(reserved, NUM_INTS_RESERVED);
     for (int i = 0; i < MAXGLOBALMES; ++i)
     {

@@ -373,9 +373,9 @@ void GameSetupStruct::ReadFromSavegame(Stream *in)
     // of GameSetupStructBase
     playercharacter = in->ReadInt32();
     dialog_bullet = in->ReadInt32();
-    hotdot = static_cast<uint16_t>(in->ReadInt16());
-    hotdotouter = static_cast<uint16_t>(in->ReadInt16());
-    invhotdotsprite = in->ReadInt32();
+    inv_hot_color = static_cast<uint16_t>(in->ReadInt16());
+    inv_hot_cross_color = static_cast<uint16_t>(in->ReadInt16());
+    inv_hot_sprite = in->ReadInt32();
     default_lipsync_frame = in->ReadInt32();
 }
 
@@ -387,8 +387,8 @@ void GameSetupStruct::WriteForSavegame(Stream *out)
     // of GameSetupStructBase
     out->WriteInt32(playercharacter);
     out->WriteInt32(dialog_bullet);
-    out->WriteInt16(static_cast<uint16_t>(hotdot));
-    out->WriteInt16(static_cast<uint16_t>(hotdotouter));
-    out->WriteInt32(invhotdotsprite);
+    out->WriteInt16(static_cast<uint16_t>(inv_hot_color));
+    out->WriteInt16(static_cast<uint16_t>(inv_hot_cross_color));
+    out->WriteInt32(inv_hot_sprite);
     out->WriteInt32(default_lipsync_frame);
 }

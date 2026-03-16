@@ -3405,6 +3405,14 @@ builtin struct Game {
   import static readonly attribute int BlockingWaitCounter;
   /// Gets the current blocking wait's skip type.
   import static readonly attribute InputType BlockingWaitSkipType;
+  /// Gets/sets whether "use inventory" cursor mode should be using current inventory graphic, or a fixed mode cursor.
+  import static attribute bool UseActiveInventoryGraphicForCursor;
+  /// Gets/sets sprite number used as a inventory cursor's hotspot marker (0 to use none).
+  import static attribute int InventoryCursorHotspotGraphic;
+  /// Gets/sets color number used to draw the inventory cursor's hotspot marker (0 to not draw any marker).
+  import static attribute int InventoryCursorHotspotColor;
+  /// Gets/sets color number used to draw the inventory cursor's hotspot marker's crosshair (0 to not draw a crosshair).
+  import static attribute int InventoryCursorHotspotCrossColor;
 #endif // SCRIPT_API_v363
 };
 
