@@ -37,10 +37,12 @@ int LoadImageFile(const char *filename)
         return 0;
 
     String ext = Path::GetFileExtension(filename);
-    std::unique_ptr<Bitmap> image(BitmapHelper::LoadBitmap(in.get(), ext));
+    PixelFormat src_fmt;
+    std::unique_ptr<Bitmap> image(BitmapHelper::LoadBitmap(in.get(), ext, &src_fmt));
     if (!image)
         return 0;
 
+    const bool has_alpha = PixelFormatHasAlpha(src_fmt);
     return add_dynamic_sprite(std::unique_ptr<Bitmap>(
-        PrepareSpriteForUse(image.release(), false /* no alpha */)));
+        PrepareSpriteForUse(image.release(), has_alpha)), has_alpha);
 }

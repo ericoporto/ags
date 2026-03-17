@@ -308,7 +308,7 @@ int DynamicSprite_SaveToFile(ScriptDynamicSprite *sds, const char* namm)
     ResolvedPath rp = ResolveWritePathAndCreateDirs(filename);
     if (!rp)
         return 0;
-    return spriteset[sds->slot]->SaveToFile(rp.FullPath, palette) ? 1 : 0;
+    return spriteset[sds->slot]->SaveToFile(rp.FullPath, ((game.SpriteInfos[sds->slot].Flags & SPF_ALPHACHANNEL) == 0), palette) ? 1 : 0;
 }
 
 ScriptDynamicSprite* DynamicSprite_CreateFromSaveGame(int sgslot, int width, int height) {

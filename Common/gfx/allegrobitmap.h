@@ -51,8 +51,7 @@ public:
     Bitmap &operator =(const Bitmap &bmp);
     Bitmap &operator =(Bitmap &&bmp) = default;
 
-    // Sets default color depth of the created bitmaps (in bits per pixel);
-    // optionally sets whether we we support alpha channel when creating compatible colors.
+    // Sets default color depth of the created bitmaps (in bits per pixel)
     static void SetColorDepth(int color_depth);
 
     // Allocate new bitmap.
@@ -86,9 +85,12 @@ public:
     // Deallocate bitmap
     void	Destroy();
 
-    bool    SaveToFile(const String &filename, const RGB *palette)
-            { return SaveToFile(filename.GetCStr(), palette); }
-    bool    SaveToFile(const char *filename, const RGB *palette);
+    // FIXME: skip_alpha parameter is added as a hotfix, to be able to reduce
+    // image file size when writing 32-bit sprites without alpha. Normally this
+    // should be replaced with a "destination pixel format" parameter.
+    bool    SaveToFile(const String &filename, bool skip_alpha, const RGB *palette)
+            { return SaveToFile(filename.GetCStr(), skip_alpha, palette); }
+    bool    SaveToFile(const char *filename, bool skip_alpha, const RGB *palette);
 
     // TODO: This is temporary solution for cases when we cannot replace
 	// use of raw BITMAP struct with Bitmap
