@@ -127,7 +127,8 @@ public:
     // Returns the topmost valid sprite number
     sprkey_t    GetTopmostSprite() const;
     // Tells if the sprite storage still has unoccupied slots to put new sprites in
-    bool        HasFreeSlots() const;
+    // FIXME: this method is not implemented properly, dont use until its fixed.
+    // bool     HasFreeSlots() const;
     // Tells if the given slot is reserved for the asset sprite, that is a "static"
     // sprite cached from the game assets
     bool        IsAssetSprite(sprkey_t index) const;
