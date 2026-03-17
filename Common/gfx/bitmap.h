@@ -94,11 +94,15 @@ namespace BitmapHelper
     // image file size when writing 32-bit sprites without alpha. Normally this
     // should be replaced with a "destination pixel format" parameter.
     bool SaveToFile(const Bitmap* bmp, const char *filename, bool skip_alpha, const RGB *pal = nullptr);
+    inline bool SaveToFile(const Bitmap* bmp, const char* filename)
+        { return SaveToFile(bmp, filename, false, nullptr); }
     // Reads a bitmap from the stream, possibly with palette.
     // Optionally assigns a source pixel format, for informational purposes.
     Bitmap *LoadBitmap(Stream *in, const String& ext, PixelFormat* src_fmt = nullptr, RGB *pal = nullptr);
     // Write a bitmap to the stream, optionally along with the palette
     bool SaveBitmap(const Bitmap *bmp, bool skip_alpha, const RGB* pal, Stream *out, const String& ext);
+    inline bool SaveBitmap(const Bitmap* bmp, Stream* out, const String& ext)
+         { return SaveBitmap(bmp, false, nullptr, out, ext); }
 
     // Stretches bitmap to the requested size. The new bitmap will have same
     // colour depth. Returns original bitmap if no changes are necessary.

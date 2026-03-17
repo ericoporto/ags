@@ -85,12 +85,16 @@ public:
     // Deallocate bitmap
     void	Destroy();
 
+    bool    SaveToFile(const char* filename, bool skip_alpha, const RGB* palette);
     // FIXME: skip_alpha parameter is added as a hotfix, to be able to reduce
     // image file size when writing 32-bit sprites without alpha. Normally this
     // should be replaced with a "destination pixel format" parameter.
-    bool    SaveToFile(const String &filename, bool skip_alpha, const RGB *palette)
+    inline bool SaveToFile(const String &filename, bool skip_alpha, const RGB *palette)
             { return SaveToFile(filename.GetCStr(), skip_alpha, palette); }
-    bool    SaveToFile(const char *filename, bool skip_alpha, const RGB *palette);
+    inline bool SaveToFile(const String &filename)
+            { return SaveToFile(filename.GetCStr(), false, nullptr); }
+    inline bool SaveToFile(const char *filename)
+            { return SaveToFile(filename, false, nullptr); }
 
     // TODO: This is temporary solution for cases when we cannot replace
 	// use of raw BITMAP struct with Bitmap

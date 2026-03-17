@@ -111,14 +111,14 @@ Bitmap *CreateBitmapFromPixels(int width, int height, int dst_color_depth,
     return bitmap.release();
 }
 
-Bitmap *LoadFromFile(const char *filename)
+Bitmap *LoadFromFile(const char *filename, PixelFormat* src_fmt)
 {
     std::unique_ptr<Stream> in (
             File::OpenFile(filename, FileOpenMode::kFile_Open, StreamMode::kStream_Read));
     if(!in)
         return nullptr;
 
-    return BitmapHelper::LoadBitmap(in.get(), Path::GetFileExtension(filename), nullptr);
+    return BitmapHelper::LoadBitmap(in.get(), Path::GetFileExtension(filename), src_fmt, nullptr);
 }
 
 Bitmap *AdjustBitmapSize(const Bitmap *src, int width, int height)
