@@ -2,6 +2,10 @@ name: GitHub Actions Build
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+  packages: read
+
 env:
   BASE_BRANCH: master
   MANUAL_ASSET: ags-help.chm
@@ -582,6 +586,87 @@ jobs:
           name: pdb-archive
           include-hidden-files: true
           path: AGS-*-pdb.zip
+
+  linux-binaries-builds:
+    name: Linux (${{ matrix.platform.arch }}, ${{ matrix.platform.rpath && 'Tar.gz' || 'Deb PKG' }})
+    runs-on: ${{ matrix.platform.os }}
+    timeout-minutes: 90
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+        - { arch: amd64, rpath: true,  os: ubuntu-latest }
+        - { arch: i386,  rpath: true,  os: ubuntu-latest }
+        - { arch: amd64, rpath: false, os: ubuntu-latest }
+        - { arch: i386,  rpath: false, os: ubuntu-latest }
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run build inside container
+        run: |
+          TAG_NAME=${{ env.BASE_BRANCH }}-${{ matrix.platform.arch }}
+          IMAGE="ghcr.io/${{ github.repository_owner }}/ags-linux-builder-image:$TAG_NAME"          
+          if [ "${{matrix.platform.rpath}}" = "true" ]; then
+            PREFIX=lib
+          else
+            PREFIX=
+          fi
+
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            -w /workspace \
+            -e RPATH_PREFIX=$PREFIX \
+            "$IMAGE" \
+            bash debian/build.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: linux-deb-${{ matrix.platform.arch }}${{ matrix.platform.rpath && '-rpath' || '' }}
+          path: ${{ matrix.platform.rpath && 'data_*.tar.gz' || 'ags_*.deb' }}
+
+  build-linux-bundle:
+    name: Linux Bundle
+    needs: linux-binaries-builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install bsdtar
+        run: sudo apt-get update -y && sudo apt-get install -y libarchive-tools
+
+      - name: Download amd64 data archive
+        uses: actions/download-artifact@v8
+        with:
+          name: linux-deb-amd64-rpath
+          path: /tmp/linux-amd64
+
+      - name: Download i386 data archive
+        uses: actions/download-artifact@v8
+        with:
+          name: linux-deb-i386-rpath
+          path: /tmp/linux-i386
+
+      - name: Assemble Linux bundle
+        run: |
+          set -e
+          tmp=$(mktemp -d)
+          mkdir -p $tmp/data
+          bsdtar -f /tmp/linux-amd64/data_amd64.tar.gz -xvzC $tmp/data
+          bsdtar -f /tmp/linux-i386/data_i386.tar.gz   -xvzC $tmp/data
+          cp -v debian/copyright $tmp/data/licenses/ags-copyright
+          cp -v debian/ags+libraries/startgame $tmp/
+          awk 'BEGIN { RS="" } !/make_ags/ { if (NR>1) print RS; print }' debian/ags+libraries/README > $tmp/README
+          version=$(awk -F'[ "]+' '$1=="#define" && $2=="ACI_VERSION_STR" { print $3; exit }' Common/ac/def_version.h)
+          bsdtar -f ags_${version}_linux.tar.gz -cvzC $tmp data startgame README
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ags-bundle-linux
+          path: ags_*_linux.tar.gz
 
   windows-packaging:
     name: Windows Packaging
