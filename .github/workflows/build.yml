@@ -281,6 +281,12 @@ jobs:
         with:
           submodules: true
 
+      - name: Install Windows 8.1 SDK
+        shell: cmd
+        run: |
+          for /f "usebackq delims=" %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -property installationPath`) do set VS_PATH=%%i
+          "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\setup.exe" modify --installPath "%VS_PATH%" --add Microsoft.VisualStudio.Component.Windows81SDK --includeRecommended --passive --norestart
+
       - uses: microsoft/setup-msbuild@v3
 
       - name: Download Windows dependencies
@@ -350,6 +356,12 @@ jobs:
       AGS_SDL_SOUND_LIB:     C:\Lib\SDL_sound\lib\x86
     steps:
       - uses: actions/checkout@v6
+
+      - name: Install Windows 8.1 SDK
+        shell: cmd
+        run: |
+          for /f "usebackq delims=" %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -property installationPath`) do set VS_PATH=%%i
+          "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\setup.exe" modify --installPath "%VS_PATH%" --add Microsoft.VisualStudio.Component.Windows81SDK --includeRecommended --passive --norestart
 
       - uses: microsoft/setup-msbuild@v3
 
@@ -448,6 +460,12 @@ jobs:
       AGS_SDL_SOUND_LIB:     C:\Lib\SDL_sound\lib\x86
     steps:
       - uses: actions/checkout@v6
+
+      - name: Install Windows 8.1 SDK
+        shell: cmd
+        run: |
+          for /f "usebackq delims=" %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -property installationPath`) do set VS_PATH=%%i
+          "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\setup.exe" modify --installPath "%VS_PATH%" --add Microsoft.VisualStudio.Component.Windows81SDK --includeRecommended --passive --norestart
 
       - uses: microsoft/setup-msbuild@v3
 
