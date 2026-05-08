@@ -25,6 +25,16 @@ namespace AGS.Types
             get { return Script.TextEncoding; }
         }
 
+        public static string GetFileName(string dialog_name)
+        {
+            return Path.Combine("Dialogs", dialog_name + ".asd");
+        }
+
+        public static string GetFileName(Dialog dialog)
+        {
+            return Path.Combine("Dialogs", dialog.Name + ".asd");
+        }
+
         public static DialogScript CreateDefault(string filename)
         {
             return new DialogScript(filename, DEFAULT_NEW_DIALOG_SCRIPT);

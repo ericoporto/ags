@@ -124,7 +124,15 @@ namespace AGS.Types
             // Luckily the CDATA section is easy to read back
             // FIX-ME: we will need to figure how to look the .asd file and then if it fails look into the inner text?
             // or the reverse? Need to think on this
-            _script = new DialogScript("Dialog" + _id, scriptNode.InnerText);
+            if (!string.IsNullOrEmpty(scriptNode.InnerText))
+            {
+                _script = new DialogScript("Dialog" + _id, scriptNode.InnerText);
+            }
+            else
+            {
+                // read from .asd file
+                DialogScript.GetFileName(_name)
+            }
 
             foreach (XmlNode child in SerializeUtils.GetChildNodes(node, "DialogOptions"))
             {
