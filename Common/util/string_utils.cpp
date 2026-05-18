@@ -15,6 +15,8 @@
 #include <errno.h>
 #include <regex>
 #include <string.h>
+
+#include "debug/out.h"
 #include "platform/platform.h"
 #include "util/math.h"
 #include "util/stream.h"
@@ -454,6 +456,7 @@ static bool TryUTF8LocaleName(const String &locale_name)
     try
     {
         auto locale = std::locale(locale_name.GetCStr());
+        Debug::Printf(kDbgMsg_Info, "Trying locale '%s', got '%s'", locale_name.GetCStr(), locale.name().c_str());
         if (locale_name.CompareNoCase(locale.name().c_str()) == 0)
             return true;
     }
