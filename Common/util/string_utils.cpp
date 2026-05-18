@@ -460,8 +460,13 @@ static bool TryUTF8LocaleName(const String &locale_name)
         if (locale_name.CompareNoCase(locale.name().c_str()) == 0)
             return true;
     }
-    catch (const std::runtime_error&)
+    catch (const std::exception &e)
     {
+        Debug::Printf(kDbgMsg_Info,"Locale '%s' failed: %s", locale_name.GetCStr(), e.what());
+    }
+    catch (...)
+    {
+        Debug::Printf(kDbgMsg_Info,"Locale '%s' failed with unknown exception", locale_name.GetCStr());
     }
     return false;
 }
