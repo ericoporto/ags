@@ -48,18 +48,18 @@ const char *HELP_STRING = "Usage:\n"
     "      Options may adjust the operation further.\n"
     "\n"
     "Commands:\n"
-    "  -a, --append           append pack data to the existing file, gathering the\n"
+    "  create                 create a new pack file, gathering the files from the\n"
+    "                         input directory.\n"
+    "  extract                export (extract) files from the existing pack file\n"
+    "                         into the output directory.\n"
+    "  list                   print pack file's contents.\n"
+    "  attach                 append pack data to the existing file, gathering the\n"
     "                         files from the input directory. Replaces the previously\n"
     "                         attached pack data, if there was any.\n"
-    "  -c, --create           create a new pack file, gathering the files from the\n"
-    "                         input directory.\n"
-    "  -e, --export           export (extract) files from the existing pack file\n"
-    "                         into the output directory.\n"
-    "  -l, --list             print pack file's contents.\n"
-    "  -s, --split            split an attached pack data into the <DEST_FILE>.\n"
+    "  detach                 split an attached pack data into the <DEST_FILE>.\n"
     "                         NOTE: if pack data occupies whole file, then operation\n"
     "                         will be cancelled.\n"
-    "  -x, --cut              cut an attached pack data from the file.\n"
+    "  remove                 cut an attached pack data from the file.\n"
     "                         NOTE: if pack data occupies whole file, then its size\n"
     "                         will become zero.\n"
     "\n"
@@ -75,53 +75,123 @@ const char *HELP_STRING = "Usage:\n"
     "                         of a working directory too\n"
     "\n"
     "Other options:\n"
-    "  -v, --verbose          print operation details"
+    "  -v, --verbose          print operation details\n"
+    "  -h, --help             Show help message for command\n"
     ;
 
+const char *HELP_CREATE = "Usage:\n"
+   //--------------------------------------------------------------------------------|
+    "  agspak create <PAK-FILE> <WORK-DIR> [<FILES>] [OPTIONS]\n"
+    "      creates a new pack file, gathering files from the input directory.\n"
+    "\n"
+    "Options:\n"
+    "  -f, --pattern-file <file>\n"
+    "                         use pattern file with include/exclude patterns\n"
+    "  -p, --partition <MB>   split assets between partitions of this size max\n"
+    "  -r, --recursive        include all subdirectories of the working directory\n"
+    "\n"
+    "Other options:\n"
+    "  -v, --verbose          print operation details\n"
+    "  -h, --help             show this help message\n"
+    ;
 
-int DoCommand(const CmdLineOpts::ParseResult &cmdargs)
+const char *HELP_EXTRACT = "Usage:\n"
+   //--------------------------------------------------------------------------------|
+    "  agspak extract <PAK-FILE> <WORK-DIR> [<FILES>]\n"
+    "      exports (extracts) files from the existing pack file into the output\n"
+    "      directory.\n"
+    "\n"
+    "Other options:\n"
+    "  -v, --verbose          print operation details\n"
+    "  -h, --help             Show this help message\n"
+    ;
+
+const char *HELP_LIST = "Usage:\n"
+   //--------------------------------------------------------------------------------|
+    "  agspak list <PAK-FILE>\n"
+    "      prints the pack file's contents.\n"
+    "\n"
+    "Other options:\n"
+    "  -v, --verbose          print operation details\n"
+    "  -h, --help             Show this help message\n"
+    ;
+
+const char *HELP_ATTACH = "Usage:\n"
+   //--------------------------------------------------------------------------------|
+    "  agspak attach <PAK-FILE> <WORK-DIR> [<FILES>] [OPTIONS]\n"
+    "      appends pack data to the existing file, gathering files from the input\n"
+    "      directory. Replaces the previously attached pack data, if there was any.\n"
+    "\n"
+    "Options:\n"
+    "  -f, --pattern-file <file>\n"
+    "                         use pattern file with include/exclude patterns\n"
+    "  -p, --partition <MB>   split assets between partitions of this size max\n"
+    "  -r, --recursive        include all subdirectories of the working directory\n"
+    "\n"
+    "Other options:\n"
+    "  -v, --verbose          print operation details\n"
+    "  -h, --help             show this help message\n"
+    ;
+
+const char *HELP_DETACH = "Usage:\n"
+   //--------------------------------------------------------------------------------|
+    "  agspak detach <PAK-FILE> <DEST-FILE> [OPTIONS]\n"
+    "      splits an attached pack data into <DEST-FILE>.\n"
+    "      NOTE: if pack data occupies the whole file, then the operation will be\n"
+    "      cancelled.\n"
+    "\n"
+    "Other options:\n"
+    "  -v, --verbose          print operation details\n"
+    "  -h, --help             show this help message\n"
+    ;
+
+const char *HELP_REMOVE = "Usage:\n"
+   //--------------------------------------------------------------------------------|
+    "  agspak remove <PAK-FILE> [OPTIONS]\n"
+    "      cuts an attached pack data from the file.\n"
+    "      NOTE: if pack data occupies the whole file, then its size will become\n"
+    "      zero.\n"
+    "\n"
+    "Other options:\n"
+    "  -v, --verbose          print operation details\n"
+    "  -h, --help             show this help message\n"
+    ;
+
+enum CommandType
 {
-    // Parse the command
-    char command = 0;
-    for (const auto &opt : cmdargs.Opt)
-    {
-        if (opt == "-a" || opt == "--append")
-        {
-            command = 'a'; // append
-            break;
-        }
-        if (opt == "-c" || opt == "--create")
-        {
-            command = 'c'; // create
-            break;
-        }
-        if (opt == "-e" || opt == "--export")
-        {
-            command = 'e'; // export
-            break;
-        }
-        if (opt == "-l" || opt == "--list")
-        {
-            command = 'l'; // list
-            break;
-        }
-        if (opt == "-s" || opt == "--split")
-        {
-            command = 's'; // split
-            break;
-        }
-        if (opt == "-x" || opt == "--cut")
-        {
-            command = 'x'; // cut
-            break;
-        }
-    }
+    kCmdCreate = 0,
+    kCmdExtract,
+    kCmdList,
+    kCmdAttach,
+    kCmdDetach,
+    kCmdRemove,
+    kCmdMAX,
+    kCmdNone = kCmdMAX
+};
 
+struct Command
+{
+    const char *Opt;
+    const CommandType Cmd;
+    const size_t NumArgs;
+    const char *Help;
+} Command[] = {
+        {"create",  kCmdCreate,  2, HELP_CREATE},
+        {"extract", kCmdExtract, 2, HELP_EXTRACT},
+        {"list",    kCmdList,    1, HELP_LIST},
+        {"attach",  kCmdAttach,  2, HELP_ATTACH},
+        {"detach",  kCmdDetach,  2, HELP_DETACH},
+        {"remove",  kCmdRemove,  1, HELP_REMOVE},
+        {nullptr,   kCmdNone,    0, nullptr}
+};
+
+int DoCommand(CommandType command, const CmdLineOpts::ParseResult &cmdargs)
+{
     // Fixed pos options
-    const String pak_file = cmdargs.PosArgs.size() > 0 ? cmdargs.PosArgs[0] : String();
-    const String work_dir = cmdargs.PosArgs.size() > 1 ? cmdargs.PosArgs[1] : String();
-    const String dest_pak_file = cmdargs.PosArgs.size() > 1 ? cmdargs.PosArgs[1] : String();
-    const String file_list_str = cmdargs.PosArgs.size() > 2 ? cmdargs.PosArgs[2] : String();
+    const String pak_file = cmdargs.PosArgs.size() > 1 ? cmdargs.PosArgs[1] : String();
+    const String work_dir = cmdargs.PosArgs.size() > 2 ? cmdargs.PosArgs[2] : String();
+    const String dest_pak_file = cmdargs.PosArgs.size() > 2 ? cmdargs.PosArgs[2] : String();
+    const String file_list_str = cmdargs.PosArgs.size() > 3 ? cmdargs.PosArgs[3] : String();
     // Common options
     // a include pattern file that should be inside the input-dir
     // TO-DO: support nested include pattern files in input-dir
@@ -152,53 +222,43 @@ int DoCommand(const CmdLineOpts::ParseResult &cmdargs)
     // Run supported commands
     switch (command)
     {
-    case 'a': // append
-    case 'c': // create
+    case kCmdAttach:
+    case kCmdCreate:
         {
-            if (command == 'a')
+            if (command == kCmdAttach)
                 printf("Operation: append asset package to the existing file\n");
             else
                 printf("Operation: create asset package\n");
-            if (cmdargs.PosArgs.size() < 2)
-                break; // not enough args
-            return AGSPak::Command_Create(work_dir, pak_file, command == 'a',
+            return AGSPak::Command_Create(work_dir, pak_file, command == kCmdAttach,
                 pattern_list, pattern_file, do_subdirs, part_size_mb, verbose);
         }
-    case 'e': // export
+    case kCmdExtract:
         {
             printf("Operation: export assets\n");
-            if (cmdargs.PosArgs.size() < 2)
-                break; // not enough args
             return AGSPak::Command_Export(pak_file, work_dir, pattern_list);
         }
-    case 'l': // list
+    case kCmdList:
         {
-            if (cmdargs.PosArgs.size() < 1)
-                break; // not enough args
             return AGSPak::Command_List(pak_file);
         }
-    case 's': // split
+    case kCmdDetach:
         {
             printf("Operation: split asset package away from the existing file\n");
-            if (cmdargs.PosArgs.size() < 2)
-                break; // not enough args
             return AGSPak::Command_Split(pak_file, dest_pak_file, verbose);
         }
-    case 'x': // cut
+    case kCmdRemove:
         {
             printf("Operation: cut asset package from the existing file\n");
-            if (cmdargs.PosArgs.size() < 1)
-                break; // not enough args
             return AGSPak::Command_Cut(pak_file, verbose);
         }
     default:
+        // we should never print this
         printf("Error: no valid command is specified\n");
         printf("%s\n", HELP_STRING);
         return -1;
     }
 
-    printf("Error: not enough arguments\n");
-    printf("%s\n", HELP_STRING);
+    // this should hopefully be unreachable code
     return -1;
 }
 
@@ -206,12 +266,59 @@ int main(int argc, char *argv[])
 {
     printf("%s\n", BIN_STRING);
 
-    CmdLineOpts::ParseResult cmdargs = CmdLineOpts::Parse(argc, argv, {"-p", "-f", "--pattern-file"});
-    if (cmdargs.HelpRequested)
+    CmdLineOpts::ParseResult result = CmdLineOpts::Parse(argc, argv, {"-p", "-f", "--pattern-file", "--partition"});
+
+    if (result.PosArgs.empty())
     {
+        if (!result.HelpRequested)
+        {
+            printf("Error: not enough arguments\n");
+        }
         printf("%s\n", HELP_STRING);
-        return 0; // display help and bail out
+        return result.HelpRequested ? 0 : -1;
     }
 
-    return DoCommand(cmdargs);
+    //-----------------------------------------------------------------------//
+    // Parse command specific arguments
+    //-----------------------------------------------------------------------//
+
+    const String &asked_command = result.PosArgs[0];
+    const size_t asked_command_argc = result.PosArgs.size() - 1;
+    CommandType command = kCmdNone;
+
+    for (int cmd = 0; cmd < kCmdMAX; cmd++)
+    {
+        if (asked_command.Equals(Command[cmd].Opt))
+        {
+            command = static_cast<CommandType>(cmd);
+            const size_t required_cmd_argc = Command[cmd].NumArgs - 1;
+            const char *cmd_help = Command[cmd].Help;
+            if (result.HelpRequested)
+            {
+                printf("%s\n", cmd_help);
+                return 0;
+            }
+            // create, extract, and attach can take an optional file list
+            // so we will be less strict here
+            // A proper way to handle this would be to only do this for these specific commands.
+            const size_t max_argc = required_cmd_argc + 1;
+            if (!(required_cmd_argc <= asked_command_argc && asked_command_argc <= max_argc))
+            {
+                printf("Error: required positional arguments don't match\n");
+                printf("Requires %zu argument(s), passed %zu\n", required_cmd_argc, asked_command_argc);
+                printf("%s\n", cmd_help);
+                return -1;
+            }
+            break;
+        }
+    }
+
+    if (command == kCmdNone)
+    {
+        printf("Error: unknown command '%s'\n", asked_command.GetCStr());
+        printf("%s\n", HELP_STRING);
+        return -1;
+    }
+
+    return DoCommand(command, result);
 }
