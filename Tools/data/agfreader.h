@@ -360,6 +360,7 @@ public:
     String ReadScriptName(DocElem elem) override { return ""; }
 
     DocElem GetSettings(DocElem elem);
+    static int ReadPlayerCharacter(DocElem elem) { return ReadInt(elem, "PlayerCharacter", -1); }
 };
 
 class GameSettings : public EntityParser

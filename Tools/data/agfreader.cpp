@@ -479,6 +479,9 @@ void ReadGameSettings(DataUtil::GameSettings &opt, DocElem elem)
 void ReadGameRef(DataUtil::GameRef &game, AGFReader &reader)
 {
     DocElem root = reader.GetGameRoot();
+
+    game.PlayerCharacter = Game::ReadPlayerCharacter(root);
+
     // Audio clips
     AGF::AudioClips audioclips;
     AGF::AudioClip audioclip;

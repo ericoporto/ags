@@ -260,6 +260,7 @@ struct GameRef
 
     std::vector<Variable>  GlobalVars;
 
+    int                    PlayerCharacter = -1;
     GameSettings           Settings;
 };
 
