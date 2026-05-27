@@ -352,6 +352,27 @@ public:
     void GetAll(DocElem root, std::vector<DocElem> &elems) override;
 };
 
+class CustomPropertySchemaItem : public ValueParser
+{
+public:
+    static String ReadName(DocElem elem) { return ReadString(elem, "Name"); }
+    static String ReadDescription(DocElem elem) { return ReadString(elem, "Description"); }
+    static String ReadDefaultValue(DocElem elem) { return ReadString(elem, "DefaultValue"); }
+    static String ReadType(DocElem elem) { return ReadString(elem, "Type"); }
+    static bool ReadAppliesToCharacters(DocElem elem) { return ReadBool(elem, "AppliesToCharacters", true); }
+    static bool ReadAppliesToHotspots(DocElem elem) { return ReadBool(elem, "AppliesToHotspots", true); }
+    static bool ReadAppliesToObjects(DocElem elem) { return ReadBool(elem, "AppliesToObjects", true); }
+    static bool ReadAppliesToInvItems(DocElem elem) { return ReadBool(elem, "AppliesToInvItems", true); }
+    static bool ReadAppliesToRooms(DocElem elem) { return ReadBool(elem, "AppliesToRooms", true); }
+    static bool ReadTranslated(DocElem elem) { return ReadBool(elem, "Translated"); }
+};
+
+class CustomPropertySchema : public EntityListParser
+{
+public:
+    void GetAll(DocElem root, std::vector<DocElem> &elems) override;
+};
+
 class Game : public EntityParser
 {
 public:
@@ -516,6 +537,8 @@ void ReadAllEntityRefs(std::vector<DataUtil::EntityRef> &ents, EntityListParser 
     EntityParser &parser, DocElem root);
 // Reads global variables defined inside the game project from the given doc root element.
 void ReadGlobalVariables(std::vector<DataUtil::Variable> &vars, DocElem root);
+// Reads custom property schema definitions from the given doc root element.
+void ReadCustomPropertySchema(std::vector<DataUtil::CustomPropertySchemaItem> &schema, DocElem root);
 // Reads game settings from the given doc root element.
 void ReadGameSettings(DataUtil::GameSettings &opt, DocElem root);
 // Reads full game reference data using AGFReader

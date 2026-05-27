@@ -244,6 +244,20 @@ struct GameSettings
     String WhenInterfaceDisabled;
 };
 
+struct CustomPropertySchemaItem
+{
+    String Name;
+    String Description;
+    String DefaultValue;
+    String Type;
+    bool AppliesToCharacters = true;
+    bool AppliesToHotspots = true;
+    bool AppliesToObjects = true;
+    bool AppliesToInvItems = true;
+    bool AppliesToRooms = true;
+    bool Translated = false;
+};
+
 // GameRef contains only game data strictly necessary for generating scripts.
 // NOTE: replace with full Game struct later if appears necessary
 struct GameRef
@@ -260,6 +274,7 @@ struct GameRef
     std::vector<std::pair<int, String>> Rooms;
 
     std::vector<Variable>  GlobalVars;
+    std::vector<CustomPropertySchemaItem> PropertySchema;
 
     int                    PlayerCharacter = -1;
     GameSettings           Settings;

@@ -334,6 +334,18 @@ void GlobalVariables::GetAll(DocElem root, std::vector<DocElem> &elems)
     }
 }
 
+void CustomPropertySchema::GetAll(DocElem root, std::vector<DocElem> &elems)
+{
+    DocElem list_node = root->FirstChildElement("PropertyDefinitions");
+    if (!list_node)
+        return;
+    for (DocElem node = list_node->FirstChildElement("CustomPropertySchemaItem");
+        node; node = node->NextSiblingElement("CustomPropertySchemaItem"))
+    {
+        elems.push_back(node);
+    }
+}
+
 DocElem Game::GetSettings(DocElem elem)
 {
     return elem->FirstChildElement("Settings");
@@ -466,6 +478,32 @@ void ReadGlobalVariables(std::vector<DataUtil::Variable> &vars, DocElem root)
     }
 }
 
+void ReadCustomPropertySchema(std::vector<DataUtil::CustomPropertySchemaItem> &schema, DocElem root)
+{
+    AGF::CustomPropertySchema props;
+    std::vector<AGF::DocElem> prop_elems;
+    props.GetAll(root, prop_elems);
+    if (prop_elems.size() == 0)
+        return;
+
+    AGF::CustomPropertySchemaItem prop_parser;
+    for (const auto &el : prop_elems)
+    {
+        DataUtil::CustomPropertySchemaItem prop;
+        prop.Name = CustomPropertySchemaItem::ReadName(el);
+        prop.Description = CustomPropertySchemaItem::ReadDescription(el);
+        prop.DefaultValue = CustomPropertySchemaItem::ReadDefaultValue(el);
+        prop.Type = CustomPropertySchemaItem::ReadType(el);
+        prop.AppliesToCharacters = CustomPropertySchemaItem::ReadAppliesToCharacters(el);
+        prop.AppliesToHotspots = CustomPropertySchemaItem::ReadAppliesToHotspots(el);
+        prop.AppliesToObjects = CustomPropertySchemaItem::ReadAppliesToObjects(el);
+        prop.AppliesToInvItems = CustomPropertySchemaItem::ReadAppliesToInvItems(el);
+        prop.AppliesToRooms = CustomPropertySchemaItem::ReadAppliesToRooms(el);
+        prop.Translated = CustomPropertySchemaItem::ReadTranslated(el);
+        schema.push_back(prop);
+    }
+}
+
 void ReadGameSettings(DataUtil::GameSettings &opt, DocElem elem)
 {
     AGF::Game p_game;
@@ -544,6 +582,9 @@ void ReadGameRef(DataUtil::GameRef &game, AGFReader &reader)
 
     // Global Variables
     ReadGlobalVariables(game.GlobalVars, root);
+
+    // Custom property schema
+    ReadCustomPropertySchema(game.PropertySchema, root);
 
     // Game settings
     ReadGameSettings(game.Settings, root);
