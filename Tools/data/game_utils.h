@@ -257,6 +257,7 @@ struct GameRef
     std::vector<GUIRef>    GUI;
     std::vector<EntityRef> Inventory;
     std::vector<EntityRef> Views;
+    std::vector<std::pair<int, String>> Rooms;
 
     std::vector<Variable>  GlobalVars;
 

@@ -539,6 +539,9 @@ void ReadGameRef(DataUtil::GameRef &game, AGFReader &reader)
     AGF::Views views;
     ReadAllEntityRefs(game.Views, views, view, root);
 
+    // Rooms
+    ReadRoomList(game.Rooms, root);
+
     // Global Variables
     ReadGlobalVariables(game.GlobalVars, root);
 
