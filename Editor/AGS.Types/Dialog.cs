@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Text;
 using System.Xml;
 using AGS.Types.Interfaces;
@@ -124,14 +125,22 @@ namespace AGS.Types
             // Luckily the CDATA section is easy to read back
             // FIX-ME: we will need to figure how to look the .asd file and then if it fails look into the inner text?
             // or the reverse? Need to think on this
-            if (!string.IsNullOrEmpty(scriptNode.InnerText))
+            String fileName = DialogScript.GetFileName(_name);
+
+            if (File.Exists(fileName))
             {
+                // read from .asd file
+                DialogScript.GetFileName(_name);
+            }
+            else if (!string.IsNullOrEmpty(scriptNode.InnerText))
+            {
+                // try the CData?
                 _script = new DialogScript("Dialog" + _id, scriptNode.InnerText);
             }
             else
             {
-                // read from .asd file
-                DialogScript.GetFileName(_name)
+                // I don't think we should be here???
+                _script = DialogScript.CreateDefault(fileName);
             }
 
             foreach (XmlNode child in SerializeUtils.GetChildNodes(node, "DialogOptions"))
@@ -142,14 +151,19 @@ namespace AGS.Types
 
         public void ToXml(XmlTextWriter writer)
         {
+            // lets save the .asd file
+            _script.SaveToDisk();
+
             writer.WriteStartElement("Dialog");
             writer.WriteElementString("ID", ID.ToString());
             writer.WriteElementString("Name", _name);
             writer.WriteElementString("ShowTextParser", _showTextParser.ToString());
             writer.WriteStartElement("Script");
+            // Actually I am commenting this
             // FIX-ME: move this out because the writing will be in a file by DialogScript.
             // For now we keep this so things still work.
-            writer.WriteCData(_script.Text);
+            // writer.WriteCData(_script.Text);
+            writer.WriteCData(string.Empty);
             writer.WriteEndElement();
 
             writer.WriteStartElement("DialogOptions");

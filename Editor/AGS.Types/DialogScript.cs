@@ -79,7 +79,7 @@ namespace AGS.Types
         public bool Modified
         {
             get { return _modified; }
-            set { _modified = value; }
+            // set { _modified = value; }
         }
 
         [Browsable(false)]
