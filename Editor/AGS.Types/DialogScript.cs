@@ -100,6 +100,11 @@ namespace AGS.Types
                 _isBeingSaved = true;
                 try
                 {
+                    if(!Directory.Exists(Path.GetDirectoryName(_fileName)))
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(_fileName));
+                    }
+
                     byte[] bytes = TextEncoding.GetBytes(_text);
                     using (BinaryWriter binWriter = new BinaryWriter(File.Open(_fileName, FileMode.Create)))
                     {
