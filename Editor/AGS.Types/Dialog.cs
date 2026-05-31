@@ -23,6 +23,7 @@ namespace AGS.Types
         {
             // we don't know the filename yet
             _script = DialogScript.CreateDefault(null);
+            _script.FileName = DialogScript.GetFileName(this);
             _cachedConvertedScript = null;
             _scriptChangedSinceLastCompile = true;
         }
@@ -130,7 +131,8 @@ namespace AGS.Types
             if (File.Exists(fileName))
             {
                 // read from .asd file
-                DialogScript.GetFileName(_name);
+                _script = new DialogScript(fileName, "");
+                _script.LoadFromDisk();
             }
             else if (!string.IsNullOrEmpty(scriptNode.InnerText))
             {
@@ -142,6 +144,7 @@ namespace AGS.Types
                 // I don't think we should be here???
                 _script = DialogScript.CreateDefault(fileName);
             }
+            _script.FileName = fileName;
 
             foreach (XmlNode child in SerializeUtils.GetChildNodes(node, "DialogOptions"))
             {
@@ -152,7 +155,7 @@ namespace AGS.Types
         public void ToXml(XmlTextWriter writer)
         {
             // lets save the .asd file
-            _script.SaveToDisk();
+            _script.SaveToDisk(true);
 
             writer.WriteStartElement("Dialog");
             writer.WriteElementString("ID", ID.ToString());
