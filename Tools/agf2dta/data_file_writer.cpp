@@ -150,46 +150,56 @@ static void WriteDefaultCharacter(Stream *out, const DataUtil::EntityRef &ref, i
     chinfo.WriteToFile(chinfo2, out);
 }
 
-static void WriteDefaultInventoryItem(Stream *out, const DataUtil::EntityRef &ref)
+static void WriteInventoryItem(Stream *out, const DataUtil::InventoryItemData &ref)
 {
-    InventoryItemInfo item;
-    item.name = ref.ScriptName.IsEmpty() ? ref.TypeName : ref.ScriptName;
+    InventoryItemInfo item{};
+    item.name = ref.Description;
+    item.pic = ref.Image;
+    item.cursorPic = ref.CursorImage;
+    item.hotx = ref.HotspotX;
+    item.hoty = ref.HotspotY;
+    item.flags = ref.PlayerStartsWith ? IFLG_STARTWITH : 0;
     item.WriteToFile(out);
 }
 
-static void WriteDefaultCursor(Stream *out, const DataUtil::EntityRef &ref)
+static void WriteCursor(Stream *out, const DataUtil::CursorData &ref)
 {
     MouseCursor cur;
     const String &name = ref.ScriptName.IsEmpty() ? ref.TypeName : ref.ScriptName;
     std::snprintf(cur.legacy_name, LEGACY_MAX_CURSOR_NAME_LENGTH, "%s", name.GetCStr());
     cur.name = name;
-    cur.pic = 0;
-    cur.hotx = 0;
-    cur.hoty = 0;
-    cur.view = -1;
-    cur.flags = 0;
+    cur.pic = ref.Image;
+    cur.hotx = static_cast<short>(ref.HotspotX);
+    cur.hoty = static_cast<short>(ref.HotspotY);
+    cur.view = static_cast<short>(ref.View > 0 ? ref.View - 1 : -1);
+    cur.flags = ref.Animate ? MCF_ANIMMOVE : 0;
     cur.WriteToFile(out);
 }
 
-static void WriteDefaultGui(Stream *out, const DataUtil::GUIRef &ref, int index)
+static void WriteGui(Stream *out, const DataUtil::GUIData &ref, int index)
 {
     const String &name = ref.ScriptName.IsEmpty() ? ref.TypeName : ref.ScriptName;
     WriteCountedText(out, name);
-    WriteCountedText(out, "");
-    out->WriteInt32(0); // x
-    out->WriteInt32(0); // y
-    out->WriteInt32(1); // wid
-    out->WriteInt32(2); // hit
-    out->WriteInt32(0); // numobjs
-    out->WriteInt32(kGUIPopupNormal);
-    out->WriteInt32(0); // popupyp
-    out->WriteInt32(0); // bgcol
-    out->WriteInt32(0); // bgpic
-    out->WriteInt32(0); // fgcol
-    out->WriteInt32(kGUIMain_DefFlags);
-    out->WriteInt32(0); // transparency
-    out->WriteInt32(index); // zorder
-    out->WriteInt32(index); // guiId
+    WriteCountedText(out, ref.OnClick);
+    out->WriteInt32(ref.Left);
+    out->WriteInt32(ref.Top);
+    out->WriteInt32(ref.Width);
+    out->WriteInt32(ref.Height);
+    // Control records are written in the type-specific lists below; these are
+    // still empty until that serialization is implemented.
+    out->WriteInt32(0);
+    out->WriteInt32(ref.PopupStyle.CompareNoCase("MouseYPos") == 0 ? kGUIPopupMouseY : kGUIPopupNormal);
+    out->WriteInt32(ref.PopupYPos);
+    out->WriteInt32(ref.BackgroundColor);
+    out->WriteInt32(ref.BackgroundImage);
+    out->WriteInt32(ref.BorderColor);
+    int flags = kGUIMain_DefFlags;
+    if (!ref.Clickable) flags &= ~kGUIMain_Clickable;
+    if (!ref.Visible) flags &= ~kGUIMain_Visible;
+    out->WriteInt32(flags);
+    out->WriteInt32(ref.Transparency);
+    out->WriteInt32(ref.ZOrder);
+    out->WriteInt32(ref.ID >= 0 ? ref.ID : index);
     out->WriteInt32(TEXTWINDOW_PADDING_DEFAULT);
 }
 
@@ -445,13 +455,13 @@ static void WriteInventoryBlock(const DataUtil::GameRef &game, Stream *out)
 {
     out->WriteByteCount(0, 68); // slot 0 is unused
     for (const auto &item_ref : game.Inventory)
-        WriteDefaultInventoryItem(out, item_ref);
+        WriteInventoryItem(out, item_ref);
 }
 
 static void WriteCursorBlock(const DataUtil::GameRef &game, Stream *out)
 {
     for (const auto &cursor_ref : game.Cursors)
-        WriteDefaultCursor(out, cursor_ref);
+        WriteCursor(out, cursor_ref);
 }
 
 static void WriteInteractionScriptsBlock(const DataUtil::GameRef &game, Stream *out)
@@ -486,7 +496,7 @@ static void WriteGuiBlock(const DataUtil::GameRef &game, Stream *out)
     out->WriteInt32(kGuiVersion_Current);
     out->WriteInt32(static_cast<int32_t>(game.GUI.size()));
     for (size_t i = 0; i < game.GUI.size(); ++i)
-        WriteDefaultGui(out, game.GUI[i], static_cast<int>(i));
+        WriteGui(out, game.GUI[i], static_cast<int>(i));
 
     WriteEmptyGuiControlList(out); // buttons
     WriteEmptyGuiControlList(out); // labels
