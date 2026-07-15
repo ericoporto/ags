@@ -741,6 +741,7 @@ static void WriteHeaderBlock(Stream *out)
     out->WriteInt32(kGameVersion_Current);
 
     // TEMP: hardcoded until the tool exposes build metadata.
+    // TODO: FIGURE OUT HOW??? Should I pick from Common/ac/def_version.h ?
     const String compiled_with = "3.6.3.12";
     out->WriteInt32(static_cast<int32_t>(compiled_with.GetLength()));
     WriteFixedText(out, compiled_with, compiled_with.GetLength());
