@@ -29,17 +29,17 @@ using AGS::Common::Stream;
 class DataFileWriter
 {
 public:
-    bool WriteGame28(const GameRef &game, Stream *out, String &error);
+    bool WriteGame28(const GameData &game, Stream *out, String &error);
 
 private:
     void WriteString(Stream *out, const String &text);
     void WriteFixedString(Stream *out, const String &text, size_t length);
 
-    void WriteHeader(const GameRef &game, Stream *out);
-    void WriteFonts(const GameRef &game, Stream *out);
-    void WriteInventory(const GameRef &game, Stream *out);
-    void WriteViews(const GameRef &game, Stream *out);
-    void WriteGUIs(const GameRef &game, Stream *out);
+    void WriteHeader(const GameData &game, Stream *out);
+    void WriteFonts(const GameData &game, Stream *out);
+    void WriteInventory(const GameData &game, Stream *out);
+    void WriteViews(const GameData &game, Stream *out);
+    void WriteGUIs(const GameData &game, Stream *out);
 };
 
 } // namespace DataUtil

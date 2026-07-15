@@ -68,8 +68,8 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    DataUtil::GameRef game{};
-    AGF::ReadGameRef(game, reader);
+    DataUtil::GameData game{};
+    AGF::ReadGameData(game, reader);
 
     //-----------------------------------------------------------------------//
     // Set the main game data struct values from Game.agf

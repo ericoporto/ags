@@ -288,7 +288,7 @@ static int ParseSplitResources(const String &value)
     return StrUtil::StringToInt(value, 0);
 }
 
-static void WriteGameSetupStructBase(const DataUtil::GameRef &game, Stream *out)
+static void WriteGameSetupStructBase(const DataUtil::GameData &game, Stream *out)
 {
     String game_name = game.Settings.GameName;
     if (game_name.IsEmpty())
@@ -421,7 +421,7 @@ static void WriteGameSetupStructBase(const DataUtil::GameRef &game, Stream *out)
     out->WriteInt32(0); // HasCCScript
 }
 
-static void WriteSaveGameInfo(const DataUtil::GameRef &game, Stream *out)
+static void WriteSaveGameInfo(const DataUtil::GameData &game, Stream *out)
 {
     String guid = game.Settings.GUIDAsString;
     WriteFixedText(out, guid, MAX_GUID_LENGTH);
@@ -440,7 +440,7 @@ static void WriteSaveGameInfo(const DataUtil::GameRef &game, Stream *out)
     WriteFixedText(out, folder, LEGACY_MAX_SG_FOLDER_LEN);
 }
 
-static void WriteFontBlock(const DataUtil::GameRef &game, Stream *out)
+static void WriteFontBlock(const DataUtil::GameData &game, Stream *out)
 {
     for (size_t i = 0; i < game.Fonts.size(); ++i)
         WriteDefaultFontInfo(out);
@@ -451,20 +451,20 @@ static void WriteSpriteFlags(Stream *out)
     out->WriteInt32(0);
 }
 
-static void WriteInventoryBlock(const DataUtil::GameRef &game, Stream *out)
+static void WriteInventoryBlock(const DataUtil::GameData &game, Stream *out)
 {
     out->WriteByteCount(0, 68); // slot 0 is unused
     for (const auto &item_ref : game.Inventory)
         WriteInventoryItem(out, item_ref);
 }
 
-static void WriteCursorBlock(const DataUtil::GameRef &game, Stream *out)
+static void WriteCursorBlock(const DataUtil::GameData &game, Stream *out)
 {
     for (const auto &cursor_ref : game.Cursors)
         WriteCursor(out, cursor_ref);
 }
 
-static void WriteInteractionScriptsBlock(const DataUtil::GameRef &game, Stream *out)
+static void WriteInteractionScriptsBlock(const DataUtil::GameData &game, Stream *out)
 {
     for (size_t i = 0; i < game.Characters.size(); ++i)
         WriteEmptyInteractionEvents(out);
@@ -472,13 +472,13 @@ static void WriteInteractionScriptsBlock(const DataUtil::GameRef &game, Stream *
         WriteEmptyInteractionEvents(out);
 }
 
-static void WriteViewsBlock(const DataUtil::GameRef &game, Stream *out)
+static void WriteViewsBlock(const DataUtil::GameData &game, Stream *out)
 {
     for (size_t i = 0; i < game.Views.size(); ++i)
         WriteDefaultView(out);
 }
 
-static void WriteCharactersBlock(const DataUtil::GameRef &game, Stream *out)
+static void WriteCharactersBlock(const DataUtil::GameData &game, Stream *out)
 {
     for (size_t i = 0; i < game.Characters.size(); ++i)
         WriteDefaultCharacter(out, game.Characters[i], static_cast<int>(i));
@@ -490,7 +490,7 @@ static void WriteLipSyncBlock(Stream *out)
         WriteFixedText(out, "", 50);
 }
 
-static void WriteGuiBlock(const DataUtil::GameRef &game, Stream *out)
+static void WriteGuiBlock(const DataUtil::GameData &game, Stream *out)
 {
     out->WriteInt32(GUIMAGIC);
     out->WriteInt32(kGuiVersion_Current);
@@ -511,7 +511,7 @@ static void WritePluginsBlock(Stream *out)
     out->WriteInt32(0);
 }
 
-static void WriteCustomPropertiesBlock(const DataUtil::GameRef &game, Stream *out)
+static void WriteCustomPropertiesBlock(const DataUtil::GameData &game, Stream *out)
 {
     WritePropertySchemaBlock(out, game.PropertySchema);
     for (size_t i = 0; i < game.Characters.size(); ++i)
@@ -534,7 +534,7 @@ static void WriteCustomPropertiesBlock(const DataUtil::GameRef &game, Stream *ou
     }
 }
 
-static void WriteAudioBlock(const DataUtil::GameRef &game, Stream *out)
+static void WriteAudioBlock(const DataUtil::GameData &game, Stream *out)
 {
     const int audio_type_count = static_cast<int>(game.AudioTypes.size()) + 1;
     out->WriteInt32(audio_type_count);
@@ -549,7 +549,7 @@ static void WriteAudioBlock(const DataUtil::GameRef &game, Stream *out)
     out->WriteInt32(-1); // no score sound
 }
 
-static void WriteRoomNamesBlock(const DataUtil::GameRef &game, Stream *out)
+static void WriteRoomNamesBlock(const DataUtil::GameData &game, Stream *out)
 {
     if (!game.Settings.DebugMode)
         return;
@@ -564,7 +564,7 @@ static void WriteRoomNamesBlock(const DataUtil::GameRef &game, Stream *out)
 namespace AGS {
 namespace DataUtil {
 
-bool DataFileWriter::WriteGame28(const GameRef &game,
+bool DataFileWriter::WriteGame28(const GameData &game,
     Stream *out, String &error)
 {
     if (out == nullptr)
@@ -604,7 +604,7 @@ void DataFileWriter::WriteFixedString(Stream *out,
     WriteFixedText(out, text, length);
 }
 
-void DataFileWriter::WriteHeader(const GameRef &, Stream *out)
+void DataFileWriter::WriteHeader(const GameData &, Stream *out)
 {
     WriteFixedText(out, "Adventure Creator Game File v2", 30);
     out->WriteInt32(kGameVersion_Current);
@@ -617,28 +617,28 @@ void DataFileWriter::WriteHeader(const GameRef &, Stream *out)
     out->WriteInt32(0); // no extended capabilities
 }
 
-void DataFileWriter::WriteFonts(const GameRef &game, Stream *out)
+void DataFileWriter::WriteFonts(const GameData &game, Stream *out)
 {
     if (!out)
         return;
     WriteFontBlock(game, out);
 }
 
-void DataFileWriter::WriteInventory(const GameRef &game, Stream *out)
+void DataFileWriter::WriteInventory(const GameData &game, Stream *out)
 {
     if (!out)
         return;
     WriteInventoryBlock(game, out);
 }
 
-void DataFileWriter::WriteViews(const GameRef &game, Stream *out)
+void DataFileWriter::WriteViews(const GameData &game, Stream *out)
 {
     if (!out)
         return;
     WriteViewsBlock(game, out);
 }
 
-void DataFileWriter::WriteGUIs(const GameRef &game, Stream *out)
+void DataFileWriter::WriteGUIs(const GameData &game, Stream *out)
 {
     if (!out)
         return;
