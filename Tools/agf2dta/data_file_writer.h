@@ -14,33 +14,19 @@
 #ifndef __AGS_TOOL_DATA__DATAFILEWRITER_H
 #define __AGS_TOOL_DATA__DATAFILEWRITER_H
 
-#include <vector>
-#include "util/string.h"
+#include <memory>
+#include "util/error.h"
 #include "util/stream.h"
 #include "data/game_utils.h"
 
 namespace AGS {
 namespace DataUtil {
 
-using AGS::Common::String;
+using AGS::Common::HError;
 using AGS::Common::Stream;
 
 // Serializes the game data to the game28.dta format.
-class DataFileWriter
-{
-public:
-    bool WriteGame28(const GameData &game, Stream *out, String &error);
-
-private:
-    void WriteString(Stream *out, const String &text);
-    void WriteFixedString(Stream *out, const String &text, size_t length);
-
-    void WriteHeader(const GameData &game, Stream *out);
-    void WriteFonts(const GameData &game, Stream *out);
-    void WriteInventory(const GameData &game, Stream *out);
-    void WriteViews(const GameData &game, Stream *out);
-    void WriteGUIs(const GameData &game, Stream *out);
-};
+HError WriteGameData28(const GameData &game, std::unique_ptr<Stream> &&out);
 
 } // namespace DataUtil
 } // namespace AGS

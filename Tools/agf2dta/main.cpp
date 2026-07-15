@@ -88,17 +88,11 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    DataUtil::DataFileWriter writer;
-    String write_error;
-    if (!writer.WriteGame28(game, out.get(), write_error))
+    HError write_err = DataUtil::WriteGameData28(game, std::move(out));
+    if (!write_err)
     {
         printf("Error: failed to write game data:\n");
-        printf("%s\n", write_error.GetCStr());
-        return -1;
-    }
-    if (!out->Flush())
-    {
-        printf("Error: failed to flush output file '%s'.\n", out_file.GetCStr());
+        printf("%s\n", write_err->FullMessage().GetCStr());
         return -1;
     }
 

@@ -486,6 +486,7 @@ static void WriteCharactersBlock(const DataUtil::GameData &game, Stream *out)
 
 static void WriteLipSyncBlock(Stream *out)
 {
+    // TODO: NOT IMPLEMENTED YET
     for (int i = 0; i < MAXLIPSYNCFRAMES; ++i)
         WriteFixedText(out, "", 50);
 }
@@ -559,52 +560,7 @@ static void WriteRoomNamesBlock(const DataUtil::GameData &game, Stream *out)
         WriteRoomName(out, room.first, room.second);
 }
 
-} // namespace
-
-namespace AGS {
-namespace DataUtil {
-
-bool DataFileWriter::WriteGame28(const GameData &game,
-    Stream *out, String &error)
-{
-    if (out == nullptr)
-    {
-        error = "Invalid output stream";
-        return false;
-    }
-
-    WriteHeader(game, out);
-    WriteGameSetupStructBase(game, out);
-    WriteSaveGameInfo(game, out);
-    WriteFonts(game, out);
-    WriteSpriteFlags(out);
-    WriteInventory(game, out);
-    WriteCursorBlock(game, out);
-    WriteInteractionScriptsBlock(game, out);
-    WriteViews(game, out);
-    WriteCharactersBlock(game, out);
-    WriteLipSyncBlock(out);
-    WriteGUIs(game, out);
-    WritePluginsBlock(out);
-    WriteCustomPropertiesBlock(game, out);
-    WriteAudioBlock(game, out);
-    WriteRoomNamesBlock(game, out);
-
-    return true;
-}
-
-void DataFileWriter::WriteString(Stream *out, const String &text)
-{
-    WriteCountedText(out, text);
-}
-
-void DataFileWriter::WriteFixedString(Stream *out,
-    const String &text, size_t length)
-{
-    WriteFixedText(out, text, length);
-}
-
-void DataFileWriter::WriteHeader(const GameData &, Stream *out)
+static void WriteHeaderBlock(Stream *out)
 {
     WriteFixedText(out, "Adventure Creator Game File v2", 30);
     out->WriteInt32(kGameVersion_Current);
@@ -617,32 +573,38 @@ void DataFileWriter::WriteHeader(const GameData &, Stream *out)
     out->WriteInt32(0); // no extended capabilities
 }
 
-void DataFileWriter::WriteFonts(const GameData &game, Stream *out)
-{
-    if (!out)
-        return;
-    WriteFontBlock(game, out);
-}
+} // namespace
 
-void DataFileWriter::WriteInventory(const GameData &game, Stream *out)
-{
-    if (!out)
-        return;
-    WriteInventoryBlock(game, out);
-}
+namespace AGS {
+namespace DataUtil {
 
-void DataFileWriter::WriteViews(const GameData &game, Stream *out)
+HError WriteGameData28(const GameData &game, std::unique_ptr<Stream> &&out)
 {
     if (!out)
-        return;
-    WriteViewsBlock(game, out);
-}
+        return new Error("WriteGameData28: Invalid output stream.");
 
-void DataFileWriter::WriteGUIs(const GameData &game, Stream *out)
-{
-    if (!out)
-        return;
-    WriteGuiBlock(game, out);
+    Stream *stream = out.get();
+
+    WriteHeaderBlock(stream);
+    WriteGameSetupStructBase(game, stream);
+    WriteSaveGameInfo(game, stream);
+    WriteFontBlock(game, stream);
+    WriteSpriteFlags(stream);
+    WriteInventoryBlock(game, stream);
+    WriteCursorBlock(game, stream);
+    WriteInteractionScriptsBlock(game, stream);
+    WriteViewsBlock(game, stream);
+    WriteCharactersBlock(game, stream);
+    WriteLipSyncBlock(stream);
+    WriteGuiBlock(game, stream);
+    WritePluginsBlock(stream);
+    WriteCustomPropertiesBlock(game, stream);
+    WriteAudioBlock(game, stream);
+    WriteRoomNamesBlock(game, stream);
+
+    if (!out->Flush())
+        return new Error("WriteGameData28: Failed to flush game data output stream.");
+    return HError::None();
 }
 
 } // namespace DataUtil
