@@ -1,4 +1,4 @@
-INCDIR = ../../Common ../../Tools
+INCDIR = ../../Common ../../Tools ../../libsrc/tinyxml2
 LIBDIR =
 
 CFLAGS := -O2 -g \
@@ -23,13 +23,15 @@ LDFLAGS  += -rdynamic -Wl,--as-needed $(addprefix -L,$(LIBDIR))
 CFLAGS   += -Werror=implicit-function-declaration
 
 COMMON_OBJS = \
-	../../Common/core/asset.cpp \
+	../../Common/ac/characterinfo.cpp \
+	../../Common/ac/inventoryiteminfo.cpp \
+	../../Common/ac/mousecursor.cpp \
+	../../Common/debug/debugmanager.cpp \
 	../../Common/util/bufferedstream.cpp \
 	../../Common/util/cmdlineopts.cpp \
 	../../Common/util/directory.cpp \
 	../../Common/util/file.cpp \
 	../../Common/util/filestream.cpp \
-	../../Common/util/multifilelib.cpp \
 	../../Common/util/path.cpp \
 	../../Common/util/stdio_compat.c \
 	../../Common/util/stream.cpp \
@@ -39,12 +41,16 @@ COMMON_OBJS = \
 	../../Common/util/textstreamreader.cpp
 
 TOOL_OBJS = \
-	../../Tools/data/ignore_utils.cpp \
-	../../Tools/data/mfl_utils.cpp
+	../../Tools/data/agfreader.cpp
+
+TINYXML2 = \
+	../../libsrc/tinyxml2/tinyxml2.cpp
 
 OBJS := main.cpp \
+	data_file_writer.cpp \
 	$(COMMON_OBJS) \
-	$(TOOL_OBJS)
+	$(TOOL_OBJS) \
+	$(TINYXML2)
 OBJS := $(OBJS:.cpp=.o)
 OBJS := $(OBJS:.c=.o)
 
