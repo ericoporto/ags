@@ -12,6 +12,8 @@
 //
 //=============================================================================
 #include "data/agfreader.h"
+#include <algorithm>
+#include <cstdio>
 #include <tinyxml2.h>
 #include "debug/out.h"
 #include "util/string_compat.h"
@@ -105,6 +107,58 @@ static const CstrArr<9> kFrameAlignmentNames = {{
     "BottomLeft", "BottomCenter", "BottomRight"
 }};
 
+static const CstrArr<3> kFontOutlineStyleNames = {{
+    "None", "Automatic", "UseOutlineFont"
+}};
+
+static const CstrArr<2> kFontAutoOutlineStyleNames = {{
+    "Squared", "Rounded"
+}};
+
+static const CstrArr<3> kSpriteImportResolutionNames = {{
+    "Real", "LowRes", "HighRes"
+}};
+
+static const CstrArr<2> kAudioBundlingTypeNames = {{
+    "InGameEXE", "InSeparateVOX"
+}};
+
+static const CstrArr<6> kAudioFileTypeNames = {{
+    "OGG", "MP3", "WAV", "VOC", "MIDI", "MOD"
+}};
+
+static const CstrArr<5> kCrossfadeSpeedNames = {{
+    "No", "SlowFade", "SlowishFade", "MediumFade", "FastFade"
+}};
+
+static const CstrArr<3> kButtonColorStyleNames = {{
+    "Default", "Dynamic", "DynamicFlat"
+}};
+
+static const CstrArr<3> kInheritableBoolNames = {{
+    "Inherit", "False", "True"
+}};
+
+static const CstrArr<6> kAudioPriorityNames = {{
+    "Inherit", "VeryLow", "Low", "Normal", "High", "VeryHigh"
+}};
+
+static const CstrArr<3> kLipSyncTypeNames = {{
+    "None", "Voice", "Text"
+}};
+
+static const CstrArr<2> kPaletteTypeNames = {{
+    "Gamewide", "Background"
+}};
+
+static const CstrArr<4> kTurnOrderPriorityNames = {{
+    "Clockwise", "CounterClockwise", "Random", "FaceDown"
+}};
+
+static const CstrArr<3> kTextBoxKeyClaimStyleNames = {{
+    "All", "Handled", "TextOnly"
+}};
+
 } // namespace
 
 namespace AGS
@@ -139,6 +193,7 @@ HError AGFReader::Open(const char *filename)
 
     const int attr_format = _doc->RootElement()->IntAttribute(XML_ATTRIBUTE_VERSION_INDEX);
     const char *attr_editorver = _doc->RootElement()->Attribute(XML_ATTRIBUTE_EDITOR_VERSION);
+    _editorVersion = attr_editorver ? attr_editorver : "";
     Debug::Printf("AGFReader: opened %s,\n format tag: %s\n format index: %d\n saved by AGS %s",
         filename, attr_filever, attr_format, attr_editorver ? attr_editorver : "unknown");
 
@@ -156,6 +211,7 @@ void AGFReader::Close()
 {
     _doc.reset();
     _gameRoot = nullptr;
+    _editorVersion.Empty();
 }
 
 //-----------------------------------------------------------------------------
@@ -359,6 +415,17 @@ static AGS::Common::PropertyType ReadCustomPropertyType(const String &value)
         AGS::Common::kPropertyBoolean, AGS::Common::kPropertyUndefined);
 }
 
+static DataUtil::FontOutlineStyle ReadFontOutlineStyle(const String &value);
+static DataUtil::FontAutoOutlineStyle ReadFontAutoOutlineStyle(const String &value);
+static DataUtil::SpriteImportResolution ReadSpriteImportResolution(const String &value);
+static DataUtil::AudioFileBundlingType ReadAudioBundlingType(const String &value);
+static DataUtil::AudioClipFileType ReadAudioFileType(const String &value);
+static DataUtil::CrossfadeSpeed ReadCrossfadeSpeed(const String &value);
+static DataUtil::ButtonColorStyle ReadButtonColorStyle(const String &value);
+static DataUtil::CharacterTurnOrderPriority ReadTurnOrderPriority(const String &value);
+static DataUtil::GUITextBoxKeyClaimStyle ReadTextBoxKeyClaimStyle(const String &value);
+static DataUtil::LipSyncType ReadLipSyncType(const String &value);
+
 int Dialog::ReadOptionCount(DocElem elem)
 {
     // Option count is not written in AGF, so we have to calculate number of elems
@@ -411,6 +478,10 @@ void Cursor::ReadAllData(DocElem elem, DataUtil::CursorData &data)
     data.HotspotY = ReadInt(elem, "HotspotY");
     data.Animate = ReadBool(elem, "Animate");
     data.View = ReadInt(elem, "View", -1);
+    data.AnimateOnlyOnHotspots = ReadBool(elem, "AnimateOnlyOnHotspots");
+    data.AnimateOnlyWhenMoving = ReadBool(elem, "AnimateOnlyWhenMoving");
+    data.StandardMode = ReadBool(elem, "StandardMode");
+    data.AnimationDelay = ReadInt(elem, "AnimationDelay", 5);
 }
 
 void InventoryItem::ReadAllData(DocElem elem, DataUtil::InventoryItemData &data)
@@ -510,6 +581,11 @@ void GUIControl::ReadAllData(DocElem elem, DataUtil::GUIControlData& data)
     data.Visible = ReadBool(elem, "Visible");
     data.Translated = ReadBool(elem, "Translated", true);
     data.ZOrder = ReadInt(elem, "ZOrder");
+    data.BackgroundColor = ReadInt(elem, "BackgroundColor");
+    data.BorderColor = ReadInt(elem, "BorderColor");
+    data.BorderWidth = ReadInt(elem, "BorderWidth");
+    data.PaddingX = ReadInt(elem, "PaddingX");
+    data.PaddingY = ReadInt(elem, "PaddingY");
 }
 
 void GUIControl::ReadButtonData(DocElem elem, DataUtil::GUIButtonData& data)
@@ -525,6 +601,15 @@ void GUIControl::ReadButtonData(DocElem elem, DataUtil::GUIButtonData& data)
     data.Text = ReadString(elem, "Text");
     data.TextAlignment = ReadFrameAlignment(ReadString(elem, "TextAlignment"), kAlignTopCenter);
     data.TextColor = ReadInt(elem, "TextColor");
+    data.ColorStyle = ReadButtonColorStyle(ReadString(elem, "ColorStyle"));
+    data.BorderShadeColor = ReadInt(elem, "BorderShadeColor");
+    data.MouseOverBackgroundColor = ReadInt(elem, "MouseOverBackgroundColor");
+    data.PushedBackgroundColor = ReadInt(elem, "PushedBackgroundColor");
+    data.MouseOverBorderColor = ReadInt(elem, "MouseOverBorderColor");
+    data.PushedBorderColor = ReadInt(elem, "PushedBorderColor");
+    data.MouseOverTextColor = ReadInt(elem, "MouseOverTextColor");
+    data.PushedTextColor = ReadInt(elem, "PushedTextColor");
+    data.TextOutlineColor = ReadInt(elem, "TextOutlineColor");
 }
 
 void GUIControl::ReadLabelData(DocElem elem, DataUtil::GUILabelData& data)
@@ -533,6 +618,7 @@ void GUIControl::ReadLabelData(DocElem elem, DataUtil::GUILabelData& data)
     data.Text = ReadString(elem, "Text");
     data.TextAlignment = ReadFrameAlignment(ReadString(elem, "TextAlignment"), kAlignTopLeft);
     data.TextColor = ReadInt(elem, "TextColor");
+    data.TextOutlineColor = ReadInt(elem, "TextOutlineColor");
 }
 
 void GUIControl::ReadSliderData(DocElem elem, DataUtil::GUISliderData& data)
@@ -544,6 +630,8 @@ void GUIControl::ReadSliderData(DocElem elem, DataUtil::GUISliderData& data)
     data.MinValue = ReadInt(elem, "MinValue");
     data.OnChange = ReadString(elem, "OnChange");
     data.Value = ReadInt(elem, "Value");
+    data.HandleColor = ReadInt(elem, "HandleColor");
+    data.BorderShadeColor = ReadInt(elem, "BorderShadeColor");
 }
 
 void GUIControl::ReadInventoryData(DocElem elem, DataUtil::GUIInventoryData& data)
@@ -561,6 +649,7 @@ void GUIControl::ReadTextBoxData(DocElem elem, DataUtil::GUITextBoxData& data)
     data.Text = ReadString(elem, "Text");
     data.TextAlignment = ReadFrameAlignment(ReadString(elem, "TextAlignment"), kAlignTopLeft);
     data.TextColor = ReadInt(elem, "TextColor");
+    data.TextOutlineColor = ReadInt(elem, "TextOutlineColor");
 }
 
 void GUIControl::ReadListBoxData(DocElem elem, DataUtil::GUIListBoxData& data)
@@ -573,6 +662,7 @@ void GUIControl::ReadListBoxData(DocElem elem, DataUtil::GUIListBoxData& data)
     data.ShowScrollArrows = ReadBool(elem, "ShowScrollArrows");
     data.TextAlignment = ReadHorizontalAlignment(ReadString(elem, "TextAlignment"), kHAlignLeft);
     data.TextColor = ReadInt(elem, "TextColor");
+    data.TextOutlineColor = ReadInt(elem, "TextOutlineColor");
 }
 
 AGS::Common::PropertyType CustomPropertySchemaItem::ReadType(DocElem elem)
@@ -613,14 +703,18 @@ void GameSettings::ReadGameSettings(DocElem elem, DataUtil::GameSettings& s)
     s.DialogScriptNarrateFunction = ReadString(elem, "DialogScriptNarrateFunction");
     s.DialogScriptSayFunction = ReadString(elem, "DialogScriptSayFunction");
     s.DisplayMultipleInventory = ReadBool(elem, "DisplayMultipleInventory");
+    s.DisplaySingleDialogOption = ReadBool(elem, "DisplaySingleDialogOption");
     s.EnforceNewAudio = ReadBool(elem, "EnforceNewAudio");
     s.EnforceNewStrings = ReadBool(elem, "EnforceNewStrings");
     s.EnforceObjectBasedScript = ReadBool(elem, "EnforceObjectBasedScript");
     s.GUIAlphaStyle = ReadGuiAlphaStyle(ReadString(elem, "GUIAlphaStyle"));
+    s.GUIHandleOnlyLeftMouseButton = ReadBool(elem, "GUIHandleOnlyLeftMouseButton");
     s.GUIDAsString = ReadString(elem, "GUIDAsString");
     s.GameFileName = ReadString(elem, "GameFileName");
     s.GameName = ReadString(elem, "GameName");
+    s.GameFPS = ReadInt(elem, "GameFPS", 40);
     s.GameTextEncoding = ReadString(elem, "GameTextEncoding");
+    s.GameTextLanguage = ReadString(elem, "GameTextLanguage");
     s.Genre = ReadString(elem, "Genre");
     s.GlobalSpeechAnimationDelay = ReadInt(elem, "GlobalSpeechAnimationDelay");
     s.HandleInvClicksInScript = ReadBool(elem, "HandleInvClicksInScript");
@@ -664,6 +758,9 @@ void GameSettings::ReadGameSettings(DocElem elem, DataUtil::GameSettings& s)
     s.UseLowResCoordinatesInScript = ReadBool(elem, "UseLowResCoordinatesInScript");
     s.UseOldCustomDialogOptionsAPI = ReadBool(elem, "UseOldCustomDialogOptionsAPI");
     s.UseOldKeyboardHandling = ReadBool(elem, "UseOldKeyboardHandling");
+    s.UseOldVoiceClipNaming = ReadBool(elem, "UseOldVoiceClipNaming");
+    s.TurnOrderPriority = ReadTurnOrderPriority(ReadString(elem, "TurnOrderPriority"));
+    s.TextBoxKeyClaimStyle = ReadTextBoxKeyClaimStyle(ReadString(elem, "TextBoxKeyClaimStyle"));
     s.Version = ReadString(elem, "Version");
     s.WalkInLookMode = ReadBool(elem, "WalkInLookMode");
     s.WhenInterfaceDisabled = ReadGuiDisableStyle(ReadString(elem, "WhenInterfaceDisabled"));
@@ -874,6 +971,257 @@ void ReadGameSettings(DataUtil::GameSettings &opt, DocElem elem)
     p_set.ReadGameSettings(set_elem, opt);
 }
 
+static DataUtil::FontOutlineStyle ReadFontOutlineStyle(const String &value)
+{
+    return StrUtil::ParseEnum(value, kFontOutlineStyleNames, DataUtil::kFontOutline_None);
+}
+
+static DataUtil::FontAutoOutlineStyle ReadFontAutoOutlineStyle(const String &value)
+{
+    return StrUtil::ParseEnum(value, kFontAutoOutlineStyleNames, DataUtil::kFontAutoOutline_Squared);
+}
+
+static DataUtil::SpriteImportResolution ReadSpriteImportResolution(const String &value)
+{
+    return StrUtil::ParseEnumWithBase(value, kSpriteImportResolutionNames,
+        DataUtil::kSpriteImport_Real, DataUtil::kSpriteImport_Real);
+}
+
+static DataUtil::AudioFileBundlingType ReadAudioBundlingType(const String &value)
+{
+    return StrUtil::ParseEnumWithBase(value, kAudioBundlingTypeNames,
+        DataUtil::kAudioBundling_InGameEXE, DataUtil::kAudioBundling_InGameEXE);
+}
+
+static DataUtil::AudioClipFileType ReadAudioFileType(const String &value)
+{
+    return StrUtil::ParseEnumWithBase(value, kAudioFileTypeNames,
+        DataUtil::kAudioFile_OGG, DataUtil::kAudioFile_Undefined);
+}
+
+static DataUtil::CrossfadeSpeed ReadCrossfadeSpeed(const String &value)
+{
+    return StrUtil::ParseEnum(value, kCrossfadeSpeedNames, DataUtil::kCrossfade_No);
+}
+
+static DataUtil::ButtonColorStyle ReadButtonColorStyle(const String &value)
+{
+    return StrUtil::ParseEnum(value, kButtonColorStyleNames, DataUtil::kButtonColor_Default);
+}
+
+static int ReadInheritableBool(const String &value)
+{
+    return StrUtil::ParseEnumWithBase(value, kInheritableBoolNames, -1, -1);
+}
+
+static int ReadAudioPriority(const String &value)
+{
+    switch (StrUtil::ParseEnum(value, kAudioPriorityNames, 0))
+    {
+    case 1: return 1;
+    case 2: return 25;
+    case 4: return 75;
+    case 5: return 100;
+    case 3: return 50;
+    case 0:
+    default: return -1;
+    }
+}
+
+static DataUtil::CharacterTurnOrderPriority ReadTurnOrderPriority(const String &value)
+{
+    return StrUtil::ParseEnum(value, kTurnOrderPriorityNames, DataUtil::kTurnOrder_Clockwise);
+}
+
+static DataUtil::GUITextBoxKeyClaimStyle ReadTextBoxKeyClaimStyle(const String &value)
+{
+    return StrUtil::ParseEnum(value, kTextBoxKeyClaimStyleNames, DataUtil::kTextBoxKeyClaim_All);
+}
+
+static DataUtil::LipSyncType ReadLipSyncType(const String &value)
+{
+    return StrUtil::ParseEnum(value, kLipSyncTypeNames, DataUtil::kLipSync_None);
+}
+
+static void ReadProperties(DocElem elem, std::vector<DataUtil::CustomPropertyValue> &props)
+{
+    DocElem list = elem ? elem->FirstChildElement("Properties") : nullptr;
+    for (DocElem prop = list ? list->FirstChildElement("CustomProperty") : nullptr;
+         prop; prop = prop->NextSiblingElement("CustomProperty"))
+    {
+        DataUtil::CustomPropertyValue value;
+        value.Name = ValueParser::ReadString(prop, "Name");
+        value.Value = ValueParser::ReadString(prop, "Value");
+        props.push_back(value);
+    }
+}
+
+static void ReadInteractions(DocElem elem, String &script_module, std::vector<String> &events)
+{
+    DocElem interactions = elem ? elem->FirstChildElement("Interactions") : nullptr;
+    if (!interactions)
+        return;
+    script_module = ValueParser::ReadString(interactions, "ScriptModule");
+    for (DocElem event = interactions->FirstChildElement("Event");
+         event; event = event->NextSiblingElement("Event"))
+    {
+        const int index = event->IntAttribute("Index", static_cast<int>(events.size()));
+        if (index >= 0)
+        {
+            if (events.size() <= static_cast<size_t>(index)) events.resize(index + 1);
+            events[index] = event->GetText() ? event->GetText() : "";
+        }
+    }
+}
+
+void AudioClip::ReadAllData(DocElem elem, DataUtil::AudioClipData &data)
+{
+    data.Index = ReadInt(elem, "Index");
+    data.SourceFileName = ReadString(elem, "SourceFileName");
+    const char *dot = std::strrchr(data.SourceFileName.GetCStr(), '.');
+    data.CacheFileName = String::FromFormat("au%06X%s", data.Index, dot ? dot : "");
+    data.BundlingType = ReadAudioBundlingType(ReadString(elem, "BundlingType"));
+    data.Type = ReadInt(elem, "Type");
+    data.FileType = ReadAudioFileType(ReadString(elem, "FileType"));
+
+    int repeat = ReadInheritableBool(ReadString(elem, "DefaultRepeat", "Inherit"));
+    int priority = ReadAudioPriority(ReadString(elem, "DefaultPriority", "Inherit"));
+    int volume = ReadInt(elem, "DefaultVolume", -1);
+    for (XMLNode *node = elem->Parent(); node && (repeat < 0 || priority < 0 || volume < 0);
+         node = node->Parent())
+    {
+        DocElem folder = node->ToElement();
+        if (!folder || strcmp(folder->Name(), "AudioClipFolder") != 0) continue;
+        if (repeat < 0) repeat = ReadInheritableBool(ReadString(folder, "DefaultRepeat", "Inherit"));
+        if (priority < 0) priority = ReadAudioPriority(ReadString(folder, "DefaultPriority", "Inherit"));
+        if (volume < 0) volume = ReadInt(folder, "DefaultVolume", -1);
+    }
+    data.Repeat = repeat > 0;
+    data.Priority = priority < 0 ? 50 : priority;
+    data.Volume = volume < 0 ? 100 : volume;
+}
+
+void AudioType::ReadAllData(DocElem elem, DataUtil::AudioTypeData &data)
+{
+    data.MaxChannels = ReadInt(elem, "MaxChannels");
+    data.VolumeReductionWhileSpeechPlaying = ReadInt(elem, "VolumeReductionWhileSpeechPlaying");
+    data.Crossfade = ReadCrossfadeSpeed(ReadString(elem, "CrossfadeClips"));
+}
+
+void Character::ReadAllData(DocElem elem, DataUtil::CharacterData &data)
+{
+    data.AdjustSpeedWithScaling = ValueParser::ReadBool(elem, "AdjustSpeedWithScaling");
+    data.AdjustVolumeWithScaling = ValueParser::ReadBool(elem, "AdjustVolumeWithScaling");
+    data.AnimationDelay = ValueParser::ReadInt(elem, "AnimationDelay");
+    data.Baseline = ValueParser::ReadInt(elem, "Baseline");
+    data.BlinkingView = ValueParser::ReadInt(elem, "BlinkingView");
+    std::sscanf(ValueParser::ReadString(elem, "BlockingRectangle", "0,0,0,0"), "%d,%d,%d,%d",
+        &data.BlockingX, &data.BlockingY, &data.BlockingWidth, &data.BlockingHeight);
+    data.Clickable = ValueParser::ReadBool(elem, "Clickable", true);
+    data.DiagonalLoops = ValueParser::ReadBool(elem, "DiagonalLoops", true);
+    data.IdleAnimationDelay = ValueParser::ReadInt(elem, "IdleAnimationDelay");
+    data.IdleDelay = ValueParser::ReadInt(elem, "IdleDelay");
+    data.IdleView = ValueParser::ReadInt(elem, "IdleView");
+    data.MovementLinkedToAnimation = ValueParser::ReadBool(elem, "MovementLinkedToAnimation");
+    data.MovementSpeed = ValueParser::ReadInt(elem, "MovementSpeed");
+    data.MovementSpeedX = ValueParser::ReadInt(elem, "MovementSpeedX");
+    data.MovementSpeedY = ValueParser::ReadInt(elem, "MovementSpeedY");
+    data.NormalView = ValueParser::ReadInt(elem, "NormalView");
+    data.RealName = ValueParser::ReadString(elem, "RealName");
+    data.Solid = ValueParser::ReadBool(elem, "Solid", true);
+    data.SpeechAnimationDelay = ValueParser::ReadInt(elem, "SpeechAnimationDelay");
+    data.SpeechColor = ValueParser::ReadInt(elem, "SpeechColor");
+    data.SpeechView = ValueParser::ReadInt(elem, "SpeechView");
+    data.StartX = ValueParser::ReadInt(elem, "StartX");
+    data.StartY = ValueParser::ReadInt(elem, "StartY");
+    data.StartingRoom = ValueParser::ReadInt(elem, "StartingRoom", -1);
+    data.ThinkingView = ValueParser::ReadInt(elem, "ThinkingView");
+    data.Transparency = ValueParser::ReadInt(elem, "Transparency");
+    data.TurnBeforeWalking = ValueParser::ReadBool(elem, "TurnBeforeWalking", true);
+    data.TurnWhenFacing = ValueParser::ReadBool(elem, "TurnWhenFacing", true);
+    data.UniformMovementSpeed = ValueParser::ReadBool(elem, "UniformMovementSpeed", true);
+    data.UseRoomAreaLighting = ValueParser::ReadBool(elem, "UseRoomAreaLighting", true);
+    data.UseRoomAreaScaling = ValueParser::ReadBool(elem, "UseRoomAreaScaling", true);
+    ReadProperties(elem, data.Properties);
+    ReadInteractions(elem, data.ScriptModule, data.InteractionEvents);
+}
+
+void View::ReadAllData(DocElem elem, DataUtil::ViewData &data)
+{
+    DocElem loops = elem->FirstChildElement("Loops");
+    for (DocElem loop = loops ? loops->FirstChildElement("Loop") : nullptr;
+         loop; loop = loop->NextSiblingElement("Loop"))
+    {
+        DataUtil::ViewLoopData loop_data;
+        loop_data.RunNextLoop = ValueParser::ReadBool(loop, "RunNextLoop");
+        DocElem frames = loop->FirstChildElement("Frames");
+        for (DocElem frame = frames ? frames->FirstChildElement("ViewFrame") : nullptr;
+             frame; frame = frame->NextSiblingElement("ViewFrame"))
+        {
+            DataUtil::ViewFrameData frame_data;
+            frame_data.Delay = ValueParser::ReadInt(frame, "Delay");
+            frame_data.Flipped = ValueParser::ReadBool(frame, "Flipped");
+            frame_data.Image = ValueParser::ReadInt(frame, "Image");
+            frame_data.Sound = ValueParser::ReadInt(frame, "Sound");
+            loop_data.Frames.push_back(frame_data);
+        }
+        data.Loops.push_back(loop_data);
+    }
+}
+
+void Font::ReadAllData(DocElem elem, DataUtil::FontData &data)
+{
+    data.AutoOutlineThickness = ValueParser::ReadInt(elem, "AutoOutlineThickness");
+    data.AutoOutlineStyle = ReadFontAutoOutlineStyle(ValueParser::ReadString(elem, "AutoOutlineStyle"));
+    data.CharacterSpacing = ValueParser::ReadInt(elem, "CharacterSpacing");
+    data.CustomHeightValue = ValueParser::ReadInt(elem, "CustomHeightValue");
+    data.HeightDefinedBy = ReadFontHeightDefinition(ValueParser::ReadString(elem, "HeightDefinedBy"));
+    data.LineSpacing = ValueParser::ReadInt(elem, "LineSpacing");
+    data.OutlineFont = ValueParser::ReadInt(elem, "OutlineFont");
+    data.OutlineStyle = ReadFontOutlineStyle(ValueParser::ReadString(elem, "OutlineStyle"));
+    data.PointSize = ValueParser::ReadInt(elem, "PointSize");
+    data.SizeMultiplier = ValueParser::ReadInt(elem, "SizeMultiplier", 1);
+    data.MetricsFixup = ReadFontMetricsFixup(ValueParser::ReadString(elem, "TTFMetricsFixup"));
+    data.VerticalOffset = ValueParser::ReadInt(elem, "VerticalOffset");
+}
+
+static void CollectElements(DocElem elem, const char *name, std::vector<DocElem> &result)
+{
+    if (!elem) return;
+    for (DocElem child = elem->FirstChildElement(); child; child = child->NextSiblingElement())
+    {
+        if (strcmp(child->Name(), name) == 0) result.push_back(child);
+        CollectElements(child, name, result);
+    }
+}
+
+static std::vector<uint8_t> DecodeBase64(const char *text)
+{
+    std::vector<uint8_t> result;
+    int value = 0, bits = -8;
+    for (const unsigned char *ptr = reinterpret_cast<const unsigned char*>(text ? text : ""); *ptr; ++ptr)
+    {
+        const unsigned char ch = *ptr;
+        int digit = ch >= 'A' && ch <= 'Z' ? ch - 'A' : ch >= 'a' && ch <= 'z' ? ch - 'a' + 26 :
+            ch >= '0' && ch <= '9' ? ch - '0' + 52 : ch == '+' ? 62 : ch == '/' ? 63 : -1;
+        if (digit < 0) continue;
+        value = (value << 6) | digit;
+        bits += 6;
+        if (bits >= 0)
+        {
+            result.push_back(static_cast<uint8_t>((value >> bits) & 0xff));
+            bits -= 8;
+        }
+    }
+    return result;
+}
+
+template <typename T>
+static void SortByID(std::vector<T> &items)
+{
+    std::sort(items.begin(), items.end(), [](const T &a, const T &b) { return a.ID < b.ID; });
+}
+
 
 
 void ReadGameData(DataUtil::GameData &game, AGFReader &reader)
@@ -883,18 +1231,52 @@ void ReadGameData(DataUtil::GameData &game, AGFReader &reader)
 
     game.PlayerCharacter = Game::ReadPlayerCharacter(root);
 
+    game.EditorVersion = reader.GetEditorVersion();
     // Audio clips
-    AGF::AudioClips audioclips;
-    AGF::AudioClip audioclip;
-    ReadAllEntityRefs(game.AudioClips, audioclips, audioclip, root);
+    {
+        AGF::AudioClips list;
+        AGF::AudioClip parser;
+        std::vector<DocElem> elems;
+        list.GetAll(root, elems);
+        for (DocElem elem : elems)
+        {
+            DataUtil::AudioClipData data;
+            ReadEntityRef(data, parser, elem);
+            parser.ReadAllData(elem, data);
+            game.AudioClips.push_back(data);
+        }
+        SortByID(game.AudioClips);
+    }
     // Audio types
-    AGF::AudioTypes audiotypes;
-    AGF::AudioType audiotype;
-    ReadAllEntityRefs(game.AudioTypes, audiotypes, audiotype, root);
+    {
+        AGF::AudioTypes list;
+        AGF::AudioType parser;
+        std::vector<DocElem> elems;
+        list.GetAll(root, elems);
+        for (DocElem elem : elems)
+        {
+            DataUtil::AudioTypeData data;
+            ReadEntityRef(data, parser, elem);
+            parser.ReadAllData(elem, data);
+            game.AudioTypes.push_back(data);
+        }
+        SortByID(game.AudioTypes);
+    }
     // Characters
-    AGF::Characters characters;
-    AGF::Character character;
-    ReadAllEntityRefs(game.Characters, characters, character, root);
+    {
+        AGF::Characters list;
+        AGF::Character parser;
+        std::vector<DocElem> elems;
+        list.GetAll(root, elems);
+        for (DocElem elem : elems)
+        {
+            DataUtil::CharacterData data;
+            ReadEntityRef(data, parser, elem);
+            parser.ReadAllData(elem, data);
+            game.Characters.push_back(data);
+        }
+        SortByID(game.Characters);
+    }
     // Cursors
     {
         AGF::Cursors cursors;
@@ -908,6 +1290,7 @@ void ReadGameData(DataUtil::GameData &game, AGFReader &reader)
             cursor.ReadAllData(el, data);
             game.Cursors.push_back(data);
         }
+        SortByID(game.Cursors);
     }
     // Dialogs
     {
@@ -922,9 +1305,20 @@ void ReadGameData(DataUtil::GameData &game, AGFReader &reader)
         }
     }
     // Fonts
-    AGF::Fonts fonts;
-    AGF::Font font;
-    ReadAllEntityRefs(game.Fonts, fonts, font, root);
+    {
+        AGF::Fonts list;
+        AGF::Font parser;
+        std::vector<DocElem> elems;
+        list.GetAll(root, elems);
+        for (DocElem elem : elems)
+        {
+            DataUtil::FontData data;
+            ReadEntityRef(data, parser, elem);
+            parser.ReadAllData(elem, data);
+            game.Fonts.push_back(data);
+        }
+        SortByID(game.Fonts);
+    }
     // GUI and controls
     {
         AGF::GUIs guis;
@@ -951,13 +1345,94 @@ void ReadGameData(DataUtil::GameData &game, AGFReader &reader)
             DataUtil::InventoryItemData data;
             ReadEntityRef(data, invitem, el);
             invitem.ReadAllData(el, data);
+            ReadProperties(el, data.Properties);
+            ReadInteractions(el, data.ScriptModule, data.InteractionEvents);
             game.Inventory.push_back(data);
         }
+        SortByID(game.Inventory);
     }
     // Views
-    AGF::View view;
-    AGF::Views views;
-    ReadAllEntityRefs(game.Views, views, view, root);
+    {
+        AGF::Views list;
+        AGF::View parser;
+        std::vector<DocElem> elems;
+        list.GetAll(root, elems);
+        int max_id = 0;
+        std::vector<DataUtil::ViewData> views;
+        for (DocElem elem : elems)
+        {
+            DataUtil::ViewData data;
+            ReadEntityRef(data, parser, elem);
+            parser.ReadAllData(elem, data);
+            max_id = std::max(max_id, data.ID);
+            views.push_back(data);
+        }
+        game.Views.resize(max_id);
+        for (const auto &view : views)
+            if (view.ID > 0) game.Views[view.ID - 1] = view;
+    }
+
+    // Parser dictionary, lip-sync, global messages, palette and sprite flags.
+    std::vector<DocElem> elems;
+    CollectElements(root->FirstChildElement("TextParser"), "TextParserWord", elems);
+    for (DocElem elem : elems)
+    {
+        DataUtil::TextParserWordData word;
+        word.Word = ValueParser::ReadString(elem, "Word");
+        word.WordGroup = ValueParser::ReadInt(elem, "WordGroup");
+        game.ParserWords.push_back(word);
+    }
+
+    DocElem lipsync = root->FirstChildElement("LipSync");
+    game.LipSyncDefaultFrame = ValueParser::ReadInt(lipsync, "DefaultFrame");
+    game.LipSync = ReadLipSyncType(ValueParser::ReadString(lipsync, "Type"));
+    DocElem frames = lipsync ? lipsync->FirstChildElement("Frames") : nullptr;
+    for (DocElem frame = frames ? frames->FirstChildElement("CharsForFrame") : nullptr;
+         frame; frame = frame->NextSiblingElement("CharsForFrame"))
+        game.LipSyncFrames.push_back(frame->GetText() ? frame->GetText() : "");
+
+    game.GlobalMessages.resize(500);
+    DocElem messages = root->FirstChildElement("GlobalMessages");
+    for (DocElem msg = messages ? messages->FirstChildElement("Message") : nullptr;
+         msg; msg = msg->NextSiblingElement("Message"))
+    {
+        const int id = msg->IntAttribute("ID", 500) - 500;
+        if (id >= 0 && id < 500) game.GlobalMessages[id] = msg->GetText() ? msg->GetText() : "";
+    }
+
+    game.Palette.resize(256);
+    DocElem palette = root->FirstChildElement("Palette");
+    for (DocElem entry = palette ? palette->FirstChildElement("PaletteEntry") : nullptr;
+         entry; entry = entry->NextSiblingElement("PaletteEntry"))
+    {
+        const int index = entry->IntAttribute("Index", -1);
+        if (index < 0 || index >= 256) continue;
+        auto &data = game.Palette[index];
+        data.Background = StrUtil::ParseEnum(String(entry->Attribute("Type") ? entry->Attribute("Type") : ""),
+            kPaletteTypeNames, 0) == 1;
+        data.Red = entry->IntAttribute("Red"); data.Green = entry->IntAttribute("Green"); data.Blue = entry->IntAttribute("Blue");
+    }
+
+    elems.clear();
+    CollectElements(root->FirstChildElement("Sprites"), "Sprite", elems);
+    for (DocElem sprite : elems)
+    {
+        DataUtil::SpriteData data;
+        data.Slot = sprite->IntAttribute("Slot");
+        const String resolution = sprite->Attribute("Resolution") ? sprite->Attribute("Resolution") : "Real";
+        data.Resolution = ReadSpriteImportResolution(resolution);
+        game.Sprites.push_back(data);
+    }
+
+    DocElem plugins = root->FirstChildElement("Plugins");
+    for (DocElem plugin = plugins ? plugins->FirstChildElement("Plugin") : nullptr;
+         plugin; plugin = plugin->NextSiblingElement("Plugin"))
+    {
+        DataUtil::PluginData data;
+        data.Name = ValueParser::ReadString(plugin, "FileName");
+        data.Data = DecodeBase64(ValueParser::ReadString(plugin, "Data"));
+        game.Plugins.push_back(data);
+    }
 
     // Rooms
     ReadRoomList(game.Rooms, root);
@@ -979,8 +1454,13 @@ void ReadGameRef(DataUtil::GameRef &game, AGFReader &reader)
 
     game = static_cast<const DataUtil::GameRef&>(data);
 
+    game.AudioClips.assign(data.AudioClips.begin(), data.AudioClips.end());
+    game.AudioTypes.assign(data.AudioTypes.begin(), data.AudioTypes.end());
+    game.Characters.assign(data.Characters.begin(), data.Characters.end());
     game.Cursors.assign(data.Cursors.begin(), data.Cursors.end());
+    game.Fonts.assign(data.Fonts.begin(), data.Fonts.end());
     game.Inventory.assign(data.Inventory.begin(), data.Inventory.end());
+    game.Views.assign(data.Views.begin(), data.Views.end());
 
     game.GUI.reserve(data.GUI.size());
     for (const auto &gui_data : data.GUI)

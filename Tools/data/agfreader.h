@@ -60,10 +60,12 @@ public:
     void Close();
 
     inline DocElem GetGameRoot() const { return _gameRoot; }
+    inline const String &GetEditorVersion() const { return _editorVersion; }
 
 private:
     std::unique_ptr<Document> _doc;
     DocElem _gameRoot;
+    String _editorVersion;
 };
 
 // Helper class, providing static methods for reading values from a doc element
@@ -73,6 +75,7 @@ protected:
     ValueParser() = default;
     ~ValueParser() = default;
 
+public:
     // Helper functions for reading certain field;
     // all of them return default value if the field cannot be read
     static const char *ReadString(DocElem elem, const char *field, const char *def_value = "");
@@ -137,6 +140,7 @@ public:
     String ReadType(DocElem elem) override { return "AudioClip"; }
     int ReadID(DocElem elem) override { return ReadInt(elem, "ID", -1); }
     String ReadScriptName(DocElem elem) override { return ReadString(elem, "ScriptName"); }
+    void ReadAllData(DocElem elem, DataUtil::AudioClipData &data);
 };
 
 // AudioType data parser
@@ -146,6 +150,7 @@ public:
     String ReadType(DocElem elem) override { return ""; }
     int ReadID(DocElem elem) override { return ReadInt(elem, "TypeID"); }
     String ReadScriptName(DocElem elem) override { return ReadString(elem, "Name"); }
+    void ReadAllData(DocElem elem, DataUtil::AudioTypeData &data);
 };
 
 // Character data parser
@@ -155,6 +160,7 @@ public:
     String ReadType(DocElem elem) override { return "Character"; }
     int ReadID(DocElem elem) override { return ReadInt(elem, "ID", -1); }
     String ReadScriptName(DocElem elem) override { return ReadString(elem, "ScriptName");  }
+    void ReadAllData(DocElem elem, DataUtil::CharacterData &data);
 };
 
 // Cursor data parser
@@ -186,6 +192,7 @@ public:
     String ReadType(DocElem elem) override { return ""; }
     int ReadID(DocElem elem) override { return ReadInt(elem, "ID", -1); }
     String ReadScriptName(DocElem elem) override { return ReadString(elem, "Name"); }
+    void ReadAllData(DocElem elem, DataUtil::FontData &data);
 };
 
 // GUI Control data parser
@@ -235,6 +242,7 @@ public:
     String ReadType(DocElem elem) override { return ""; }
     int ReadID(DocElem elem) override { return ReadInt(elem, "ID", -1); }
     String ReadScriptName(DocElem elem) override { return ReadString(elem, "Name"); }
+    void ReadAllData(DocElem elem, DataUtil::ViewData &data);
 };
 
 

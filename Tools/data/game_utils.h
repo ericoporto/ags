@@ -15,6 +15,7 @@
 #define __AGS_TOOL_DATA__GAMEUTIL_H
 
 #include <memory>
+#include <map>
 #include <vector>
 #include "ac/gamestructdefines.h"
 #include "ac/spritefile.h"
@@ -118,6 +119,209 @@ struct EntityRef
 
 typedef EntityRef CharacterRef;
 
+struct CustomPropertyValue
+{
+    String Name;
+    String Value;
+};
+
+enum FontOutlineStyle
+{
+    kFontOutline_None = 0,
+    kFontOutline_Automatic = 1,
+    kFontOutline_UseOutlineFont = 2
+};
+
+enum FontAutoOutlineStyle
+{
+    kFontAutoOutline_Squared = 0,
+    kFontAutoOutline_Rounded = 1
+};
+
+enum SpriteImportResolution
+{
+    kSpriteImport_Real = -1,
+    kSpriteImport_LowRes = 0,
+    kSpriteImport_HighRes = 1
+};
+
+enum AudioFileBundlingType
+{
+    kAudioBundling_InGameEXE = 1,
+    kAudioBundling_InSeparateVOX = 2
+};
+
+enum AudioClipFileType
+{
+    kAudioFile_Undefined = 0,
+    kAudioFile_OGG = 1,
+    kAudioFile_MP3 = 2,
+    kAudioFile_WAV = 3,
+    kAudioFile_VOC = 4,
+    kAudioFile_MIDI = 5,
+    kAudioFile_MOD = 6
+};
+
+enum CrossfadeSpeed
+{
+    kCrossfade_No = 0,
+    kCrossfade_Slow = 1,
+    kCrossfade_Slowish = 2,
+    kCrossfade_Medium = 3,
+    kCrossfade_Fast = 4
+};
+
+enum ButtonColorStyle
+{
+    kButtonColor_Default = 0,
+    kButtonColor_Dynamic = 1,
+    kButtonColor_DynamicFlat = 2
+};
+
+enum CharacterTurnOrderPriority
+{
+    kTurnOrder_Clockwise = 0,
+    kTurnOrder_CounterClockwise = 1,
+    kTurnOrder_Random = 2,
+    kTurnOrder_FaceDown = 3
+};
+
+enum GUITextBoxKeyClaimStyle
+{
+    kTextBoxKeyClaim_All = 0,
+    kTextBoxKeyClaim_Handled = 1,
+    kTextBoxKeyClaim_TextOnly = 2
+};
+
+enum LipSyncType
+{
+    kLipSync_None = 0,
+    kLipSync_Voice = 1,
+    kLipSync_Text = 2
+};
+
+struct CharacterData : EntityRef
+{
+    bool AdjustSpeedWithScaling{};
+    bool AdjustVolumeWithScaling{};
+    int AnimationDelay{};
+    int Baseline{};
+    int BlinkingView{};
+    int BlockingX{};
+    int BlockingY{};
+    int BlockingWidth{};
+    int BlockingHeight{};
+    bool Clickable{};
+    bool DiagonalLoops{};
+    int IdleAnimationDelay{};
+    int IdleDelay{};
+    int IdleView{};
+    bool MovementLinkedToAnimation{};
+    int MovementSpeed{};
+    int MovementSpeedX{};
+    int MovementSpeedY{};
+    int NormalView{};
+    String RealName;
+    bool Solid{};
+    int SpeechAnimationDelay{};
+    int SpeechColor{};
+    int SpeechView{};
+    int StartX{};
+    int StartY{};
+    int StartingRoom{};
+    int ThinkingView{};
+    int Transparency{};
+    bool TurnBeforeWalking{};
+    bool TurnWhenFacing{};
+    bool UniformMovementSpeed{};
+    bool UseRoomAreaLighting{};
+    bool UseRoomAreaScaling{};
+    String ScriptModule;
+    std::vector<String> InteractionEvents;
+    std::vector<CustomPropertyValue> Properties;
+};
+
+struct ViewFrameData
+{
+    int Delay{};
+    bool Flipped{};
+    int Image{};
+    int Sound{}; // stable audio clip index in the AGF
+};
+
+struct ViewLoopData
+{
+    bool RunNextLoop{};
+    std::vector<ViewFrameData> Frames;
+};
+
+struct ViewData : EntityRef
+{
+    std::vector<ViewLoopData> Loops;
+};
+
+struct FontData : EntityRef
+{
+    int AutoOutlineThickness{};
+    FontAutoOutlineStyle AutoOutlineStyle = kFontAutoOutline_Squared;
+    int CharacterSpacing{};
+    int CustomHeightValue{};
+    FontHeightDefinition HeightDefinedBy = kFontHeight_NominalHeight;
+    int LineSpacing{};
+    int OutlineFont{};
+    FontOutlineStyle OutlineStyle = kFontOutline_None;
+    int PointSize{};
+    int SizeMultiplier = 1;
+    FontMetricsFixup MetricsFixup = kFontMetrics_None;
+    int VerticalOffset{};
+};
+
+struct SpriteData
+{
+    int Slot{};
+    SpriteImportResolution Resolution = kSpriteImport_Real;
+};
+
+struct PaletteEntryData
+{
+    bool Background{};
+    int Red{};
+    int Green{};
+    int Blue{};
+};
+
+struct TextParserWordData
+{
+    String Word;
+    int WordGroup{};
+};
+
+struct AudioTypeData : EntityRef
+{
+    int MaxChannels{};
+    int VolumeReductionWhileSpeechPlaying{};
+    CrossfadeSpeed Crossfade = kCrossfade_No;
+};
+
+struct AudioClipData : EntityRef
+{
+    int Index{};
+    String SourceFileName;
+    String CacheFileName;
+    AudioFileBundlingType BundlingType = kAudioBundling_InGameEXE;
+    int Type{};
+    AudioClipFileType FileType = kAudioFile_Undefined;
+    bool Repeat{};
+    int Priority = 50;
+    int Volume = 100;
+};
+
+struct PluginData
+{
+    String Name;
+    std::vector<uint8_t> Data;
+};
+
 // DialogRef contains only Dialog data strictly necessary for generating scripts.
 // NOTE: replace with full Dialog struct later if appears necessary
 struct DialogRef : EntityRef
@@ -137,6 +341,11 @@ struct GUIControlData : EntityRef
     bool Enabled{};
     bool Visible{};
     bool Translated{};
+    int BackgroundColor{};
+    int BorderColor{};
+    int BorderWidth{};
+    int PaddingX{};
+    int PaddingY{};
 };
 
 struct GUIButtonData : GUIControlData
@@ -152,6 +361,15 @@ struct GUIButtonData : GUIControlData
     String Text;
     FrameAlignment TextAlignment = kAlignTopCenter;
     int TextColor{};
+    ButtonColorStyle ColorStyle = kButtonColor_Default;
+    int BorderShadeColor{};
+    int MouseOverBackgroundColor{};
+    int PushedBackgroundColor{};
+    int MouseOverBorderColor{};
+    int PushedBorderColor{};
+    int MouseOverTextColor{};
+    int PushedTextColor{};
+    int TextOutlineColor{};
 };
 
 struct GUIInventoryData : GUIControlData
@@ -170,6 +388,8 @@ struct GUISliderData : GUIControlData
     int MinValue{};
     String OnChange;
     int Value{};
+    int HandleColor{};
+    int BorderShadeColor{};
 };
 
 struct GUILabelData : GUIControlData
@@ -178,6 +398,7 @@ struct GUILabelData : GUIControlData
     String Text;
     FrameAlignment TextAlignment = kAlignTopLeft;
     int TextColor{};
+    int TextOutlineColor{};
 };
 
 struct GUITextBoxData : GUIControlData
@@ -188,6 +409,7 @@ struct GUITextBoxData : GUIControlData
     String Text;
     FrameAlignment TextAlignment = kAlignTopLeft;
     int TextColor{};
+    int TextOutlineColor{};
 };
 
 struct GUIListBoxData : GUIControlData
@@ -200,6 +422,7 @@ struct GUIListBoxData : GUIControlData
     bool ShowScrollArrows{};
     HorAlignment TextAlignment = kHAlignLeft;
     int TextColor{};
+    int TextOutlineColor{};
 };
 
 // GUIRef contains only GUI data strictly necessary for generating scripts.
@@ -273,14 +496,18 @@ struct GameSettings
     String DialogScriptNarrateFunction; // Custom narrate function name
     String DialogScriptSayFunction; // Custom speech function name
     bool DisplayMultipleInventory;
+    bool DisplaySingleDialogOption;
     bool EnforceNewAudio;
     bool EnforceNewStrings;
     bool EnforceObjectBasedScript;
     GameGuiAlphaRenderingStyle GUIAlphaStyle = ::kGuiAlphaRender_Proper;
+    bool GUIHandleOnlyLeftMouseButton;
     String GUIDAsString;
     String GameFileName;
     String GameName;
+    int GameFPS = 40;
     String GameTextEncoding;
+    String GameTextLanguage;
     String Genre;
     int GlobalSpeechAnimationDelay;
     bool HandleInvClicksInScript;
@@ -324,6 +551,9 @@ struct GameSettings
     bool UseLowResCoordinatesInScript;
     bool UseOldCustomDialogOptionsAPI;
     bool UseOldKeyboardHandling;
+    bool UseOldVoiceClipNaming;
+    CharacterTurnOrderPriority TurnOrderPriority = kTurnOrder_Clockwise;
+    GUITextBoxKeyClaimStyle TextBoxKeyClaimStyle = kTextBoxKeyClaim_All;
     String Version;
     bool WalkInLookMode;
     GuiDisableStyle WhenInterfaceDisabled = AGS::Common::kGuiDis_Greyout;
@@ -351,6 +581,9 @@ struct InventoryItemData : EntityRef
     int HotspotX = 0;
     int HotspotY = 0;
     bool PlayerStartsWith = false;
+    String ScriptModule;
+    std::vector<String> InteractionEvents;
+    std::vector<CustomPropertyValue> Properties;
 };
 
 struct CursorData : EntityRef
@@ -360,6 +593,10 @@ struct CursorData : EntityRef
     int HotspotY = 0;
     bool Animate = false;
     int View = -1;
+    bool AnimateOnlyOnHotspots = false;
+    bool AnimateOnlyWhenMoving = false;
+    bool StandardMode = false;
+    int AnimationDelay = 5;
 };
 
 // GameRef contains only game data strictly necessary for generating scripts.
@@ -388,9 +625,23 @@ struct GameRef
 // remains the lightweight representation used by the other data tools.
 struct GameData : GameRef
 {
+    std::vector<AudioClipData> AudioClips;
+    std::vector<AudioTypeData> AudioTypes;
+    std::vector<CharacterData> Characters;
     std::vector<CursorData> Cursors;
+    std::vector<FontData> Fonts;
     std::vector<GUIData> GUI;
     std::vector<InventoryItemData> Inventory;
+    std::vector<ViewData> Views;
+    std::vector<SpriteData> Sprites;
+    std::vector<PaletteEntryData> Palette;
+    std::vector<TextParserWordData> ParserWords;
+    std::vector<String> LipSyncFrames;
+    int LipSyncDefaultFrame = 0;
+    LipSyncType LipSync = kLipSync_None;
+    std::vector<String> GlobalMessages;
+    std::vector<PluginData> Plugins;
+    String EditorVersion;
 };
 
 } // namespace DataUtil
