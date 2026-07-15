@@ -13,6 +13,36 @@
 //=============================================================================
 #include "data_file_writer.h"
 
+// TODO: This writer is not yet feature-complete compared with the Editor's
+// DataFileWriter.cs.
+// Missing or placeholder serialization currently includes:
+//
+//  * text-parser dictionary;
+//  * global/dialog compiled scripts, script-module count and compiled module data,
+//    we plan to add them separately but I think the count here is still necessary?;
+//  * real view loops/frames and character data (only empty views and minimally
+//    initialized characters are emitted);
+//  * sprite count/flags and real font properties;
+//  * lip-sync frame letters and global messages;
+//  * plugins, per-entity custom-property values, and complete audio type/clip
+//    metadata (including the score-sound mapping);
+//  * a number of GameSetupStructBase options, palette data, and other settings
+//    for which GameData does not yet retain the source project information;
+//  * the current-format extension list and its offset: v360_fonts,
+//    v360_cursors, v361_objnames, v362_interevent2, v363_gameinfo,
+//    v363_dialogsnew, and v363_guictrls2;
+//  * build/editor version metadata (the compiled-with version is hardcoded).
+//
+// Known layout/count issues to correct while implementing these sections:
+// inventory interaction placeholders must match every real inventory item,
+// and the legacy AudioClip record needs the Editor's exact one-byte alignment
+// before its int16 fields.
+//
+// GUI base records and their six legacy control lists are written, but the
+// v363_guictrls2 extension is still required for all current GUI appearance
+// properties. Cursor animation/standard-mode flags are also incomplete because
+// these properties are not represented by CursorData yet.
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -320,6 +350,8 @@ static void WriteGuiListBox(Stream *out, const DataUtil::GUIListBoxData &list_bo
     out->WriteInt32(list_box.SelectedBackgroundColor);
 }
 
+// TODO: this is placeholder
+// this will be replaced by a proper WriteAudioType
 static void WriteDefaultAudioType(Stream *out, bool speech)
 {
     out->WriteInt32(speech ? 0 : 1);
@@ -329,6 +361,8 @@ static void WriteDefaultAudioType(Stream *out, bool speech)
     out->WriteInt32(0);
 }
 
+// TODO: this is placeholder
+// this will be replaced by a proper WriteAudioClip
 static void WriteDefaultAudioClip(Stream *out, const DataUtil::EntityRef &ref, int index)
 {
     const String &name = ref.ScriptName.IsEmpty() ? ref.TypeName : ref.ScriptName;
@@ -467,14 +501,15 @@ static void WriteGameSetupStructBase(const DataUtil::GameData &game, Stream *out
     for (int i = 0; i < GameSetupStructBase::MAX_OPTIONS; ++i)
         out->WriteInt32(options[i]);
 
+    // PLACEHOLDER FOR PALETTE STUFF!!!
     for (int i = 0; i < 256; ++i)
-        out->WriteByte(0);
+        out->WriteByte(0); // PAL_BACKGROUND or PAL_GAMEWIDE
     for (int i = 0; i < 256; ++i)
     {
-        out->WriteByte(0);
-        out->WriteByte(0);
-        out->WriteByte(0);
-        out->WriteByte(255);
+        out->WriteByte(0);   // R
+        out->WriteByte(0);   // G
+        out->WriteByte(0);   // B
+        out->WriteByte(255); // opaque
     }
 
     const int num_views = static_cast<int>(game.Views.size());
@@ -485,24 +520,26 @@ static void WriteGameSetupStructBase(const DataUtil::GameData &game, Stream *out
     const int num_gui = static_cast<int>(game.GUI.size());
     const int num_cursors = static_cast<int>(game.Cursors.size());
 
-    out->WriteInt32(num_views);
-    out->WriteInt32(num_characters);
-    out->WriteInt32(game.PlayerCharacter);
+    out->WriteInt32(num_views); // ViewCount
+    out->WriteInt32(num_characters); // Characters.Count
+    out->WriteInt32(game.PlayerCharacter); // PlayerCharacter.ID
     out->WriteInt32(game.Settings.MaximumScore);
     out->WriteInt16(static_cast<int16_t>(num_inventory + 1));
-    out->WriteInt16(0);
-    out->WriteInt32(num_dialogs);
+    out->WriteInt16(0); // alignment padding
+    out->WriteInt32(0); // was game.Dialogs.Count, write 0 for old format entries, we use "v363_dialogsnew" extension
     out->WriteInt32(0); // numdlgmessage, deprecated
-    out->WriteInt32(num_fonts);
+    out->WriteInt32(num_fonts); // Fonts.Count
     out->WriteInt32(static_cast<int32_t>(game.Settings.ColorDepth)); // color_depth in bytes per pixel
     out->WriteInt32(0); // target_win
     out->WriteInt32(game.Settings.DialogOptionsBullet);
-    out->WriteInt16(static_cast<int16_t>(game.Settings.InventoryHotspotMarkerDotColor));
+    out->WriteInt16(static_cast<int16_t>(game.Settings.InventoryHotspotMarkerStyle != DataUtil::kInventoryHotspot_None ?
+        game.Settings.InventoryHotspotMarkerDotColor : 0));
     out->WriteInt16(static_cast<int16_t>(game.Settings.InventoryHotspotMarkerCrosshairColor));
     out->WriteInt32(game.Settings.UniqueID);
-    out->WriteInt32(num_gui);
-    out->WriteInt32(num_cursors);
+    out->WriteInt32(num_gui); // GUIs.Count
+    out->WriteInt32(num_cursors); // Cursors.Count
 
+    // IGNORE LETTERBOX RESOLUTION
     int game_width = 320;
     int game_height = 200;
     const bool has_resolution = ParseResolution(game.Settings.CustomResolution, game_width, game_height);
@@ -519,18 +556,28 @@ static void WriteGameSetupStructBase(const DataUtil::GameData &game, Stream *out
         out->WriteInt32(200);
     }
 
+    // TODO: fix to LipSync.DefaultFrame
     out->WriteInt32(0); // default lipsync frame
-    out->WriteInt32(game.Settings.InventoryHotspotMarkerSprite);
+    // TODO: revise this, may be missing a HotspotMarkerImage somewhere?
+    out->WriteInt32(game.Settings.InventoryHotspotMarkerStyle == DataUtil::kInventoryHotspot_Sprite ?
+        game.Settings.InventoryHotspotMarkerSprite : 0);
+    // reserved; 16 ints
     for (int i = 0; i < GameSetupStructBase::NUM_INTS_RESERVED; ++i)
         out->WriteInt32(0);
 
+    // reserve a 32-bit position for extension offset
+    // TODO: revise if I am missing something here?
     out->WriteInt32(0); // extension offset - none
+
+    // MAXGLOBALMES; write 500 ints
     for (int i = 0; i < MAXGLOBALMES; ++i)
         out->WriteInt32(0);
-    out->WriteInt32(0); // HasWordsDict
-    out->WriteInt32(0); // globalscript pointer placeholder
-    out->WriteInt32(0); // chars pointer placeholder
-    out->WriteInt32(0); // HasCCScript
+
+    out->WriteInt32(1); // dict != null
+    out->WriteInt32(0); // globalscript != null
+    out->WriteInt32(0); // chars != null
+    // TODO: I think this must be zero because the scripts are outside?
+    out->WriteInt32(0); // compiled_script != null
 }
 
 static void WriteSaveGameInfo(const DataUtil::GameData &game, Stream *out)
