@@ -87,6 +87,10 @@ static const CstrArr<4> kInterfaceDisabledNames = {{
     "GreyOut", "GoBlack", "Unchanged", "TurnOff"
 }};
 
+static const CstrArr<4> kGuiPopupStyleNames = {{
+    "Normal", "MouseYPos", "PopupModal", "Persistent"
+}};
+
 static const CstrArr<3> kInventoryHotspotMarkerNames = {{
     "None", "Crosshair", "Sprite"
 }};
@@ -339,6 +343,11 @@ static GuiDisableStyle ReadGuiDisableStyle(const String &value)
     return StrUtil::ParseEnum(value, kInterfaceDisabledNames, kGuiDis_Greyout);
 }
 
+static DataUtil::GUIPopupStyle ReadGuiPopupStyle(const String &value)
+{
+    return StrUtil::ParseEnum(value, kGuiPopupStyleNames, DataUtil::kGUIPopupStyle_Normal);
+}
+
 static DataUtil::InventoryHotspotMarkerStyle ReadInventoryHotspotMarkerStyle(const String &value)
 {
     return StrUtil::ParseEnum(value, kInventoryHotspotMarkerNames, DataUtil::kInventoryHotspot_None);
@@ -438,7 +447,10 @@ void GUIMain::ReadAllData(DocElem elem, DataUtil::GUIData& gui_data)
 {
     DocElem self = GetNormalGUI(elem);
     if (!self)
+    {
         self = GetTextWindow(elem);
+        gui_data.IsTextWindow = static_cast<bool>(self);
+    }
     if (!self)
         return;
     gui_data.Clickable = ReadBool(self, "Clickable");
@@ -452,9 +464,11 @@ void GUIMain::ReadAllData(DocElem elem, DataUtil::GUIData& gui_data)
     gui_data.BackgroundImage = ReadInt(self, "BackgroundImage");
     gui_data.BorderColor = ReadInt(self, "BorderColor");
     gui_data.OnClick = ReadString(self, "OnClick");
-    gui_data.PopupStyle = ReadString(self, "PopupStyle");
+    gui_data.PopupStyle = ReadGuiPopupStyle(ReadString(self, "PopupStyle"));
     gui_data.ZOrder = ReadInt(self, "ZOrder");
     gui_data.PopupYPos = ReadInt(self, "PopupYPos");
+    gui_data.Padding = ReadInt(self, "Padding", TEXTWINDOW_PADDING_DEFAULT);
+    gui_data.TextColor = ReadInt(self, "TextColor");
 }
 
 DocElem GUIMain::GetNormalGUI(DocElem elem)
@@ -494,7 +508,7 @@ void GUIControl::ReadAllData(DocElem elem, DataUtil::GUIControlData& data)
     data.Width = ReadInt(elem, "Width");
     data.Enabled = ReadBool(elem, "Enabled");
     data.Visible = ReadBool(elem, "Visible");
-    data.Translated = ReadBool(elem, "Translated");
+    data.Translated = ReadBool(elem, "Translated", true);
     data.ZOrder = ReadInt(elem, "ZOrder");
 }
 

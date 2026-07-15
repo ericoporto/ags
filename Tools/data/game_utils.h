@@ -65,6 +65,14 @@ enum FontMetricsFixup
     kFontMetrics_SetAscenderToHeight = 1
 };
 
+enum GUIPopupStyle
+{
+    kGUIPopupStyle_Normal = 0,
+    kGUIPopupStyle_MouseYPos = 1,
+    kGUIPopupStyle_PopupModal = 2,
+    kGUIPopupStyle_Persistent = 3
+};
+
 enum SkipSpeechStyle
 {
     kSkipSpeech_MouseOrKeyboardOrTimer = 0,
@@ -125,8 +133,6 @@ struct GUIControlData : EntityRef
     int Left{};
     int Top{};
     int ZOrder{};
-    int ID{};
-    String Name;
     bool Clickable{};
     bool Enabled{};
     bool Visible{};
@@ -205,22 +211,24 @@ struct GUIRef : EntityRef
 
 struct GUIData : EntityRef
 {
+    bool IsTextWindow{};
     int BackgroundColor{};
     int BackgroundImage{};
     int BorderColor{};
     bool Clickable{};
     int Height{};
-    int ID{};
     int Left{};
     String Name;
     String OnClick;
-    String PopupStyle;
+    GUIPopupStyle PopupStyle = kGUIPopupStyle_Normal;
     int PopupYPos{};
     int Top{};
     int Transparency{};
     int Visible{};
     int Width{};
     int ZOrder{};
+    int Padding = TEXTWINDOW_PADDING_DEFAULT;
+    int TextColor{};
     std::vector<std::shared_ptr<GUIControlData>> Controls;
 };
 
