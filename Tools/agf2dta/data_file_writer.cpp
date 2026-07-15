@@ -24,6 +24,7 @@
 #include "ac/inventoryiteminfo.h"
 #include "ac/mousecursor.h"
 #include "game/customproperties.h"
+#include "gfx/gfx_def.h"
 #include "gui/guidefines.h"
 #include "util/string_utils.h"
 
@@ -176,36 +177,147 @@ static void WriteCursor(Stream *out, const DataUtil::CursorData &ref)
     cur.WriteToFile(out);
 }
 
-static void WriteGui(Stream *out, const DataUtil::GUIData &ref, int index)
+static int GetGuiPopupStyle(DataUtil::GUIPopupStyle style)
+{
+    switch (style)
+    {
+    case DataUtil::kGUIPopupStyle_MouseYPos: return kGUIPopupMouseY;
+    case DataUtil::kGUIPopupStyle_PopupModal: return kGUIPopupModal;
+    case DataUtil::kGUIPopupStyle_Persistent: return kGUIPopupNoAutoRemove;
+    case DataUtil::kGUIPopupStyle_Normal:
+    default: return kGUIPopupNormal;
+    }
+}
+
+static void WriteGui(Stream *out, const DataUtil::GUIData &ref, int index,
+    const std::vector<uint32_t> &control_refs)
 {
     const String &name = ref.ScriptName.IsEmpty() ? ref.TypeName : ref.ScriptName;
     WriteCountedText(out, name);
-    WriteCountedText(out, ref.OnClick);
-    out->WriteInt32(ref.Left);
-    out->WriteInt32(ref.Top);
-    out->WriteInt32(ref.Width);
-    out->WriteInt32(ref.Height);
-    // Control records are written in the type-specific lists below; these are
-    // still empty until that serialization is implemented.
-    out->WriteInt32(0);
-    out->WriteInt32(ref.PopupStyle.CompareNoCase("MouseYPos") == 0 ? kGUIPopupMouseY : kGUIPopupNormal);
-    out->WriteInt32(ref.PopupYPos);
+    WriteCountedText(out, ref.IsTextWindow ? String() : ref.OnClick);
+    out->WriteInt32(ref.IsTextWindow ? 0 : ref.Left);
+    out->WriteInt32(ref.IsTextWindow ? 0 : ref.Top);
+    out->WriteInt32(ref.IsTextWindow ? 200 : ref.Width);
+    out->WriteInt32(ref.IsTextWindow ? 100 : ref.Height);
+    out->WriteInt32(static_cast<int32_t>(control_refs.size()));
+    out->WriteInt32(ref.IsTextWindow ? kGUIPopupModal : GetGuiPopupStyle(ref.PopupStyle));
+    out->WriteInt32(ref.IsTextWindow ? -1 : ref.PopupYPos);
     out->WriteInt32(ref.BackgroundColor);
     out->WriteInt32(ref.BackgroundImage);
-    out->WriteInt32(ref.BorderColor);
-    int flags = kGUIMain_DefFlags;
-    if (!ref.Clickable) flags &= ~kGUIMain_Clickable;
-    if (!ref.Visible) flags &= ~kGUIMain_Visible;
+    out->WriteInt32(ref.IsTextWindow ? ref.TextColor : ref.BorderColor);
+    int flags = ref.IsTextWindow ? kGUIMain_TextWindow : kGUIMain_DefFlags;
+    if (!ref.IsTextWindow && !ref.Clickable) flags &= ~kGUIMain_Clickable;
+    if (!ref.IsTextWindow && !ref.Visible) flags &= ~kGUIMain_Visible;
     out->WriteInt32(flags);
-    out->WriteInt32(ref.Transparency);
-    out->WriteInt32(ref.ZOrder);
+    out->WriteInt32(ref.IsTextWindow ? 0 : GfxDef::Trans100ToLegacyTrans255(ref.Transparency));
+    out->WriteInt32(ref.IsTextWindow ? -1 : ref.ZOrder);
     out->WriteInt32(ref.ID >= 0 ? ref.ID : index);
-    out->WriteInt32(TEXTWINDOW_PADDING_DEFAULT);
+    out->WriteInt32(ref.IsTextWindow ? ref.Padding : TEXTWINDOW_PADDING_DEFAULT);
+    for (uint32_t control_ref : control_refs)
+        out->WriteInt32(control_ref);
 }
 
-static void WriteEmptyGuiControlList(Stream *out)
+static int GetGuiControlFlags(const DataUtil::GUIControlData &control)
 {
+    int flags = 0;
+    if (control.Clickable) flags |= kGUICtrl_Clickable;
+    if (control.Enabled) flags |= kGUICtrl_Enabled;
+    if (control.Visible) flags |= kGUICtrl_Visible;
+    if (control.Translated) flags |= kGUICtrl_Translated;
+    return flags;
+}
+
+static void WriteGuiControl(Stream *out, const DataUtil::GUIControlData &control,
+    int extra_flags, const String *event_handler)
+{
+    out->WriteInt32(GetGuiControlFlags(control) | extra_flags);
+    out->WriteInt32(control.Left);
+    out->WriteInt32(control.Top);
+    out->WriteInt32(control.Width);
+    out->WriteInt32(control.Height);
+    out->WriteInt32(control.ZOrder);
+    WriteNullTerminatedString(out, control.ScriptName);
+    out->WriteInt32(event_handler ? 1 : 0);
+    if (event_handler)
+        WriteNullTerminatedString(out, *event_handler);
+}
+
+static int GetButtonClickAction(const String &action)
+{
+    if (action.CompareNoCase("SetCursorMode") == 0 || action.CompareNoCase("SetMode") == 0)
+        return 1;
+    if (action.CompareNoCase("RunScript") == 0)
+        return 2;
+    return 0;
+}
+
+static void WriteGuiButton(Stream *out, const DataUtil::GUIButtonData &button)
+{
+    WriteGuiControl(out, button, button.ClipImage ? kGUICtrl_Clip : 0, &button.OnClick);
+    out->WriteInt32(button.Image);
+    out->WriteInt32(button.MouseoverImage);
+    out->WriteInt32(button.PushedImage);
+    out->WriteInt32(button.Font);
+    out->WriteInt32(button.TextColor);
+    out->WriteInt32(GetButtonClickAction(button.ClickAction));
     out->WriteInt32(0);
+    out->WriteInt32(button.NewModeNumber);
+    out->WriteInt32(0);
+    WriteCountedText(out, button.Text);
+    out->WriteInt32(button.TextAlignment);
+}
+
+static void WriteGuiLabel(Stream *out, const DataUtil::GUILabelData &label)
+{
+    WriteGuiControl(out, label, 0, nullptr);
+    WriteCountedText(out, label.Text);
+    out->WriteInt32(label.Font);
+    out->WriteInt32(label.TextColor);
+    out->WriteInt32(label.TextAlignment);
+}
+
+static void WriteGuiInvWindow(Stream *out, const DataUtil::GUIInventoryData &inv)
+{
+    WriteGuiControl(out, inv, 0, nullptr);
+    out->WriteInt32(inv.CharacterID);
+    out->WriteInt32(inv.ItemWidth);
+    out->WriteInt32(inv.ItemHeight);
+}
+
+static void WriteGuiSlider(Stream *out, const DataUtil::GUISliderData &slider)
+{
+    WriteGuiControl(out, slider, 0, &slider.OnChange);
+    out->WriteInt32(slider.MinValue);
+    out->WriteInt32(slider.MaxValue);
+    out->WriteInt32(slider.Value);
+    out->WriteInt32(slider.HandleImage);
+    out->WriteInt32(slider.HandleOffset);
+    out->WriteInt32(slider.BackgroundImage);
+}
+
+static void WriteGuiTextBox(Stream *out, const DataUtil::GUITextBoxData &text_box)
+{
+    WriteGuiControl(out, text_box, text_box.ShowBorder ? kGUICtrl_ShowBorder : 0, &text_box.OnActivate);
+    WriteCountedText(out, text_box.Text);
+    out->WriteInt32(text_box.Font);
+    out->WriteInt32(text_box.TextColor);
+    out->WriteInt32(text_box.ShowBorder ? kTextBox_ShowBorder : 0);
+}
+
+static void WriteGuiListBox(Stream *out, const DataUtil::GUIListBoxData &list_box)
+{
+    WriteGuiControl(out, list_box, list_box.ShowBorder ? kGUICtrl_ShowBorder : 0,
+        &list_box.OnSelectionChanged);
+    out->WriteInt32(0); // runtime items are not part of the project data
+    out->WriteInt32(list_box.Font);
+    out->WriteInt32(list_box.TextColor);
+    out->WriteInt32(list_box.SelectedTextColor);
+    int flags = 0;
+    if (list_box.ShowBorder) flags |= kListBox_ShowBorder;
+    if (list_box.ShowScrollArrows) flags |= kListBox_ShowArrows;
+    out->WriteInt32(flags);
+    out->WriteInt32(list_box.TextAlignment);
+    out->WriteInt32(list_box.SelectedBackgroundColor);
 }
 
 static void WriteDefaultAudioType(Stream *out, bool speech)
@@ -493,18 +605,81 @@ static void WriteLipSyncBlock(Stream *out)
 
 static void WriteGuiBlock(const DataUtil::GameData &game, Stream *out)
 {
+    std::vector<std::shared_ptr<DataUtil::GUIButtonData>> buttons;
+    std::vector<std::shared_ptr<DataUtil::GUILabelData>> labels;
+    std::vector<std::shared_ptr<DataUtil::GUIInventoryData>> inv_windows;
+    std::vector<std::shared_ptr<DataUtil::GUISliderData>> sliders;
+    std::vector<std::shared_ptr<DataUtil::GUITextBoxData>> text_boxes;
+    std::vector<std::shared_ptr<DataUtil::GUIListBoxData>> list_boxes;
+    std::vector<std::vector<uint32_t>> gui_control_refs(game.GUI.size());
+
+    for (size_t gui_index = 0; gui_index < game.GUI.size(); ++gui_index)
+    {
+        for (const auto &control : game.GUI[gui_index].Controls)
+        {
+            uint32_t packed_ref = 0;
+            if (auto button = std::dynamic_pointer_cast<DataUtil::GUIButtonData>(control))
+            {
+                packed_ref = (kGUIButton << 16) | static_cast<uint32_t>(buttons.size());
+                buttons.push_back(button);
+            }
+            else if (auto label = std::dynamic_pointer_cast<DataUtil::GUILabelData>(control))
+            {
+                packed_ref = (kGUILabel << 16) | static_cast<uint32_t>(labels.size());
+                labels.push_back(label);
+            }
+            else if (auto inv = std::dynamic_pointer_cast<DataUtil::GUIInventoryData>(control))
+            {
+                packed_ref = (kGUIInvWindow << 16) | static_cast<uint32_t>(inv_windows.size());
+                inv_windows.push_back(inv);
+            }
+            else if (auto slider = std::dynamic_pointer_cast<DataUtil::GUISliderData>(control))
+            {
+                packed_ref = (kGUISlider << 16) | static_cast<uint32_t>(sliders.size());
+                sliders.push_back(slider);
+            }
+            else if (auto text_box = std::dynamic_pointer_cast<DataUtil::GUITextBoxData>(control))
+            {
+                packed_ref = (kGUITextBox << 16) | static_cast<uint32_t>(text_boxes.size());
+                text_boxes.push_back(text_box);
+            }
+            else if (auto list_box = std::dynamic_pointer_cast<DataUtil::GUIListBoxData>(control))
+            {
+                packed_ref = (kGUIListBox << 16) | static_cast<uint32_t>(list_boxes.size());
+                list_boxes.push_back(list_box);
+            }
+            else
+            {
+                continue;
+            }
+            gui_control_refs[gui_index].push_back(packed_ref);
+        }
+    }
+
     out->WriteInt32(GUIMAGIC);
     out->WriteInt32(kGuiVersion_Current);
     out->WriteInt32(static_cast<int32_t>(game.GUI.size()));
     for (size_t i = 0; i < game.GUI.size(); ++i)
-        WriteGui(out, game.GUI[i], static_cast<int>(i));
+        WriteGui(out, game.GUI[i], static_cast<int>(i), gui_control_refs[i]);
 
-    WriteEmptyGuiControlList(out); // buttons
-    WriteEmptyGuiControlList(out); // labels
-    WriteEmptyGuiControlList(out); // inv windows
-    WriteEmptyGuiControlList(out); // sliders
-    WriteEmptyGuiControlList(out); // text boxes
-    WriteEmptyGuiControlList(out); // list boxes
+    out->WriteInt32(static_cast<int32_t>(buttons.size()));
+    for (const auto &button : buttons)
+        WriteGuiButton(out, *button);
+    out->WriteInt32(static_cast<int32_t>(labels.size()));
+    for (const auto &label : labels)
+        WriteGuiLabel(out, *label);
+    out->WriteInt32(static_cast<int32_t>(inv_windows.size()));
+    for (const auto &inv : inv_windows)
+        WriteGuiInvWindow(out, *inv);
+    out->WriteInt32(static_cast<int32_t>(sliders.size()));
+    for (const auto &slider : sliders)
+        WriteGuiSlider(out, *slider);
+    out->WriteInt32(static_cast<int32_t>(text_boxes.size()));
+    for (const auto &text_box : text_boxes)
+        WriteGuiTextBox(out, *text_box);
+    out->WriteInt32(static_cast<int32_t>(list_boxes.size()));
+    for (const auto &list_box : list_boxes)
+        WriteGuiListBox(out, *list_box);
 }
 
 static void WritePluginsBlock(Stream *out)
