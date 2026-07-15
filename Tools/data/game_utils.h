@@ -15,6 +15,10 @@
 #define __AGS_TOOL_DATA__GAMEUTIL_H
 
 #include <vector>
+#include "ac/gamestructdefines.h"
+#include "ac/spritefile.h"
+#include "game/customproperties.h"
+#include "gui/guidefines.h"
 #include "util/string.h"
 
 namespace AGS
@@ -23,6 +27,75 @@ namespace DataUtil
 {
 
 using AGS::Common::String;
+using AGS::Common::GuiDisableStyle;
+using AGS::Common::PropertyType;
+using AGS::Common::SpriteCompression;
+using ::DialogOptionNumbering;
+using ::GameGuiAlphaRenderingStyle;
+using ::GameSpriteAlphaRenderingStyle;
+using ::RenderAtScreenRes;
+using ::ScreenTransitionStyle;
+
+enum GameColorDepth
+{
+    kGameColorDepth_Palette = 1,
+    kGameColorDepth_HighColor = 2,
+    kGameColorDepth_TrueColor = 4
+};
+
+enum AndroidBuildFormat
+{
+    kAndroidBuild_ApkEmbedded = 0,
+    kAndroidBuild_AabEmbedded = 1,
+    kAndroidBuild_Aab = 2
+};
+
+enum FontHeightDefinition
+{
+    kFontHeight_NominalHeight = 0,
+    kFontHeight_PixelHeight = 1,
+    kFontHeight_CustomValue = 2
+};
+
+enum FontMetricsFixup
+{
+    kFontMetrics_None = 0,
+    kFontMetrics_SetAscenderToHeight = 1
+};
+
+enum SkipSpeechStyle
+{
+    kSkipSpeech_MouseOrKeyboardOrTimer = 0,
+    kSkipSpeech_KeyboardOrTimer = 1,
+    kSkipSpeech_TimerOnly = 2,
+    kSkipSpeech_MouseOrKeyboard = 3,
+    kSkipSpeech_MouseOrTimer = 4,
+    kSkipSpeech_KeyboardOnly = 5,
+    kSkipSpeech_MouseOnly = 6
+};
+
+enum SpeechPortraitSide
+{
+    kSpeechPortrait_Left = 0,
+    kSpeechPortrait_Right = 1,
+    kSpeechPortrait_Alternate = 2,
+    kSpeechPortrait_BasedOnCharacterPosition = 3
+};
+
+enum SpeechStyle
+{
+    kSpeechStyle_Lucasarts = 0,
+    kSpeechStyle_SierraTransparent = 1,
+    kSpeechStyle_SierraWithBackground = 2,
+    kSpeechStyle_WholeScreen = 3
+};
+
+enum InventoryHotspotMarkerStyle
+{
+    kInventoryHotspot_None = 0,
+    kInventoryHotspot_Crosshair = 1,
+    kInventoryHotspot_Sprite = 2
+};
 
 // EntityRef is a parent struct for a game object data;
 // contains common fields such as a numeric ID (aka index) and script name.
@@ -163,7 +236,7 @@ struct GameSettings
     int AndroidAppVersionCode;
     String AndroidAppVersionName;
     String AndroidApplicationId;
-    String AndroidBuildFormat;
+    AndroidBuildFormat AndroidBuildFormat = kAndroidBuild_ApkEmbedded;
     bool AntiAliasFonts;
     bool AntiGlideMode;
     bool AttachDataToExe;
@@ -172,8 +245,8 @@ struct GameSettings
     bool BackwardsText;
     String BuildTargets;
     bool ClipGUIControls;
-    String TrueColor;
-    String CompressSpritesType;
+    GameColorDepth ColorDepth = kGameColorDepth_TrueColor;
+    SpriteCompression CompressSpritesType = AGS::Common::kSprCompress_None;
     String CustomDataDir;
     String CustomResolution;
     bool DebugMode;
@@ -191,7 +264,7 @@ struct GameSettings
     bool EnforceNewAudio;
     bool EnforceNewStrings;
     bool EnforceObjectBasedScript;
-    String GUIAlphaStyle;
+    GameGuiAlphaRenderingStyle GUIAlphaStyle = ::kGuiAlphaRender_Proper;
     String GUIDAsString;
     String GameFileName;
     String GameName;
@@ -203,18 +276,18 @@ struct GameSettings
     unsigned int InventoryHotspotMarkerCrosshairColor;
     unsigned int InventoryHotspotMarkerDotColor;
     int InventoryHotspotMarkerSprite;
-    String InventoryHotspotMarkerStyle;
+    InventoryHotspotMarkerStyle InventoryHotspotMarkerStyle = kInventoryHotspot_None;
     bool LeftToRightPrecedence;
     bool LetterboxMode;
     int MaximumScore;
     bool MouseWheelEnabled;
-    String NumberDialogOptions;
+    DialogOptionNumbering NumberDialogOptions = ::kDlgOptKeysOnly;
     bool OptimizeSpriteStorage;
     bool PixelPerfect;
     int PlaySoundOnScore;
     String ReleaseDate;
-    String RenderAtScreenResolution;
-    String RoomTransition;
+    RenderAtScreenRes RenderAtScreenResolution = ::kRenderAtScreenRes_UserDefined;
+    ScreenTransitionStyle RoomTransition = ::kScrTran_Fade;
     bool RunGameLoopsWhileDialogOptionsDisplayed;
     String SaveGameFileExtension;
     String SaveGameFolderName;
@@ -223,13 +296,13 @@ struct GameSettings
     bool ScaleMovementSpeedWithMaskResolution;
     String ScriptAPIVersion;
     String ScriptCompatLevel;
-    String SkipSpeech;
-    String SpeechPortraitSide;
-    String SpeechStyle;
+    SkipSpeechStyle SkipSpeech = kSkipSpeech_MouseOrKeyboardOrTimer;
+    SpeechPortraitSide SpeechPortraitSide = kSpeechPortrait_Left;
+    SpeechStyle SpeechStyle = kSpeechStyle_Lucasarts;
     String SplitResources;
-    String SpriteAlphaStyle;
-    String TTFHeightDefinedBy;
-    String TTFMetricsFixup;
+    GameSpriteAlphaRenderingStyle SpriteAlphaStyle = ::kSpriteAlphaRender_Proper;
+    FontHeightDefinition TTFHeightDefinedBy = kFontHeight_NominalHeight;
+    FontMetricsFixup TTFMetricsFixup = kFontMetrics_None;
     int TextWindowGUI;
     int ThoughtGUI;
     bool TurnBeforeFacing;
@@ -241,7 +314,7 @@ struct GameSettings
     bool UseOldKeyboardHandling;
     String Version;
     bool WalkInLookMode;
-    String WhenInterfaceDisabled;
+    GuiDisableStyle WhenInterfaceDisabled = AGS::Common::kGuiDis_Greyout;
 };
 
 struct CustomPropertySchemaItem
@@ -249,13 +322,32 @@ struct CustomPropertySchemaItem
     String Name;
     String Description;
     String DefaultValue;
-    String Type;
+    PropertyType Type = AGS::Common::kPropertyUndefined;
     bool AppliesToCharacters = true;
     bool AppliesToHotspots = true;
     bool AppliesToObjects = true;
     bool AppliesToInvItems = true;
     bool AppliesToRooms = true;
     bool Translated = false;
+};
+
+struct InventoryItemData : EntityRef
+{
+    String Description;
+    int Image = 0;
+    int CursorImage = 0;
+    int HotspotX = 0;
+    int HotspotY = 0;
+    bool PlayerStartsWith = false;
+};
+
+struct CursorData : EntityRef
+{
+    int Image = 0;
+    int HotspotX = 0;
+    int HotspotY = 0;
+    bool Animate = false;
+    int View = -1;
 };
 
 // GameRef contains only game data strictly necessary for generating scripts.

@@ -27,6 +27,76 @@ const int  LOWEST_SUPPORTED_FORMAT = 26; // AGS 3.5.0
 using namespace AGS::Common;
 using namespace tinyxml2;
 
+namespace
+{
+
+static const CstrArr<3> kGameColorDepthNames = {{
+    "Palette", "HighColor", "TrueColor"
+}};
+
+static const CstrArr<4> kCompressSpritesTypeNames = {{
+    "None", "RLE", "LZW", "Deflate"
+}};
+
+static const CstrArr<3> kAndroidBuildFormatNames = {{
+    "ApkEmbedded", "AabEmbedded", "Aab"
+}};
+
+static const CstrArr<3> kGuiAlphaStyleNames = {{
+    "Classic", "AdditiveOpacity", "MultiplyTranslucenceSrcBlend"
+}};
+
+static const CstrArr<2> kSpriteAlphaStyleNames = {{
+    "Classic", "Improved"
+}};
+
+static const CstrArr<3> kRenderAtScreenResNames = {{
+    "UserDefined", "True", "False"
+}};
+
+static const CstrArr<5> kRoomTransitionNames = {{
+    "FadeOutAndIn", "Instant", "Dissolve", "BlackBoxOut", "CrossFade"
+}};
+
+static const CstrArr<3> kNumberDialogOptionsNames = {{
+    "None", "KeyShortcutsOnly", "Normal"
+}};
+
+static const CstrArr<7> kSkipSpeechNames = {{
+    "MouseOrKeyboardOrTimer", "KeyboardOnly", "TimerOnly",
+    "MouseOrKeyboard", "MouseOrTimer", "KeyboardOnlyStrict", "MouseOnlyStrict"
+}};
+
+static const CstrArr<4> kSpeechPortraitSideNames = {{
+    "Left", "Right", "Alternate", "BasedOnCharacterPosition"
+}};
+
+static const CstrArr<4> kSpeechStyleNames = {{
+    "Lucasarts", "SierraTransparent", "SierraWithBackground", "WholeScreen"
+}};
+
+static const CstrArr<3> kFontHeightDefinitionNames = {{
+    "NominalHeight", "PixelHeight", "CustomValue"
+}};
+
+static const CstrArr<2> kFontMetricsFixupNames = {{
+    "None", "SetAscenderToHeight"
+}};
+
+static const CstrArr<4> kInterfaceDisabledNames = {{
+    "GreyOut", "GoBlack", "Unchanged", "TurnOff"
+}};
+
+static const CstrArr<3> kInventoryHotspotMarkerNames = {{
+    "None", "Crosshair", "Sprite"
+}};
+
+static const CstrArr<3> kCustomPropertyTypeNames = {{
+    "Boolean", "Number", "Text"
+}};
+
+} // namespace
+
 namespace AGS
 {
 namespace AGF
@@ -159,6 +229,101 @@ bool ValueParser::ReadBool(DocElem elem, const char *field, bool def_value)
     if (name_f)
         return ags_stricmp(name_f->GetText(), "True") == 0;
     return def_value;
+}
+
+static DataUtil::GameColorDepth ReadGameColorDepth(const String &value)
+{
+    switch (StrUtil::ParseEnum(value, kGameColorDepthNames, 2))
+    {
+    case 0: return DataUtil::kGameColorDepth_Palette;
+    case 1: return DataUtil::kGameColorDepth_HighColor;
+    case 2:
+    default: return DataUtil::kGameColorDepth_TrueColor;
+    }
+}
+
+static SpriteCompression ReadSpriteCompression(const String &value)
+{
+    return StrUtil::ParseEnum(value, kCompressSpritesTypeNames, kSprCompress_None);
+}
+
+static DataUtil::AndroidBuildFormat ReadAndroidBuildFormat(const String &value)
+{
+    return StrUtil::ParseEnum(value, kAndroidBuildFormatNames, DataUtil::kAndroidBuild_ApkEmbedded);
+}
+
+static GameGuiAlphaRenderingStyle ReadGuiAlphaStyle(const String &value)
+{
+    return StrUtil::ParseEnum(value, kGuiAlphaStyleNames, kGuiAlphaRender_Legacy);
+}
+
+static GameSpriteAlphaRenderingStyle ReadSpriteAlphaStyle(const String &value)
+{
+    return StrUtil::ParseEnum(value, kSpriteAlphaStyleNames, kSpriteAlphaRender_Legacy);
+}
+
+static RenderAtScreenRes ReadRenderAtScreenResolution(const String &value)
+{
+    return StrUtil::ParseEnum(value, kRenderAtScreenResNames, kRenderAtScreenRes_UserDefined);
+}
+
+static ScreenTransitionStyle ReadRoomTransition(const String &value)
+{
+    return StrUtil::ParseEnum(value, kRoomTransitionNames, kScrTran_Fade);
+}
+
+static DialogOptionNumbering ReadDialogOptionsNumbering(const String &value)
+{
+    return StrUtil::ParseEnumWithBase(value, kNumberDialogOptionsNames,
+        static_cast<DialogOptionNumbering>(-1), kDlgOptNoNumbering);
+}
+
+static DataUtil::SkipSpeechStyle ReadSkipSpeech(const String &value)
+{
+    return StrUtil::ParseEnum(value, kSkipSpeechNames, DataUtil::kSkipSpeech_MouseOrKeyboardOrTimer);
+}
+
+static DataUtil::SpeechPortraitSide ReadSpeechPortraitSide(const String &value)
+{
+    return StrUtil::ParseEnum(value, kSpeechPortraitSideNames, DataUtil::kSpeechPortrait_Left);
+}
+
+static DataUtil::SpeechStyle ReadSpeechStyle(const String &value)
+{
+    switch (StrUtil::ParseEnum(value, kSpeechStyleNames, 0))
+    {
+    case 0: return DataUtil::kSpeechStyle_Lucasarts;
+    case 1: return DataUtil::kSpeechStyle_SierraTransparent;
+    case 2: return DataUtil::kSpeechStyle_SierraWithBackground;
+    case 3:
+    default: return DataUtil::kSpeechStyle_WholeScreen;
+    }
+}
+
+static DataUtil::FontHeightDefinition ReadFontHeightDefinition(const String &value)
+{
+    return StrUtil::ParseEnum(value, kFontHeightDefinitionNames, DataUtil::kFontHeight_NominalHeight);
+}
+
+static DataUtil::FontMetricsFixup ReadFontMetricsFixup(const String &value)
+{
+    return StrUtil::ParseEnum(value, kFontMetricsFixupNames, DataUtil::kFontMetrics_None);
+}
+
+static GuiDisableStyle ReadGuiDisableStyle(const String &value)
+{
+    return StrUtil::ParseEnum(value, kInterfaceDisabledNames, kGuiDis_Greyout);
+}
+
+static DataUtil::InventoryHotspotMarkerStyle ReadInventoryHotspotMarkerStyle(const String &value)
+{
+    return StrUtil::ParseEnum(value, kInventoryHotspotMarkerNames, DataUtil::kInventoryHotspot_None);
+}
+
+static AGS::Common::PropertyType ReadCustomPropertyType(const String &value)
+{
+    return StrUtil::ParseEnumWithBase(value, kCustomPropertyTypeNames,
+        AGS::Common::kPropertyBoolean, AGS::Common::kPropertyUndefined);
 }
 
 int Dialog::ReadOptionCount(DocElem elem)
@@ -317,6 +482,100 @@ void GUIControl::ReadListBoxData(DocElem elem, DataUtil::GUIListBoxData& data)
     data.ShowScrollArrows = ReadBool(elem, "ShowScrollArrows");
     data.TextAlignment = ReadString(elem, "TextAlignment");
     data.TextColor = ReadInt(elem, "TextColor");
+}
+
+AGS::Common::PropertyType CustomPropertySchemaItem::ReadType(DocElem elem)
+{
+    const String value = ReadString(elem, "Type");
+    return ReadCustomPropertyType(value);
+}
+
+void GameSettings::ReadGameSettings(DocElem elem, DataUtil::GameSettings& s)
+{
+    s.AllowRelativeAssetResolutions = ReadBool(elem, "AllowRelativeAssetResolutions");
+    s.AlwaysDisplayTextAsSpeech = ReadBool(elem, "AlwaysDisplayTextAsSpeech");
+    s.AndroidAppVersionCode = ReadInt(elem, "AndroidAppVersionCode");
+    s.AndroidAppVersionName = ReadString(elem, "AndroidAppVersionName");
+    s.AndroidApplicationId = ReadString(elem, "AndroidApplicationId");
+    s.AndroidBuildFormat = ReadAndroidBuildFormat(ReadString(elem, "AndroidBuildFormat"));
+    s.AntiAliasFonts = ReadBool(elem, "AntiAliasFonts");
+    s.AntiGlideMode = ReadBool(elem, "AntiGlideMode");
+    s.AttachDataToExe = ReadBool(elem, "AttachDataToExe");
+    s.AudioIndexer = ReadInt(elem, "AudioIndexer");
+    s.AutoMoveInWalkMode = ReadBool(elem, "AutoMoveInWalkMode");
+    s.BackwardsText = ReadBool(elem, "BackwardsText");
+    s.BuildTargets = ReadString(elem, "BuildTargets");
+    s.ClipGUIControls = ReadBool(elem, "ClipGUIControls");
+    s.ColorDepth = ReadGameColorDepth(ReadString(elem, "ColorDepth"));
+    s.CompressSpritesType = ReadSpriteCompression(ReadString(elem, "CompressSpritesType"));
+    s.CustomDataDir = ReadString(elem, "CustomDataDir");
+    s.CustomResolution = ReadString(elem, "CustomResolution");
+    s.DebugMode = ReadBool(elem, "DebugMode");
+    s.DefaultRoomMaskResolution = ReadInt(elem, "DefaultRoomMaskResolution");
+    s.Description = ReadString(elem, "Description");
+    s.DeveloperName = ReadString(elem, "DeveloperName");
+    s.DeveloperURL = ReadString(elem, "DeveloperURL");
+    s.DialogOptionsBackwards = ReadBool(elem, "DialogOptionsBackwards");
+    s.DialogOptionsBullet = ReadInt(elem, "DialogOptionsBullet");
+    s.DialogOptionsGUI = ReadInt(elem, "DialogOptionsGUI");
+    s.DialogOptionsGap = ReadInt(elem, "DialogOptionsGap");
+    s.DialogScriptNarrateFunction = ReadString(elem, "DialogScriptNarrateFunction");
+    s.DialogScriptSayFunction = ReadString(elem, "DialogScriptSayFunction");
+    s.DisplayMultipleInventory = ReadBool(elem, "DisplayMultipleInventory");
+    s.EnforceNewAudio = ReadBool(elem, "EnforceNewAudio");
+    s.EnforceNewStrings = ReadBool(elem, "EnforceNewStrings");
+    s.EnforceObjectBasedScript = ReadBool(elem, "EnforceObjectBasedScript");
+    s.GUIAlphaStyle = ReadGuiAlphaStyle(ReadString(elem, "GUIAlphaStyle"));
+    s.GUIDAsString = ReadString(elem, "GUIDAsString");
+    s.GameFileName = ReadString(elem, "GameFileName");
+    s.GameName = ReadString(elem, "GameName");
+    s.GameTextEncoding = ReadString(elem, "GameTextEncoding");
+    s.Genre = ReadString(elem, "Genre");
+    s.GlobalSpeechAnimationDelay = ReadInt(elem, "GlobalSpeechAnimationDelay");
+    s.HandleInvClicksInScript = ReadBool(elem, "HandleInvClicksInScript");
+    s.InventoryCursors = ReadBool(elem, "InventoryCursors");
+    s.InventoryHotspotMarkerCrosshairColor = ReadInt(elem, "InventoryHotspotMarkerCrosshairColor");
+    s.InventoryHotspotMarkerDotColor = ReadInt(elem, "InventoryHotspotMarkerDotColor");
+    s.InventoryHotspotMarkerSprite = ReadInt(elem, "InventoryHotspotMarkerSprite");
+    s.InventoryHotspotMarkerStyle = ReadInventoryHotspotMarkerStyle(ReadString(elem, "InventoryHotspotMarkerStyle"));
+    s.LeftToRightPrecedence = ReadBool(elem, "LeftToRightPrecedence");
+    s.LetterboxMode = ReadBool(elem, "LetterboxMode");
+    s.MaximumScore = ReadInt(elem, "MaximumScore");
+    s.MouseWheelEnabled = ReadBool(elem, "MouseWheelEnabled");
+    s.NumberDialogOptions = ReadDialogOptionsNumbering(ReadString(elem, "NumberDialogOptions"));
+    s.OptimizeSpriteStorage = ReadBool(elem, "OptimizeSpriteStorage");
+    s.PixelPerfect = ReadBool(elem, "PixelPerfect");
+    s.PlaySoundOnScore = ReadInt(elem, "PlaySoundOnScore");
+    s.ReleaseDate = ReadString(elem, "ReleaseDate");
+    s.RenderAtScreenResolution = ReadRenderAtScreenResolution(ReadString(elem, "RenderAtScreenResolution"));
+    s.RoomTransition = ReadRoomTransition(ReadString(elem, "RoomTransition"));
+    s.RunGameLoopsWhileDialogOptionsDisplayed = ReadBool(elem, "RunGameLoopsWhileDialogOptionsDisplayed");
+    s.SaveGameFileExtension = ReadString(elem, "SaveGameFileExtension");
+    s.SaveGameFolderName = ReadString(elem, "SaveGameFolderName");
+    s.SaveScreenshots = ReadBool(elem, "SaveScreenshots");
+    s.ScaleCharacterSpriteOffsets = ReadBool(elem, "ScaleCharacterSpriteOffsets");
+    s.ScaleMovementSpeedWithMaskResolution = ReadBool(elem, "ScaleMovementSpeedWithMaskResolution");
+    s.ScriptAPIVersion = ReadString(elem, "ScriptAPIVersion");
+    s.ScriptCompatLevel = ReadString(elem, "ScriptCompatLevel");
+    s.SkipSpeech = ReadSkipSpeech(ReadString(elem, "SkipSpeech"));
+    s.SpeechPortraitSide = ReadSpeechPortraitSide(ReadString(elem, "SpeechPortraitSide"));
+    s.SpeechStyle = ReadSpeechStyle(ReadString(elem, "SpeechStyle"));
+    s.SplitResources = ReadString(elem, "SplitResources");
+    s.SpriteAlphaStyle = ReadSpriteAlphaStyle(ReadString(elem, "SpriteAlphaStyle"));
+    s.TTFHeightDefinedBy = ReadFontHeightDefinition(ReadString(elem, "TTFHeightDefinedBy"));
+    s.TTFMetricsFixup = ReadFontMetricsFixup(ReadString(elem, "TTFMetricsFixup"));
+    s.TextWindowGUI = ReadInt(elem, "TextWindowGUI");
+    s.ThoughtGUI = ReadInt(elem, "ThoughtGUI");
+    s.TurnBeforeFacing = ReadBool(elem, "TurnBeforeFacing");
+    s.TurnBeforeWalking = ReadBool(elem, "TurnBeforeWalking");
+    s.UniqueID = ReadInt(elem, "UniqueID");
+    s.UseGlobalSpeechAnimationDelay = ReadBool(elem, "UseGlobalSpeechAnimationDelay");
+    s.UseLowResCoordinatesInScript = ReadBool(elem, "UseLowResCoordinatesInScript");
+    s.UseOldCustomDialogOptionsAPI = ReadBool(elem, "UseOldCustomDialogOptionsAPI");
+    s.UseOldKeyboardHandling = ReadBool(elem, "UseOldKeyboardHandling");
+    s.Version = ReadString(elem, "Version");
+    s.WalkInLookMode = ReadBool(elem, "WalkInLookMode");
+    s.WhenInterfaceDisabled = ReadGuiDisableStyle(ReadString(elem, "WhenInterfaceDisabled"));
 }
 
 void GlobalVariables::GetAll(DocElem root, std::vector<DocElem> &elems)
