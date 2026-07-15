@@ -14,11 +14,13 @@
 #ifndef __AGS_TOOL_DATA__GAMEUTIL_H
 #define __AGS_TOOL_DATA__GAMEUTIL_H
 
+#include <memory>
 #include <vector>
 #include "ac/gamestructdefines.h"
 #include "ac/spritefile.h"
 #include "game/customproperties.h"
 #include "gui/guidefines.h"
+#include "util/geometry.h"
 #include "util/string.h"
 
 namespace AGS
@@ -117,6 +119,7 @@ struct DialogRef : EntityRef
 
 struct GUIControlData : EntityRef
 {
+    virtual ~GUIControlData() = default;
     int Height{};
     int Width{};
     int Left{};
@@ -141,7 +144,7 @@ struct GUIButtonData : GUIControlData
     String OnClick;
     int PushedImage{};
     String Text;
-    String TextAlignment;
+    FrameAlignment TextAlignment = kAlignTopCenter;
     int TextColor{};
 };
 
@@ -167,7 +170,7 @@ struct GUILabelData : GUIControlData
 {
     int Font{};
     String Text;
-    String TextAlignment;
+    FrameAlignment TextAlignment = kAlignTopLeft;
     int TextColor{};
 };
 
@@ -177,6 +180,7 @@ struct GUITextBoxData : GUIControlData
     String OnActivate;
     bool ShowBorder{};
     String Text;
+    FrameAlignment TextAlignment = kAlignTopLeft;
     int TextColor{};
 };
 
@@ -188,7 +192,7 @@ struct GUIListBoxData : GUIControlData
     int SelectedTextColor{};
     bool ShowBorder{};
     bool ShowScrollArrows{};
-    String TextAlignment;
+    HorAlignment TextAlignment = kHAlignLeft;
     int TextColor{};
 };
 
@@ -217,7 +221,7 @@ struct GUIData : EntityRef
     int Visible{};
     int Width{};
     int ZOrder{};
-    std::vector<GUIControlData> Controls;
+    std::vector<std::shared_ptr<GUIControlData>> Controls;
 };
 
 // Game variable (for variables defined in the game project)
@@ -357,11 +361,11 @@ struct GameRef
     std::vector<EntityRef> AudioClips;
     std::vector<EntityRef> AudioTypes;
     std::vector<CharacterRef> Characters;
-    std::vector<EntityRef> Cursors;
+    std::vector<CursorData> Cursors;
     std::vector<DialogRef> Dialogs;
     std::vector<EntityRef> Fonts;
-    std::vector<GUIRef>    GUI;
-    std::vector<EntityRef> Inventory;
+    std::vector<GUIData>   GUI;
+    std::vector<InventoryItemData> Inventory;
     std::vector<EntityRef> Views;
     std::vector<std::pair<int, String>> Rooms;
 

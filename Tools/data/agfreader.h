@@ -164,6 +164,7 @@ public:
     String ReadType(DocElem elem) override { return ""; }
     int ReadID(DocElem elem) override { return ReadInt(elem, "ID", -1); }
     String ReadScriptName(DocElem elem) override { return ReadString(elem, "Name"); }
+    void ReadAllData(DocElem elem, DataUtil::CursorData &data);
 };
 
 // Dialog data parser
@@ -224,6 +225,7 @@ public:
     String ReadType(DocElem elem) override { return "InventoryItem"; }
     int ReadID(DocElem elem) override { return ReadInt(elem, "ID", -1); }
     String ReadScriptName(DocElem elem) override { return ReadString(elem, "Name"); }
+    void ReadAllData(DocElem elem, DataUtil::InventoryItemData &data);
 };
 
 // View data parser
