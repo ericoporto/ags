@@ -361,11 +361,11 @@ struct GameRef
     std::vector<EntityRef> AudioClips;
     std::vector<EntityRef> AudioTypes;
     std::vector<CharacterRef> Characters;
-    std::vector<CursorData> Cursors;
+    std::vector<EntityRef> Cursors;
     std::vector<DialogRef> Dialogs;
     std::vector<EntityRef> Fonts;
-    std::vector<GUIData>   GUI;
-    std::vector<InventoryItemData> Inventory;
+    std::vector<GUIRef>    GUI;
+    std::vector<EntityRef> Inventory;
     std::vector<EntityRef> Views;
     std::vector<std::pair<int, String>> Rooms;
 
@@ -374,6 +374,15 @@ struct GameRef
 
     int                    PlayerCharacter = -1;
     GameSettings           Settings;
+};
+
+// Full game data required for serializing a compiled game. The base GameRef
+// remains the lightweight representation used by the other data tools.
+struct GameData : GameRef
+{
+    std::vector<CursorData> Cursors;
+    std::vector<GUIData> GUI;
+    std::vector<InventoryItemData> Inventory;
 };
 
 } // namespace DataUtil

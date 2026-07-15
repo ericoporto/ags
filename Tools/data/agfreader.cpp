@@ -862,9 +862,9 @@ void ReadGameSettings(DataUtil::GameSettings &opt, DocElem elem)
 
 
 
-void ReadGameRef(DataUtil::GameRef &game, AGFReader &reader)
+void ReadGameData(DataUtil::GameData &game, AGFReader &reader)
 {
-    game = DataUtil::GameRef{};
+    game = DataUtil::GameData{};
     DocElem root = reader.GetGameRoot();
 
     game.PlayerCharacter = Game::ReadPlayerCharacter(root);
@@ -956,6 +956,31 @@ void ReadGameRef(DataUtil::GameRef &game, AGFReader &reader)
 
     // Game settings
     ReadGameSettings(game.Settings, root);
+}
+
+void ReadGameRef(DataUtil::GameRef &game, AGFReader &reader)
+{
+    DataUtil::GameData data;
+    ReadGameData(data, reader);
+
+    game = static_cast<const DataUtil::GameRef&>(data);
+
+    game.Cursors.assign(data.Cursors.begin(), data.Cursors.end());
+    game.Inventory.assign(data.Inventory.begin(), data.Inventory.end());
+
+    game.GUI.reserve(data.GUI.size());
+    for (const auto &gui_data : data.GUI)
+    {
+        DataUtil::GUIRef gui;
+        static_cast<DataUtil::EntityRef&>(gui) = gui_data;
+        gui.Controls.reserve(gui_data.Controls.size());
+        for (const auto &control : gui_data.Controls)
+        {
+            if (control)
+                gui.Controls.push_back(*control);
+        }
+        game.GUI.push_back(gui);
+    }
 }
 
 void ReadScriptList(std::vector<String> &script_list, DocElem root)

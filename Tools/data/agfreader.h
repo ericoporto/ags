@@ -458,6 +458,8 @@ void ReadCustomPropertySchema(std::vector<DataUtil::CustomPropertySchemaItem> &s
 void ReadGameSettings(DataUtil::GameSettings &opt, DocElem root);
 // Reads full game reference data using AGFReader
 void ReadGameRef(DataUtil::GameRef &game, AGFReader &reader);
+// Reads full game data required for serializing a compiled game.
+void ReadGameData(DataUtil::GameData &game, AGFReader &reader);
 // Reads an ordered list of script module names (their order determines dependency).
 void ReadScriptList(std::vector<String> &script_list, DocElem root);
 // Reads an ordered list of script header module names (their order determines dependency).
