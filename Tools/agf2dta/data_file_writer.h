@@ -2,13 +2,17 @@
 //
 // Adventure Game Studio (AGS)
 //
-// Temporary game28.dta serializer.
-// Most of the actual block serialization lives in the .cpp as file-local
-// helpers to keep the class surface small.
+// Copyright (C) 1999-2011 Chris Jones and 2011-2026 various contributors
+// The full list of copyright holders can be found in the Copyright.txt
+// file, which is part of this source code distribution.
+//
+// The AGS source code is provided under the Artistic License 2.0.
+// A copy of this license can be found in the file License.txt and at
+// https://opensource.org/license/artistic-2-0/
 //
 //=============================================================================
-#ifndef AGS_COMMON_DATA_FILE_WRITER_H
-#define AGS_COMMON_DATA_FILE_WRITER_H
+#ifndef __AGS_TOOL_DATA__DATAFILEWRITER_H
+#define __AGS_TOOL_DATA__DATAFILEWRITER_H
 
 #include <vector>
 #include "util/string.h"
@@ -21,6 +25,7 @@ namespace DataUtil {
 using AGS::Common::String;
 using AGS::Common::Stream;
 
+// Serializes the game data to the game28.dta format.
 class DataFileWriter
 {
 public:
@@ -40,4 +45,4 @@ private:
 } // namespace DataUtil
 } // namespace AGS
 
-#endif
+#endif // __AGS_TOOL_DATA__DATAFILEWRITER_H
