@@ -14,6 +14,9 @@ target_include_directories(libtools PUBLIC ../Common)
 set(TOOLS_COMMON_SOURCES
         ../Common/ac/spritefile.cpp
         ../Common/ac/spritefile.h
+        ../Common/ac/characterinfo.cpp
+        ../Common/ac/inventoryiteminfo.cpp
+        ../Common/ac/mousecursor.cpp
         ../Common/ac/wordsdictionary.cpp
         ../Common/ac/wordsdictionary.h
         ../Common/data/asset.h
@@ -136,7 +139,9 @@ set_target_properties(agf2dlgasc PROPERTIES
 target_link_libraries(agf2dlgasc PUBLIC libtools)
 
 #----- agf2dta ---------------------------------------------
-add_executable(agf2dta agf2dta/main.cpp)
+add_executable(agf2dta agf2dta/main.cpp
+        agf2dta/data_file_writer.cpp
+)
 set_target_properties(agf2dta PROPERTIES
         CXX_STANDARD 11
         CXX_EXTENSIONS NO

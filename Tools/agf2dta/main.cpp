@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <stdio.h>
+#include "data_file_writer.h"
 #include "data/agfreader.h"
 #include "util/cmdlineopts.h"
 #include "util/file.h"
@@ -67,16 +68,39 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    DataUtil::GameRef game;
+    DataUtil::GameRef game{};
     AGF::ReadGameRef(game, reader);
 
     //-----------------------------------------------------------------------//
     // Set the main game data struct values from Game.agf
     //-----------------------------------------------------------------------//
-	
+
+    // TODO: Refactor to use this approach instead, for now we are just replicating DataFileWriter.cs approach instead
+
     //-----------------------------------------------------------------------//
     // Write main game data file to game28.dta
     //-----------------------------------------------------------------------//
+    const String out_file = Path::ConcatPaths(dst_dir, "game28.dta");
+    std::unique_ptr<Stream> out = File::CreateFile(out_file);
+    if (!out)
+    {
+        printf("Error: unable to create output file '%s'.\n", out_file.GetCStr());
+        return -1;
+    }
+
+    DataUtil::DataFileWriter writer;
+    String write_error;
+    if (!writer.WriteGame28(game, out.get(), write_error))
+    {
+        printf("Error: failed to write game data:\n");
+        printf("%s\n", write_error.GetCStr());
+        return -1;
+    }
+    if (!out->Flush())
+    {
+        printf("Error: failed to flush output file '%s'.\n", out_file.GetCStr());
+        return -1;
+    }
 
     printf("Game main data file(s) written successfully.\nDone.\n");
     return 0;
