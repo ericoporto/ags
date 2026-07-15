@@ -13,41 +13,32 @@
 //=============================================================================
 #include "data_file_writer.h"
 
-// TODO: This writer is not yet feature-complete compared with the Editor's
-// DataFileWriter.cs.
-// Missing or placeholder serialization currently includes:
+// This implements the current game28.dta layout used by DataFileWriter.cs,
+// including parser words, views and characters, sprite/font data, lip-sync and
+// global messages, plugins and custom properties, audio metadata, palette and
+// game options, GUI appearance data, and the complete extension list.
 //
-//  * text-parser dictionary;
-//  * global/dialog compiled scripts, script-module count and compiled module data,
-//    we plan to add them separately but I think the count here is still necessary?;
-//  * real view loops/frames and character data (only empty views and minimally
-//    initialized characters are emitted);
-//  * sprite count/flags and real font properties;
-//  * lip-sync frame letters and global messages;
-//  * plugins, per-entity custom-property values, and complete audio type/clip
-//    metadata (including the score-sound mapping);
-//  * a number of GameSetupStructBase options, palette data, and other settings
-//    for which GameData does not yet retain the source project information;
-//  * the current-format extension list and its offset: v360_fonts,
-//    v360_cursors, v361_objnames, v362_interevent2, v363_gameinfo,
-//    v363_dialogsnew, and v363_guictrls2;
-//  * build/editor version metadata (the compiled-with version is hardcoded).
+// Deliberate differences from the Editor writer:
 //
-// Known layout/count issues to correct while implementing these sections:
-// inventory interaction placeholders must match every real inventory item,
-// and the legacy AudioClip record needs the Editor's exact one-byte alignment
-// before its int16 fields.
-//
-// GUI base records and their six legacy control lists are written, but the
-// v363_guictrls2 extension is still required for all current GUI appearance
-// properties. Cursor animation/standard-mode flags are also incomplete because
-// these properties are not represented by CursorData yet.
+//  * compiled global/dialog scripts and script modules are not embedded. The
+//    legacy HasCCScript flag is clear, because AGS 3.6.1+ may load these from
+//    the separately generated script files;
+//  * v363_dialogsnew currently contains an empty dialog list for the same
+//    external-dialog workflow;
+//  * v362_interevent2 retains character and inventory event function names,
+//    but its embedded global/dialog/module filenames and GUI script-module
+//    names are empty until those external-file names are part of GameData;
+//  * settings that are absent from Game.agf/GameData (notably the legacy
+//    letterbox-resolution value) still use the modern/default representation.
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
 #include "ac/characterinfo.h"
+#include "ac/view.h"
+#include "ac/wordsdictionary.h"
 #include "ac/dynobj/scriptaudioclip.h"
 #include "ac/game_version.h"
 #include "ac/gamesetupstructbase.h"
@@ -136,13 +127,30 @@ static void WriteEmptyPropertyValues(Stream *out)
     out->WriteInt32(0);
 }
 
-static void WriteDefaultFontInfo(Stream *out)
+static void WriteFontInfo(Stream *out, const DataUtil::FontData &font)
 {
-    out->WriteInt32(0);   // flags
-    out->WriteInt32(1);   // size
-    out->WriteInt32(-1);  // outline
-    out->WriteInt32(0);   // yoffset
-    out->WriteInt32(0);   // linespacing
+    int flags = 0;
+    if (font.PointSize == 0) flags |= FFLG_SIZEMULTIPLIER;
+    if (font.HeightDefinedBy == DataUtil::kFontHeight_NominalHeight) flags |= FFLG_LOGICALNOMINALHEIGHT;
+    if (font.HeightDefinedBy == DataUtil::kFontHeight_CustomValue) flags |= FFLG_LOGICALCUSTOMHEIGHT;
+    if (font.MetricsFixup == DataUtil::kFontMetrics_SetAscenderToHeight) flags |= FFLG_ASCENDERFIXUP;
+    out->WriteInt32(flags);
+    out->WriteInt32(font.PointSize == 0 ? font.SizeMultiplier : font.PointSize * font.SizeMultiplier);
+    out->WriteInt32(font.OutlineStyle == 1 ? FONT_OUTLINE_AUTO : font.OutlineStyle == 2 ? font.OutlineFont : -1);
+    out->WriteInt32(font.VerticalOffset);
+    out->WriteInt32(font.LineSpacing);
+}
+
+static void WritePropertyValues(Stream *out,
+    const std::vector<DataUtil::CustomPropertyValue> &properties)
+{
+    out->WriteInt32(AGS::Common::kPropertyVersion_Current);
+    out->WriteInt32(static_cast<int32_t>(properties.size()));
+    for (const auto &property : properties)
+    {
+        WriteCountedText(out, property.Name);
+        WriteCountedText(out, property.Value);
+    }
 }
 
 static void WriteEmptyInteractionEvents(Stream *out)
@@ -150,33 +158,84 @@ static void WriteEmptyInteractionEvents(Stream *out)
     out->WriteInt32(0);
 }
 
-static void WriteDefaultView(Stream *out)
+static int GetAudioID(const DataUtil::GameData &game, int fixed_index)
 {
-    out->WriteInt16(0);
+    for (const auto &clip : game.AudioClips)
+        if (clip.Index == fixed_index) return clip.ID;
+    return -1;
 }
 
-static void WriteDefaultCharacter(Stream *out, const DataUtil::EntityRef &ref, int index)
+static void WriteView(Stream *out, const DataUtil::GameData &game, const DataUtil::ViewData &view)
+{
+    out->WriteInt16(static_cast<int16_t>(view.Loops.size()));
+    for (const auto &loop : view.Loops)
+    {
+        out->WriteInt16(static_cast<int16_t>(loop.Frames.size()));
+        out->WriteInt32(loop.RunNextLoop ? LOOPFLAG_RUNNEXTLOOP : 0);
+        for (const auto &frame : loop.Frames)
+        {
+            out->WriteInt32(frame.Image);
+            out->WriteInt16(0);
+            out->WriteInt16(0);
+            out->WriteInt16(static_cast<int16_t>(frame.Delay));
+            out->WriteInt16(0);
+            out->WriteInt32(frame.Flipped ? VFLG_FLIPSPRITE : 0);
+            out->WriteInt32(GetAudioID(game, frame.Sound));
+            out->WriteInt32(0);
+            out->WriteInt32(0);
+        }
+    }
+}
+
+static void WriteCharacter(Stream *out, const DataUtil::GameData &game,
+    const DataUtil::CharacterData &ref, int index)
 {
     CharacterInfo chinfo;
     CharacterInfo2 chinfo2;
 
     chinfo.index_id = ref.ID >= 0 ? ref.ID : index;
     chinfo.on = 1;
-    chinfo.defview = -1;
-    chinfo.talkview = -1;
-    chinfo.view = -1;
-    chinfo.room = -1;
-    chinfo.prevroom = -1;
-    chinfo.idleview = -1;
-    chinfo.thinkview = -1;
-    chinfo.blinkview = -1;
-    chinfo.activeinv = -1;
+    chinfo.defview = ref.NormalView - 1;
+    chinfo.talkview = ref.SpeechView - 1;
+    chinfo.view = ref.NormalView - 1;
+    chinfo.room = ref.StartingRoom;
+    chinfo.x = ref.StartX;
+    chinfo.y = ref.StartY;
+    chinfo.idleview = ref.IdleView - 1;
+    chinfo.idledelay = static_cast<int16_t>(ref.IdleDelay);
+    chinfo.transparency = static_cast<int16_t>(GfxDef::Trans100ToLegacyTrans255(ref.Transparency));
+    chinfo.baseline = static_cast<int16_t>(ref.Baseline);
+    chinfo.talkcolor = ref.SpeechColor;
+    chinfo.thinkview = ref.ThinkingView - 1;
+    chinfo.blinkview = static_cast<int16_t>(ref.BlinkingView - 1);
+    chinfo.walkspeed_y = static_cast<int16_t>(ref.UniformMovementSpeed ? UNIFORM_WALK_SPEED : ref.MovementSpeedY);
+    chinfo.speech_anim_speed = static_cast<int16_t>(ref.SpeechAnimationDelay);
+    chinfo.idle_anim_speed = static_cast<int16_t>(ref.IdleAnimationDelay);
+    chinfo.blocking_width = static_cast<int16_t>(ref.BlockingWidth);
+    chinfo.blocking_height = static_cast<int16_t>(ref.BlockingHeight);
+    chinfo.walkspeed = static_cast<int16_t>(ref.UniformMovementSpeed ? ref.MovementSpeed : ref.MovementSpeedX);
+    chinfo.animspeed = static_cast<int16_t>(ref.AnimationDelay);
+    if (ref.AdjustSpeedWithScaling) chinfo.flags |= CHF_SCALEMOVESPEED;
+    if (ref.AdjustVolumeWithScaling) chinfo.flags |= CHF_SCALEVOLUME;
+    if (!ref.Clickable) chinfo.flags |= CHF_NOINTERACT;
+    if (!ref.DiagonalLoops) chinfo.flags |= CHF_NODIAGONAL;
+    if (ref.MovementLinkedToAnimation) chinfo.flags |= CHF_ANTIGLIDE;
+    if (!ref.Solid) chinfo.flags |= CHF_NOBLOCKING;
+    if (!ref.TurnBeforeWalking) chinfo.flags |= CHF_NOTURNWHENWALK;
+    if (ref.TurnWhenFacing) chinfo.flags |= CHF_TURNWHENFACE;
+    if (!ref.UseRoomAreaLighting) chinfo.flags |= CHF_NOLIGHTING;
+    if (!ref.UseRoomAreaScaling) chinfo.flags |= CHF_MANUALSCALING;
+    if ((ref.ID >= 0 ? ref.ID : index) == game.PlayerCharacter)
+        for (const auto &item : game.Inventory)
+            if (item.PlayerStartsWith && item.ID >= 0 && item.ID < MAX_INV) chinfo.inv[item.ID] = 1;
+    chinfo2.blocking_x = ref.BlockingX;
+    chinfo2.blocking_y = ref.BlockingY;
 
-    const String &name = ref.ScriptName.IsEmpty() ? ref.TypeName : ref.ScriptName;
+    const String &name = ref.RealName;
     std::snprintf(chinfo.name, LEGACY_MAX_CHAR_NAME_LEN, "%s", name.GetCStr());
-    std::snprintf(chinfo.scrname, LEGACY_MAX_SCRIPT_NAME_LEN, "%s", name.GetCStr());
+    std::snprintf(chinfo.scrname, LEGACY_MAX_SCRIPT_NAME_LEN, "%s", ref.ScriptName.GetCStr());
     chinfo2.name_new = name;
-    chinfo2.scrname_new = name;
+    chinfo2.scrname_new = ref.ScriptName;
 
     chinfo.WriteToFile(chinfo2, out);
 }
@@ -202,8 +261,11 @@ static void WriteCursor(Stream *out, const DataUtil::CursorData &ref)
     cur.pic = ref.Image;
     cur.hotx = static_cast<short>(ref.HotspotX);
     cur.hoty = static_cast<short>(ref.HotspotY);
-    cur.view = static_cast<short>(ref.View > 0 ? ref.View - 1 : -1);
-    cur.flags = ref.Animate ? MCF_ANIMMOVE : 0;
+    cur.view = static_cast<short>(ref.Animate && ref.View > 0 ? ref.View - 1 : -1);
+    cur.flags = 0;
+    if (ref.Animate && ref.AnimateOnlyOnHotspots) cur.flags |= MCF_HOTSPOT;
+    if (ref.Animate && ref.AnimateOnlyWhenMoving) cur.flags |= MCF_ANIMMOVE;
+    if (ref.StandardMode) cur.flags |= MCF_STANDARD;
     cur.WriteToFile(out);
 }
 
@@ -350,36 +412,32 @@ static void WriteGuiListBox(Stream *out, const DataUtil::GUIListBoxData &list_bo
     out->WriteInt32(list_box.SelectedBackgroundColor);
 }
 
-// TODO: this is placeholder
-// this will be replaced by a proper WriteAudioType
-static void WriteDefaultAudioType(Stream *out, bool speech)
+static void WriteAudioType(Stream *out, const DataUtil::AudioTypeData *type)
 {
-    out->WriteInt32(speech ? 0 : 1);
-    out->WriteInt32(speech ? 1 : 0);
-    out->WriteInt32(0);
-    out->WriteInt32(0);
+    out->WriteInt32(type ? type->ID : 0);
+    out->WriteInt32(type ? type->MaxChannels : 1);
+    out->WriteInt32(type ? type->VolumeReductionWhileSpeechPlaying : 0);
+    out->WriteInt32(type ? type->Crossfade : 0);
     out->WriteInt32(0);
 }
 
-// TODO: this is placeholder
-// this will be replaced by a proper WriteAudioClip
-static void WriteDefaultAudioClip(Stream *out, const DataUtil::EntityRef &ref, int index)
+static void WriteAudioClip(Stream *out, const DataUtil::AudioClipData &ref, int index)
 {
     const String &name = ref.ScriptName.IsEmpty() ? ref.TypeName : ref.ScriptName;
     out->WriteInt32(ref.ID >= 0 ? ref.ID : index);
     String script_name = name;
     if (script_name.GetLength() > 29)
         script_name = script_name.Left(29);
-    String file_name;
+    String file_name = ref.CacheFileName;
     WriteFixedText(out, script_name, 30);
     WriteFixedText(out, file_name, 15);
-    out->WriteInt8(0); // bundlingType
-    out->WriteInt8(0); // type
-    out->WriteInt8(0); // fileType
-    out->WriteInt8(0); // defaultRepeat
-    out->WriteInt16(0); // alignment padding to int16
-    out->WriteInt16(0); // defaultPriority
-    out->WriteInt16(0); // defaultVolume
+    out->WriteInt8(ref.BundlingType);
+    out->WriteInt8(ref.Type);
+    out->WriteInt8(ref.FileType);
+    out->WriteInt8(ref.Repeat ? 1 : 0);
+    out->WriteInt8(0); // alignment padding to int16
+    out->WriteInt16(ref.Priority);
+    out->WriteInt16(ref.Volume);
     out->WriteInt16(0); // alignment padding to int32
     out->WriteInt32(0); // reserved
 }
@@ -434,7 +492,7 @@ static int ParseSplitResources(const String &value)
     return StrUtil::StringToInt(value, 0);
 }
 
-static void WriteGameSetupStructBase(const DataUtil::GameData &game, Stream *out)
+static void WriteGameSetupStructBase(const DataUtil::GameData &game, Stream *out, soff_t &ext_offset_pos)
 {
     String game_name = game.Settings.GameName;
     if (game_name.IsEmpty())
@@ -442,9 +500,7 @@ static void WriteGameSetupStructBase(const DataUtil::GameData &game, Stream *out
     WriteFixedText(out, game_name, GameSetupStructBase::LEGACY_GAME_NAME_LENGTH);
     out->WriteInt16(0); // alignment padding to int32
 
-    // TEMP: this is still a partial reconstruction of the editor's full
-    // GameSetupStructBase serialization. Only the fields the current tool
-    // model knows about are wired here; the rest remain their default values.
+    // Options without a corresponding GameData field retain their default.
     int options[GameSetupStructBase::MAX_OPTIONS] = { 0 };
     options[OPT_ALWAYSSPCH] = game.Settings.AlwaysDisplayTextAsSpeech ? 1 : 0;
     options[OPT_ANTIALIASFONTS] = game.Settings.AntiAliasFonts ? 1 : 0;
@@ -497,18 +553,27 @@ static void WriteGameSetupStructBase(const DataUtil::GameData &game, Stream *out
     options[OPT_THOUGHTGUI] = game.Settings.ThoughtGUI;
     options[OPT_DISABLEOFF] = static_cast<int>(game.Settings.WhenInterfaceDisabled);
     options[OPT_RENDERATSCREENRES] = static_cast<int>(game.Settings.RenderAtScreenResolution);
+    options[OPT_FADETYPE] = static_cast<int>(game.Settings.RoomTransition);
+    options[OPT_LIPSYNCTEXT] = game.LipSync == DataUtil::kLipSync_Text ? 1 : 0;
+    options[OPT_VOICECLIPNAMERULE] = game.Settings.UseOldVoiceClipNaming ? 0 : 1;
+    options[OPT_GAMEFPS] = game.Settings.GameFPS;
+    options[OPT_GUICONTROLMOUSEBUT] = game.Settings.GUIHandleOnlyLeftMouseButton ? 1 : 0;
+    options[OPT_DISPLAYSINGLEDIALOGOPTION] = game.Settings.DisplaySingleDialogOption ? 1 : 0;
+    options[OPT_TURNORDERPRIORITY] = game.Settings.TurnOrderPriority;
+    options[OPT_TEXTBOXCLAIMSKEYS] = game.Settings.TextBoxKeyClaimStyle;
 
     for (int i = 0; i < GameSetupStructBase::MAX_OPTIONS; ++i)
         out->WriteInt32(options[i]);
 
-    // PLACEHOLDER FOR PALETTE STUFF!!!
     for (int i = 0; i < 256; ++i)
-        out->WriteByte(0); // PAL_BACKGROUND or PAL_GAMEWIDE
+        out->WriteByte(i < static_cast<int>(game.Palette.size()) && game.Palette[i].Background ? 2 : 0);
     for (int i = 0; i < 256; ++i)
     {
-        out->WriteByte(0);   // R
-        out->WriteByte(0);   // G
-        out->WriteByte(0);   // B
+        const DataUtil::PaletteEntryData entry = i < static_cast<int>(game.Palette.size()) ?
+            game.Palette[i] : DataUtil::PaletteEntryData{};
+        out->WriteByte(entry.Red / 4);
+        out->WriteByte(entry.Green / 4);
+        out->WriteByte(entry.Blue / 4);
         out->WriteByte(255); // opaque
     }
 
@@ -556,28 +621,24 @@ static void WriteGameSetupStructBase(const DataUtil::GameData &game, Stream *out
         out->WriteInt32(200);
     }
 
-    // TODO: fix to LipSync.DefaultFrame
-    out->WriteInt32(0); // default lipsync frame
-    // TODO: revise this, may be missing a HotspotMarkerImage somewhere?
+    out->WriteInt32(game.LipSyncDefaultFrame);
     out->WriteInt32(game.Settings.InventoryHotspotMarkerStyle == DataUtil::kInventoryHotspot_Sprite ?
         game.Settings.InventoryHotspotMarkerSprite : 0);
     // reserved; 16 ints
     for (int i = 0; i < GameSetupStructBase::NUM_INTS_RESERVED; ++i)
         out->WriteInt32(0);
 
-    // reserve a 32-bit position for extension offset
-    // TODO: revise if I am missing something here?
+    ext_offset_pos = out->GetPosition();
     out->WriteInt32(0); // extension offset - none
 
     // MAXGLOBALMES; write 500 ints
     for (int i = 0; i < MAXGLOBALMES; ++i)
-        out->WriteInt32(0);
+        out->WriteInt32(i < static_cast<int>(game.GlobalMessages.size()) && !game.GlobalMessages[i].IsEmpty() ? 1 : 0);
 
     out->WriteInt32(1); // dict != null
     out->WriteInt32(0); // globalscript != null
     out->WriteInt32(0); // chars != null
-    // TODO: I think this must be zero because the scripts are outside?
-    out->WriteInt32(0); // compiled_script != null
+    out->WriteInt32(0); // compiled scripts are loaded externally since 3.6.1
 }
 
 static void WriteSaveGameInfo(const DataUtil::GameData &game, Stream *out)
@@ -586,28 +647,28 @@ static void WriteSaveGameInfo(const DataUtil::GameData &game, Stream *out)
     WriteFixedText(out, guid, MAX_GUID_LENGTH);
     WriteFixedText(out, game.Settings.SaveGameFileExtension, MAX_SG_EXT_LENGTH);
 
-    String folder = game.Settings.SaveGameFolderName;
-    if (folder.IsEmpty())
-    {
-        if (!game.Settings.GameName.IsEmpty())
-            folder = game.Settings.GameName;
-        else if (!guid.IsEmpty())
-            folder = guid;
-        else
-            folder = String::FromFormat("AGS-Game-%d", game.Settings.UniqueID);
-    }
-    WriteFixedText(out, folder, LEGACY_MAX_SG_FOLDER_LEN);
+    WriteFixedText(out, game.Settings.SaveGameFolderName, LEGACY_MAX_SG_FOLDER_LEN);
 }
 
 static void WriteFontBlock(const DataUtil::GameData &game, Stream *out)
 {
-    for (size_t i = 0; i < game.Fonts.size(); ++i)
-        WriteDefaultFontInfo(out);
+    for (const auto &font : game.Fonts)
+        WriteFontInfo(out, font);
 }
 
-static void WriteSpriteFlags(Stream *out)
+static void WriteSpriteFlags(const DataUtil::GameData &game, Stream *out)
 {
-    out->WriteInt32(0);
+    int topmost = -1;
+    for (const auto &sprite : game.Sprites) topmost = std::max(topmost, sprite.Slot);
+    out->WriteInt32(topmost + 1);
+    std::vector<uint8_t> flags(topmost + 1, 0);
+    for (const auto &sprite : game.Sprites)
+    {
+        if (sprite.Slot < 0 || sprite.Slot > topmost) continue;
+        if (sprite.Resolution != DataUtil::kSpriteImport_Real) flags[sprite.Slot] |= SPF_VAR_RESOLUTION;
+        if (sprite.Resolution == DataUtil::kSpriteImport_HighRes) flags[sprite.Slot] |= SPF_HIRES;
+    }
+    if (!flags.empty()) out->Write(flags.data(), flags.size());
 }
 
 static void WriteInventoryBlock(const DataUtil::GameData &game, Stream *out)
@@ -627,27 +688,62 @@ static void WriteInteractionScriptsBlock(const DataUtil::GameData &game, Stream 
 {
     for (size_t i = 0; i < game.Characters.size(); ++i)
         WriteEmptyInteractionEvents(out);
-    for (size_t i = 1; i < game.Inventory.size(); ++i)
+    for (size_t i = 0; i < game.Inventory.size(); ++i)
         WriteEmptyInteractionEvents(out);
+}
+
+static void WriteTextParserDictionary(const DataUtil::GameData &game, Stream *out)
+{
+    std::vector<DataUtil::TextParserWordData> words;
+    for (const auto &item : game.ParserWords)
+    {
+        String remaining = item.Word;
+        while (!remaining.IsEmpty())
+        {
+            const int comma = remaining.FindChar(',');
+            String word = comma >= 0 ? remaining.Left(comma) : remaining;
+            word.Trim();
+            if (!word.IsEmpty())
+            {
+                DataUtil::TextParserWordData parsed;
+                parsed.Word = word;
+                parsed.WordGroup = item.WordGroup;
+                words.push_back(parsed);
+            }
+            if (comma < 0) break;
+            remaining = remaining.Mid(comma + 1);
+        }
+    }
+    out->WriteInt32(static_cast<int32_t>(words.size()));
+    for (const auto &word : words)
+    {
+        write_string_encrypt(out, word.Word.GetCStr());
+        out->WriteInt16(static_cast<int16_t>(word.WordGroup));
+    }
 }
 
 static void WriteViewsBlock(const DataUtil::GameData &game, Stream *out)
 {
     for (size_t i = 0; i < game.Views.size(); ++i)
-        WriteDefaultView(out);
+        WriteView(out, game, game.Views[i]);
 }
 
 static void WriteCharactersBlock(const DataUtil::GameData &game, Stream *out)
 {
     for (size_t i = 0; i < game.Characters.size(); ++i)
-        WriteDefaultCharacter(out, game.Characters[i], static_cast<int>(i));
+        WriteCharacter(out, game, game.Characters[i], static_cast<int>(i));
 }
 
-static void WriteLipSyncBlock(Stream *out)
+static void WriteLipSyncBlock(const DataUtil::GameData &game, Stream *out)
 {
-    // TODO: NOT IMPLEMENTED YET
     for (int i = 0; i < MAXLIPSYNCFRAMES; ++i)
-        WriteFixedText(out, "", 50);
+        WriteFixedText(out, i < static_cast<int>(game.LipSyncFrames.size()) ? game.LipSyncFrames[i] : String(), 50);
+}
+
+static void WriteGlobalMessagesBlock(const DataUtil::GameData &game, Stream *out)
+{
+    for (const auto &message : game.GlobalMessages)
+        if (!message.IsEmpty()) write_string_encrypt(out, message.GetCStr());
 }
 
 static void WriteGuiBlock(const DataUtil::GameData &game, Stream *out)
@@ -729,19 +825,26 @@ static void WriteGuiBlock(const DataUtil::GameData &game, Stream *out)
         WriteGuiListBox(out, *list_box);
 }
 
-static void WritePluginsBlock(Stream *out)
+static void WritePluginsBlock(const DataUtil::GameData &game, Stream *out)
 {
-    out->WriteInt32(0);
+    out->WriteInt32(1); // plugin data format version
+    out->WriteInt32(static_cast<int32_t>(game.Plugins.size()));
+    for (const auto &plugin : game.Plugins)
+    {
+        WriteNullTerminatedString(out, plugin.Name);
+        out->WriteInt32(static_cast<int32_t>(plugin.Data.size()));
+        if (!plugin.Data.empty()) out->Write(plugin.Data.data(), plugin.Data.size());
+    }
 }
 
 static void WriteCustomPropertiesBlock(const DataUtil::GameData &game, Stream *out)
 {
     WritePropertySchemaBlock(out, game.PropertySchema);
-    for (size_t i = 0; i < game.Characters.size(); ++i)
-        WriteEmptyPropertyValues(out);
+    for (const auto &character : game.Characters)
+        WritePropertyValues(out, character.Properties);
     WriteEmptyPropertyValues(out); // inventory slot 0
-    for (size_t i = 0; i < game.Inventory.size(); ++i)
-        WriteEmptyPropertyValues(out);
+    for (const auto &item : game.Inventory)
+        WritePropertyValues(out, item.Properties);
 
     for (size_t i = 0; i < game.Views.size(); ++i)
     {
@@ -761,15 +864,15 @@ static void WriteAudioBlock(const DataUtil::GameData &game, Stream *out)
 {
     const int audio_type_count = static_cast<int>(game.AudioTypes.size()) + 1;
     out->WriteInt32(audio_type_count);
-    WriteDefaultAudioType(out, true);
+    WriteAudioType(out, nullptr);
     for (const auto &audio_type : game.AudioTypes)
-        WriteDefaultAudioType(out, false);
+        WriteAudioType(out, &audio_type);
 
     out->WriteInt32(static_cast<int32_t>(game.AudioClips.size()));
     for (size_t i = 0; i < game.AudioClips.size(); ++i)
-        WriteDefaultAudioClip(out, game.AudioClips[i], static_cast<int>(i));
+        WriteAudioClip(out, game.AudioClips[i], static_cast<int>(i));
 
-    out->WriteInt32(-1); // no score sound
+    out->WriteInt32(GetAudioID(game, game.Settings.PlaySoundOnScore));
 }
 
 static void WriteRoomNamesBlock(const DataUtil::GameData &game, Stream *out)
@@ -782,14 +885,225 @@ static void WriteRoomNamesBlock(const DataUtil::GameData &game, Stream *out)
         WriteRoomName(out, room.first, room.second);
 }
 
-static void WriteHeaderBlock(Stream *out)
+static void WriteInteractionEvents(Stream *out, const String &module,
+    const std::vector<String> &events)
+{
+    out->WriteInt32(3060200); // kInterEvents_v362
+    WriteCountedText(out, module);
+    out->WriteInt32(static_cast<int32_t>(events.size()));
+    for (const auto &event : events) WriteCountedText(out, event);
+}
+
+static void WriteEmptyInteractionEventsV362(Stream *out)
+{
+    out->WriteInt32(3060200);
+    WriteCountedText(out, "");
+    out->WriteInt32(0);
+}
+
+static void WriteGuiControlLooks363(Stream *out, const DataUtil::GUIControlData &control)
+{
+    out->WriteInt32(control.BackgroundColor);
+    out->WriteInt32(control.BorderColor);
+    out->WriteInt32(control.BorderWidth);
+    out->WriteInt32(control.PaddingX);
+    out->WriteInt32(control.PaddingY);
+    for (int i = 0; i < 4; ++i) out->WriteInt32(0);
+}
+
+static void WriteExt360Fonts(Stream *out, const DataUtil::GameData &game)
+{
+    for (const auto &font : game.Fonts)
+    {
+        out->WriteInt32(font.AutoOutlineThickness);
+        out->WriteInt32(font.AutoOutlineStyle);
+        out->WriteInt32(font.CharacterSpacing);
+        out->WriteInt32(font.CustomHeightValue);
+        out->WriteInt32(0); out->WriteInt32(0);
+    }
+}
+
+static void WriteExt360Cursors(Stream *out, const DataUtil::GameData &game)
+{
+    for (const auto &cursor : game.Cursors)
+    {
+        out->WriteInt32(cursor.AnimationDelay);
+        out->WriteInt32(0); out->WriteInt32(0); out->WriteInt32(0);
+    }
+}
+
+static void WriteExt361ObjNames(Stream *out, const DataUtil::GameData &game)
+{
+    WriteCountedText(out, game.Settings.GameName);
+    WriteCountedText(out, game.Settings.SaveGameFolderName);
+    out->WriteInt32(static_cast<int32_t>(game.Characters.size()));
+    for (const auto &character : game.Characters)
+    {
+        WriteCountedText(out, character.ScriptName);
+        WriteCountedText(out, character.RealName);
+    }
+    out->WriteInt32(static_cast<int32_t>(game.Inventory.size() + 1));
+    WriteCountedText(out, "");
+    for (const auto &item : game.Inventory) WriteCountedText(out, item.Description);
+    out->WriteInt32(static_cast<int32_t>(game.Cursors.size()));
+    for (const auto &cursor : game.Cursors) WriteCountedText(out, cursor.ScriptName);
+    out->WriteInt32(static_cast<int32_t>(game.AudioClips.size()));
+    for (const auto &clip : game.AudioClips)
+    {
+        WriteCountedText(out, clip.ScriptName);
+        WriteCountedText(out, clip.CacheFileName);
+    }
+}
+
+static void WriteExt362Interactions(Stream *out, const DataUtil::GameData &game)
+{
+    // Embedded scripts are intentionally absent; script objects are supplied externally.
+    WriteCountedText(out, "");
+    WriteCountedText(out, "");
+    out->WriteInt32(0); // script module filename count
+    out->WriteInt32(static_cast<int32_t>(game.Characters.size()));
+    for (const auto &character : game.Characters)
+        WriteInteractionEvents(out, character.ScriptModule, character.InteractionEvents);
+    out->WriteInt32(static_cast<int32_t>(game.Inventory.size() + 1));
+    WriteEmptyInteractionEventsV362(out);
+    for (const auto &item : game.Inventory)
+        WriteInteractionEvents(out, item.ScriptModule, item.InteractionEvents);
+    out->WriteInt32(static_cast<int32_t>(game.GUI.size()));
+    for (size_t i = 0; i < game.GUI.size(); ++i) WriteCountedText(out, "");
+}
+
+static void WriteExt363GameInfo(Stream *out, const DataUtil::GameData &game)
+{
+    String release_date = game.Settings.ReleaseDate;
+    int year = 0, month = 0, day = 0;
+    if (std::sscanf(release_date.GetCStr(), "%d-%d-%d", &year, &month, &day) == 3)
+        release_date = String::FromFormat("%02d.%02d.%04d", day, month, year);
+    String text_lang = game.Settings.GameTextLanguage;
+    text_lang.Replace('-', '_');
+    const std::pair<const char*, String> info[] = {
+        {"title", game.Settings.GameName}, {"description", game.Settings.Description},
+        {"dev_name", game.Settings.DeveloperName}, {"dev_url", game.Settings.DeveloperURL},
+        {"genre", game.Settings.Genre}, {"release_date", release_date},
+        {"version", game.Settings.Version}, {"text_lang", text_lang}
+    };
+    out->WriteInt32(8);
+    for (const auto &item : info)
+    {
+        WriteCountedText(out, item.first);
+        WriteCountedText(out, item.second);
+    }
+}
+
+template <typename T>
+static std::vector<std::shared_ptr<T>> CollectGuiControls(const DataUtil::GameData &game)
+{
+    std::vector<std::shared_ptr<T>> result;
+    for (const auto &gui : game.GUI)
+        for (const auto &control : gui.Controls)
+            if (auto typed = std::dynamic_pointer_cast<T>(control)) result.push_back(typed);
+    return result;
+}
+
+static void WriteExt363GuiControls(Stream *out, const DataUtil::GameData &game)
+{
+    const auto buttons = CollectGuiControls<DataUtil::GUIButtonData>(game);
+    out->WriteInt32(static_cast<int32_t>(buttons.size()));
+    for (const auto &button : buttons)
+    {
+        WriteGuiControlLooks363(out, *button);
+        const bool dynamic = button->ColorStyle == DataUtil::kButtonColor_Dynamic ||
+            button->ColorStyle == DataUtil::kButtonColor_DynamicFlat;
+        out->WriteInt32((dynamic ? 1 : 0) |
+            (button->ColorStyle == DataUtil::kButtonColor_DynamicFlat ? 2 : 0));
+        out->WriteInt32(button->BorderShadeColor); out->WriteInt32(button->MouseOverBackgroundColor);
+        out->WriteInt32(button->PushedBackgroundColor); out->WriteInt32(button->MouseOverBorderColor);
+        out->WriteInt32(button->PushedBorderColor); out->WriteInt32(button->MouseOverTextColor);
+        out->WriteInt32(button->PushedTextColor); out->WriteInt32(button->TextOutlineColor);
+        out->WriteInt32(0); out->WriteInt32(0); out->WriteInt32(0);
+    }
+    const auto labels = CollectGuiControls<DataUtil::GUILabelData>(game);
+    out->WriteInt32(static_cast<int32_t>(labels.size()));
+    for (const auto &label : labels)
+    {
+        WriteGuiControlLooks363(out, *label); out->WriteInt32(label->TextOutlineColor);
+        out->WriteInt32(0); out->WriteInt32(0); out->WriteInt32(0);
+    }
+    const auto invs = CollectGuiControls<DataUtil::GUIInventoryData>(game);
+    out->WriteInt32(static_cast<int32_t>(invs.size()));
+    for (const auto &inv : invs)
+    {
+        WriteGuiControlLooks363(out, *inv);
+        for (int i = 0; i < 4; ++i) out->WriteInt32(0);
+    }
+    const auto sliders = CollectGuiControls<DataUtil::GUISliderData>(game);
+    out->WriteInt32(static_cast<int32_t>(sliders.size()));
+    for (const auto &slider : sliders)
+    {
+        WriteGuiControlLooks363(out, *slider); out->WriteInt32(slider->HandleColor);
+        out->WriteInt32(slider->BorderShadeColor);
+        for (int i = 0; i < 4; ++i) out->WriteInt32(0);
+    }
+    const auto textboxes = CollectGuiControls<DataUtil::GUITextBoxData>(game);
+    out->WriteInt32(static_cast<int32_t>(textboxes.size()));
+    for (const auto &textbox : textboxes)
+    {
+        WriteGuiControlLooks363(out, *textbox); out->WriteInt32(textbox->TextAlignment);
+        out->WriteInt32(textbox->TextOutlineColor); out->WriteInt32(0); out->WriteInt32(0);
+    }
+    const auto listboxes = CollectGuiControls<DataUtil::GUIListBoxData>(game);
+    out->WriteInt32(static_cast<int32_t>(listboxes.size()));
+    for (const auto &listbox : listboxes)
+    {
+        WriteGuiControlLooks363(out, *listbox); out->WriteInt32(listbox->TextOutlineColor);
+        out->WriteInt32(0); out->WriteInt32(0); out->WriteInt32(0);
+    }
+}
+
+typedef void (*ExtensionWriter)(Stream*, const DataUtil::GameData&);
+
+static void WriteExtension(Stream *out, const char *id, const DataUtil::GameData &game,
+    ExtensionWriter writer)
+{
+    out->WriteInt8(0);
+    WriteFixedText(out, id, 16);
+    const soff_t length_pos = out->GetPosition();
+    out->WriteInt64(0);
+    const soff_t data_pos = out->GetPosition();
+    writer(out, game);
+    const soff_t end_pos = out->GetPosition();
+    out->Seek(length_pos, kSeekBegin);
+    out->WriteInt64(end_pos - data_pos);
+    out->Seek(end_pos, kSeekBegin);
+}
+
+static void WriteExt363Dialogs(Stream *out, const DataUtil::GameData &)
+{
+    out->WriteInt32(0); // dialog scripts and topics are supplied externally
+}
+
+static void WriteExtensions(Stream *out, const DataUtil::GameData &game, soff_t ext_offset_pos)
+{
+    const soff_t ext_offset = out->GetPosition();
+    out->Seek(ext_offset_pos, kSeekBegin);
+    out->WriteInt32(static_cast<int32_t>(ext_offset));
+    out->Seek(ext_offset, kSeekBegin);
+    WriteExtension(out, "v360_fonts", game, WriteExt360Fonts);
+    WriteExtension(out, "v360_cursors", game, WriteExt360Cursors);
+    WriteExtension(out, "v361_objnames", game, WriteExt361ObjNames);
+    WriteExtension(out, "v362_interevent2", game, WriteExt362Interactions);
+    WriteExtension(out, "v363_gameinfo", game, WriteExt363GameInfo);
+    WriteExtension(out, "v363_dialogsnew", game, WriteExt363Dialogs);
+    WriteExtension(out, "v363_guictrls2", game, WriteExt363GuiControls);
+    out->WriteInt8(0xff);
+}
+
+static void WriteHeaderBlock(const DataUtil::GameData &game, Stream *out)
 {
     WriteFixedText(out, "Adventure Creator Game File v2", 30);
     out->WriteInt32(kGameVersion_Current);
 
-    // TEMP: hardcoded until the tool exposes build metadata.
-    // TODO: FIGURE OUT HOW??? Should I pick from Common/ac/def_version.h ?
-    const String compiled_with = "3.6.3.12";
+    // Preserve the editor version recorded in Game.agf.
+    const String compiled_with = game.EditorVersion.IsEmpty() ? String("3.6.3.12") : game.EditorVersion;
     out->WriteInt32(static_cast<int32_t>(compiled_with.GetLength()));
     WriteFixedText(out, compiled_with, compiled_with.GetLength());
 
@@ -808,22 +1122,28 @@ HError WriteGameData28(const GameData &game, std::unique_ptr<Stream> &&out)
 
     Stream *stream = out.get();
 
-    WriteHeaderBlock(stream);
-    WriteGameSetupStructBase(game, stream);
+    WriteHeaderBlock(game, stream);
+    soff_t ext_offset_pos = 0;
+    WriteGameSetupStructBase(game, stream, ext_offset_pos);
     WriteSaveGameInfo(game, stream);
     WriteFontBlock(game, stream);
-    WriteSpriteFlags(stream);
+    WriteSpriteFlags(game, stream);
     WriteInventoryBlock(game, stream);
     WriteCursorBlock(game, stream);
     WriteInteractionScriptsBlock(game, stream);
+    WriteTextParserDictionary(game, stream);
+    // Compiled global/dialog scripts and module list are omitted intentionally;
+    // HasCCScript is false in GameSetupStructBase, so no zero payload is needed here.
     WriteViewsBlock(game, stream);
     WriteCharactersBlock(game, stream);
-    WriteLipSyncBlock(stream);
+    WriteLipSyncBlock(game, stream);
+    WriteGlobalMessagesBlock(game, stream);
     WriteGuiBlock(game, stream);
-    WritePluginsBlock(stream);
+    WritePluginsBlock(game, stream);
     WriteCustomPropertiesBlock(game, stream);
     WriteAudioBlock(game, stream);
     WriteRoomNamesBlock(game, stream);
+    WriteExtensions(stream, game, ext_offset_pos);
 
     if (!out->Flush())
         return new Error("WriteGameData28: Failed to flush game data output stream.");
