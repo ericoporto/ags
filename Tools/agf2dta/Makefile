@@ -26,6 +26,7 @@ COMMON_OBJS = \
 	../../Common/ac/characterinfo.cpp \
 	../../Common/ac/inventoryiteminfo.cpp \
 	../../Common/ac/mousecursor.cpp \
+	../../Common/ac/wordsdictionary.cpp \
 	../../Common/debug/debugmanager.cpp \
 	../../Common/util/bufferedstream.cpp \
 	../../Common/util/cmdlineopts.cpp \
