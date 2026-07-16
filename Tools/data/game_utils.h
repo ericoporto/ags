@@ -471,7 +471,7 @@ struct GameSettings
     int AndroidAppVersionCode;
     String AndroidAppVersionName;
     String AndroidApplicationId;
-    AndroidBuildFormat AndroidBuildFormat = kAndroidBuild_ApkEmbedded;
+    DataUtil::AndroidBuildFormat AndroidBuildFormat = kAndroidBuild_ApkEmbedded;
     bool AntiAliasFonts;
     bool AntiGlideMode;
     bool AttachDataToExe;
@@ -515,7 +515,7 @@ struct GameSettings
     unsigned int InventoryHotspotMarkerCrosshairColor;
     unsigned int InventoryHotspotMarkerDotColor;
     int InventoryHotspotMarkerSprite;
-    InventoryHotspotMarkerStyle InventoryHotspotMarkerStyle = kInventoryHotspot_None;
+    DataUtil::InventoryHotspotMarkerStyle InventoryHotspotMarkerStyle = kInventoryHotspot_None;
     bool LeftToRightPrecedence;
     bool LetterboxMode;
     int MaximumScore;
@@ -536,8 +536,8 @@ struct GameSettings
     String ScriptAPIVersion;
     String ScriptCompatLevel;
     SkipSpeechStyle SkipSpeech = kSkipSpeech_MouseOrKeyboardOrTimer;
-    SpeechPortraitSide SpeechPortraitSide = kSpeechPortrait_Left;
-    SpeechStyle SpeechStyle = kSpeechStyle_Lucasarts;
+    DataUtil::SpeechPortraitSide SpeechPortraitSide = kSpeechPortrait_Left;
+    DataUtil::SpeechStyle SpeechStyle = kSpeechStyle_Lucasarts;
     String SplitResources;
     GameSpriteAlphaRenderingStyle SpriteAlphaStyle = ::kSpriteAlphaRender_Proper;
     FontHeightDefinition TTFHeightDefinedBy = kFontHeight_NominalHeight;
