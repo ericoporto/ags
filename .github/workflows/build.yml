@@ -561,6 +561,49 @@ jobs:
           include-hidden-files: true
           path: Solutions/.build/*/*
 
+  windows-tools-archive:
+    name: Windows Tools Packaging
+    runs-on: ubuntu-latest
+    needs:
+      - windows-msvc-tools
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Install bsdtar
+        run: sudo apt-get update -y && sudo apt-get install -y libarchive-tools
+
+      - name: Download x64 Tools binaries
+        uses: actions/download-artifact@v8
+        with:
+          name: windows-tools-binaries-x64
+          path: tmp_win_tools/x64
+
+      - name: Download x86 Tools binaries
+        uses: actions/download-artifact@v8
+        with:
+          name: windows-tools-binaries-x86
+          path: tmp_win_tools/x86
+
+      - name: Create Windows Tools archive
+        run: |
+          version=$(awk -F'[ "]+' '$1=="#define" && $2=="ACI_VERSION_STR" { print $3; exit }' Common/ac/def_version.h)
+          mkdir -p Win/Tools/x86
+          mkdir -p Win/Tools/x64
+          cp tmp_win_tools/x86/x86/Release/*.exe Win/Tools/x86/
+          cp tmp_win_tools/x64/x64/Release/*.exe Win/Tools/x64/
+          bsdtar -f "AGS-Tools-${version}.zip" -acvC Win/Tools x86 x64
+          rm -rf tmp_win_tools
+          rm -rf Win/Tools
+
+      - name: Upload Windows Tools archive
+        uses: actions/upload-artifact@v7
+        with:
+          name: ags-windows-tools-archive
+          include-hidden-files: true
+          path: AGS-Tools-*.zip
+
   windows-msvc-editor:
     name: Windows MSVC Editor
     runs-on: windows-2022
@@ -969,6 +1012,7 @@ jobs:
       - build-android-bundle
       - build-linux-bundle
       - windows-packaging
+      - windows-tools-archive
       - package-pdbs
     steps:
       - uses: actions/checkout@v6
@@ -1055,6 +1099,12 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: ags-bundle-android
+          path: /tmp/github_release
+
+      - name: Download Windows Tools archive
+        uses: actions/download-artifact@v8
+        with:
+          name: ags-windows-tools-archive
           path: /tmp/github_release
 
       - name: Generate SHA-256 checksums
