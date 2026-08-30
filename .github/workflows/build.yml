@@ -814,6 +814,57 @@ jobs:
           name: linux-deb-${{ matrix.platform.arch }}${{ matrix.platform.rpath && '-rpath' || '' }}
           path: ${{ matrix.platform.rpath && 'data_*.tar.gz' || 'ags_*.deb' }}
 
+  linux-tools-builds:
+    name: Linux Tools (${{ matrix.platform.archname }})
+    runs-on: ${{ matrix.platform.os }}
+    timeout-minutes: 20
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+        - { arch: amd64, archname: x64, os: ubuntu-latest }
+        - { arch: i386,  archname: x86, os: ubuntu-latest }
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Install bsdtar
+        run: sudo apt-get update -y && sudo apt-get install -y libarchive-tools
+        
+      - name: Log in to GHCR
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 #v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run build inside container ${{ matrix.platform.archname }}
+        run: |
+          TAG_NAME=${{ env.BASE_BRANCH }}-${{ matrix.platform.arch }}
+          IMAGE="ghcr.io/${{ github.repository_owner }}/ags-linux-builder-image:$TAG_NAME"
+  
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            -w /workspace \
+            "$IMAGE" \
+            bash -c 'find Tools -name Makefile -execdir make -j4 PREFIX=/workspace/dist-tools/usr/local install \; && make -j4 --directory=Compiler PREFIX=/workspace/dist-tools/usr/local install'
+    
+      - name: Create Linux Tools archive ${{ matrix.platform.archname }}
+        run: |
+          version=$(awk -F'[ "]+' '$1=="#define" && $2=="ACI_VERSION_STR" { print $3; exit }' Common/ac/def_version.h)
+          mkdir -p Linux/Tools/${{ matrix.platform.archname }}
+          cp -v dist-tools/usr/local/bin/* Linux/Tools/${{ matrix.platform.archname }}/
+          bsdtar -f "AGS-Tools-${version}-linux-${{ matrix.platform.archname }}.tar.gz" -cvzC Linux/Tools ${{ matrix.platform.archname }}
+
+      - name: Upload Linux Tools artifact ${{ matrix.platform.archname }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: tools-linux-archive-${{ matrix.platform.archname }}
+          path: AGS-Tools-*-linux-${{ matrix.platform.archname }}.tar.gz
+
   build-linux-bundle:
     name: Linux Bundle
     needs: linux-binaries-builds
