@@ -908,6 +908,35 @@ jobs:
           name: ags-bundle-linux
           path: ags_*_linux.tar.gz
 
+  macos-tools-builds:
+    name: macOS Tools (arm64)
+    runs-on: macos-15
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Build Tools on macOS
+        run: |
+          PREFIX="$PWD/dist-tools/usr/local"
+          find Tools -name Makefile -execdir make -j4 PREFIX="$PREFIX" install \;
+          make -j4 --directory=Compiler PREFIX="$PREFIX" install
+
+      - name: Create macOS Tools archive
+        run: |
+          version=$(awk -F'[ "]+' '$1=="#define" && $2=="ACI_VERSION_STR" { print $3; exit }' Common/ac/def_version.h)
+          mkdir -p MacOS/Tools/arm64
+          cp -v dist-tools/usr/local/bin/* MacOS/Tools/arm64/
+          bsdtar -f "AGS-Tools-${version}-macos.tar.gz" -cvzC MacOS/Tools arm64
+
+      - name: Upload macOS Tools artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: tools-macos-archive
+          path: AGS-Tools-*-macos.tar.gz
+
   windows-packaging:
     name: Windows Packaging
     runs-on: windows-2022
