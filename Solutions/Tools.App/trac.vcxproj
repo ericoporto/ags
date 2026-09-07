@@ -46,6 +46,7 @@
     <ClCompile Include="..\..\libsrc\allegro\src\win\wfile.c" />
     <ClCompile Include="..\..\Tools\data\tra_utils.cpp" />
     <ClCompile Include="..\..\Tools\trac\main.cpp" />
+    <ClCompile Include="..\..\Tools\data\log_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Common\data\data_ext.h" />
@@ -54,6 +55,7 @@
     <ClInclude Include="..\..\Common\util\textstreamreader.h" />
     <ClInclude Include="..\..\Common\util\textstreamwriter.h" />
     <ClInclude Include="..\..\Tools\data\tra_utils.h" />
+    <ClInclude Include="..\..\Tools\data\log_utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0981C97D-C8AE-43CE-8A4B-3231B6468AE7}</ProjectGuid>

@@ -30,6 +30,7 @@ set(TOOLS_COMMON_SOURCES
         ../Common/data/tra_file.h
         ../Common/debug/debugmanager.cpp
         ../Common/debug/debugmanager.h
+        ../Common/debug/outputhandler.h
         ../Common/game/customproperties.cpp
         ../Common/game/customproperties.h
         ../Common/game/interactions.cpp
@@ -134,6 +135,8 @@ target_sources(libtools
         data/game_utils.cpp
         data/include_utils.cpp
         data/include_utils.h
+        data/log_utils.cpp
+        data/log_utils.h
         data/mfl_utils.cpp
         data/mfl_utils.h
         data/room_utils.cpp
