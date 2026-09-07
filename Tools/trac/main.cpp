@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "data/tra_utils.h"
+#include "data/log_utils.h"
 #include "util/cmdlineopts.h"
 #include "util/file.h"
 #include "util/path.h"
@@ -17,12 +18,13 @@ static const char *HELP_STRING = "Usage:\n"
 
 static int Command_Compile(const String &src, const String &dst, const String *game_name, const int *game_uid)
 {
-    printf("Input translation source: %s\n", src.GetCStr());
-    printf("Output compiled translation: %s\n", dst.GetCStr());
+
+    LogInfo("Input translation source: %s\n", src.GetCStr());
+    LogInfo("Output compiled translation: %s\n", dst.GetCStr());
     if (game_name)
-        printf("Game name: %s\n", game_name->GetCStr());
+        LogInfo("Game name: %s\n", game_name->GetCStr());
     if (game_uid)
-        printf("Game uniqueid: %d\n", *game_uid);
+        LogInfo("Game uniqueid: %d\n", *game_uid);
 
     //-----------------------------------------------------------------------//
     // Read TRS
@@ -30,7 +32,7 @@ static int Command_Compile(const String &src, const String &dst, const String *g
     auto in = File::OpenFileRead(src);
     if (!in)
     {
-        printf("Error: failed to open source TRS for reading.\n");
+        LogError("failed to open source TRS for reading.\n");
         return -1;
     }
 
@@ -38,8 +40,8 @@ static int Command_Compile(const String &src, const String &dst, const String *g
     HError err = ReadTRS(tra, std::move(in));
     if (!err)
     {
-        printf("Error: failed to read source TRS:\n");
-        printf("%s\n", err->FullMessage().GetCStr());
+        LogError("failed to read source TRS:\n");
+        LogError("%s\n", err->FullMessage().GetCStr());
         return -1;
     }
 
@@ -54,24 +56,24 @@ static int Command_Compile(const String &src, const String &dst, const String *g
     auto out = File::CreateFile(dst);
     if (!out)
     {
-        printf("Error: failed to open output TRA for writing.\n");
+        LogError("failed to open output TRA for writing.\n");
         return -1;
     }
     err = WriteTRA(tra, std::move(out));
     if (!err)
     {
-        printf("Error: failed to compile TRA:\n");
-        printf("%s\n", err->FullMessage().GetCStr());
+        LogError("failed to compile TRA:\n");
+        LogError("%s\n", err->FullMessage().GetCStr());
         return -1;
     }
-    printf("Compiled translation written successfully.\nDone.\n");
+    LogInfo("Compiled translation written successfully.\nDone.\n");
     return 0;
 }
 
 static int Command_Decompile(const String &src, const String &dst)
 {
-    printf("Input compiled translation: %s\n", src.GetCStr());
-    printf("Output translation source: %s\n", dst.GetCStr());
+    LogInfo("Input compiled translation: %s\n", src.GetCStr());
+    LogInfo("Output translation source: %s\n", dst.GetCStr());
 
     //-----------------------------------------------------------------------//
     // Read TRA
@@ -79,7 +81,7 @@ static int Command_Decompile(const String &src, const String &dst)
     auto in = File::OpenFileRead(src);
     if (!in)
     {
-        printf("Error: failed to open TRA for reading.\n");
+        LogError("failed to open TRA for reading.\n");
         return -1;
     }
 
@@ -87,8 +89,8 @@ static int Command_Decompile(const String &src, const String &dst)
     HError err = ReadTraData(tra, std::move(in));
     if (!err)
     {
-        printf("Error: failed to read input TRA:\n");
-        printf("%s\n", err->FullMessage().GetCStr());
+        LogError("failed to read input TRA:\n");
+        LogError("%s\n", err->FullMessage().GetCStr());
         return -1;
     }
 
@@ -98,37 +100,38 @@ static int Command_Decompile(const String &src, const String &dst)
     auto out = File::CreateFile(dst);
     if (!out)
     {
-        printf("Error: failed to open output TRS for writing.\n");
+        LogError("failed to open output TRS for writing.\n");
         return -1;
     }
     err = WriteTRS(tra, std::move(out));
     if (!err)
     {
-        printf("Error: failed to write TRS:\n");
-        printf("%s\n", err->FullMessage().GetCStr());
+        LogError("failed to write TRS:\n");
+        LogError("%s\n", err->FullMessage().GetCStr());
         return -1;
     }
 
-    printf("Translation source written successfully.\nDone.\n");
+    LogInfo("Translation source written successfully.\nDone.\n");
     return 0;
 }
 
 int main(int argc, char *argv[])
 {
-    printf("trac v0.9.6 - AGS translation compiler and decompiler (TRS <-> TRA)\n"\
+    InitToolOutput("trac");
+    LogInfo("trac v0.9.6 - AGS translation compiler and decompiler (TRS <-> TRA)\n"\
         "Copyright (c) 2021-2026 AGS Team and contributors\n");
 
     ParseResult cmdargs = Parse(argc, argv, {"--gamename", "--uniqueid"});
     if (cmdargs.HelpRequested)
     {
-        printf("%s\n", HELP_STRING);
+        LogInfo("%s\n", HELP_STRING);
         return 0; // display help and bail out
     }
 
     if (cmdargs.PosArgs.empty())
     {
-        printf("Error: not enough arguments\n");
-        printf("%s\n", HELP_STRING);
+        LogError("not enough arguments\n");
+        LogInfo("%s\n", HELP_STRING);
         return -1;
     }
 
@@ -145,7 +148,7 @@ int main(int argc, char *argv[])
             dst = Path::ReplaceExtension(src, "trs");
         return Command_Decompile(src, dst);
     }
-    
+
     String game_name;
     int game_uid = 0;
     bool use_game_uid = false;
