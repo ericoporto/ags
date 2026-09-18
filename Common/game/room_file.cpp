@@ -132,7 +132,7 @@ HError ReadMainBlock(RoomData *room, Stream *in, RoomFileVersion data_ver, const
     room->BackgroundBPP = bpp;
     room->WalkBehindCount = in->ReadInt16();
     if (room->WalkBehindCount > MAX_WALK_BEHINDS)
-        return new RoomFileError(kRoomFileErr_IncompatibleEngine, String::FromFormat("Too many walk-behinds (in room: %d, max: %d).", room->WalkBehindCount, MAX_WALK_BEHINDS));
+        return new RoomFileError(kRoomFileErr_IncompatibleEngine, "Too many walk-behinds (in room: %d, max: %d).", room->WalkBehindCount, MAX_WALK_BEHINDS);
 
     // Walk-behinds baselines
     for (uint32_t i = 0; i < room->WalkBehindCount; ++i)
@@ -142,7 +142,7 @@ HError ReadMainBlock(RoomData *room, Stream *in, RoomFileVersion data_ver, const
     if ((data_ver <= kRoomVersion_272) && (room->HotspotCount == 0))
         room->HotspotCount = MIN_ROOM_HOTSPOTS;
     if (room->HotspotCount > MAX_ROOM_HOTSPOTS)
-        return new RoomFileError(kRoomFileErr_IncompatibleEngine, String::FromFormat("Too many hotspots (in room: %d, max: %d).", room->HotspotCount, MAX_ROOM_HOTSPOTS));
+        return new RoomFileError(kRoomFileErr_IncompatibleEngine, "Too many hotspots (in room: %d, max: %d).", room->HotspotCount, MAX_ROOM_HOTSPOTS);
 
     // Hotspots walk-to points
     for (uint32_t i = 0; i < room->HotspotCount; ++i)
@@ -191,7 +191,7 @@ HError ReadMainBlock(RoomData *room, Stream *in, RoomFileVersion data_ver, const
     uint16_t obj_count = in->ReadInt16();
     if (obj_count > MAX_ROOM_OBJECTS)
         return new RoomFileError(kRoomFileErr_IncompatibleEngine,
-            String::FromFormat("Too many objects (in room: %d, max: %d).", obj_count, MAX_ROOM_OBJECTS));
+            "Too many objects (in room: %d, max: %d).", obj_count, MAX_ROOM_OBJECTS);
 
     room->Objects.resize(obj_count);
     for (auto &obj : room->Objects)
@@ -236,7 +236,7 @@ HError ReadMainBlock(RoomData *room, Stream *in, RoomFileVersion data_ver, const
     {
         room->RegionCount = in->ReadInt32();
         if (room->RegionCount > MAX_ROOM_REGIONS)
-            return new RoomFileError(kRoomFileErr_IncompatibleEngine, String::FromFormat("Too many regions (in room: %d, max: %d).", room->RegionCount, MAX_ROOM_REGIONS));
+            return new RoomFileError(kRoomFileErr_IncompatibleEngine, "Too many regions (in room: %d, max: %d).", room->RegionCount, MAX_ROOM_REGIONS);
 
         if (data_ver < kRoomVersion_300a)
         {
@@ -303,7 +303,7 @@ HError ReadMainBlock(RoomData *room, Stream *in, RoomFileVersion data_ver, const
     if (data_ver >= kRoomVersion_240)
         room->WalkAreaCount = in->ReadInt32();
     if (room->WalkAreaCount > MAX_WALK_AREAS)
-        return new RoomFileError(kRoomFileErr_IncompatibleEngine, String::FromFormat("Too many walkable areas (in room: %d, max: %d).", room->WalkAreaCount, MAX_WALK_AREAS));
+        return new RoomFileError(kRoomFileErr_IncompatibleEngine, "Too many walkable areas (in room: %d, max: %d).", room->WalkAreaCount, MAX_WALK_AREAS);
 
     if (data_ver >= kRoomVersion_200_alpha7)
         for (uint32_t i = 0; i < room->WalkAreaCount; ++i)
@@ -332,7 +332,7 @@ HError ReadMainBlock(RoomData *room, Stream *in, RoomFileVersion data_ver, const
 
     room->MessageCount = in->ReadInt16();
     if (room->MessageCount > MAX_MESSAGES)
-        return new RoomFileError(kRoomFileErr_IncompatibleEngine, String::FromFormat("Too many room messages (in room: %d, max: %d).", room->MessageCount, MAX_MESSAGES));
+        return new RoomFileError(kRoomFileErr_IncompatibleEngine, "Too many room messages (in room: %d, max: %d).", room->MessageCount, MAX_MESSAGES);
 
     if (data_ver >= kRoomVersion_272)
         room->GameID = in->ReadInt32();
@@ -443,7 +443,7 @@ HError ReadObjNamesBlock(RoomData *room, Stream *in, RoomFileVersion data_ver)
     size_t name_count = static_cast<uint8_t>(in->ReadInt8());
     if (name_count != room->Objects.size())
         return new RoomFileError(kRoomFileErr_InconsistentData,
-            String::FromFormat("In the object names block, expected name count: %zu, got %zu", room->Objects.size(), name_count));
+            "In the object names block, expected name count: %zu, got %zu", room->Objects.size(), name_count);
 
     for (auto &obj : room->Objects)
     {
@@ -461,7 +461,7 @@ HError ReadObjScNamesBlock(RoomData *room, Stream *in, RoomFileVersion data_ver)
     size_t name_count = static_cast<uint8_t>(in->ReadInt8());
     if (name_count != room->Objects.size())
         return new RoomFileError(kRoomFileErr_InconsistentData,
-            String::FromFormat("In the object script names block, expected name count: %zu, got %zu", room->Objects.size(), name_count));
+            "In the object script names block, expected name count: %zu, got %zu", room->Objects.size(), name_count);
 
     for (auto &obj : room->Objects)
     {
@@ -498,7 +498,7 @@ HError ReadPropertiesBlock(RoomData *room, Stream *in, RoomFileVersion /*data_ve
 {
     int prop_ver = in->ReadInt32();
     if (prop_ver != 1)
-        return new RoomFileError(kRoomFileErr_PropertiesBlockFormat, String::FromFormat("Expected version %d, got %d", 1, prop_ver));
+        return new RoomFileError(kRoomFileErr_PropertiesBlockFormat, "Expected version %d, got %d", 1, prop_ver);
 
     int errors = 0;
     errors += Properties::ReadValues(room->Properties, in);
@@ -517,7 +517,7 @@ HError ReadExt_363_Objects(RoomData *room, Stream *in, RoomFileVersion /*data_ve
     uint32_t obj_count = static_cast<uint32_t>(in->ReadInt32());
     if (obj_count != room->Objects.size())
         return new RoomFileError(kRoomFileErr_InconsistentData,
-            String::FromFormat("Mismatching number of room objects: expected %zu, got %u", room->Objects.size(), obj_count));
+            "Mismatching number of room objects: expected %zu, got %u", room->Objects.size(), obj_count);
 
     for (auto &obj : room->Objects)
     {
@@ -569,12 +569,12 @@ HError ReadRoomBlock(RoomData *room, RoomDataAux *room_aux, Stream *in, RoomFile
     case kRoomFblk_CompScript:
     case kRoomFblk_CompScript2:
         return new RoomFileError(kRoomFileErr_OldBlockNotSupported,
-            String::FromFormat("Type: %d.", block));
+            "Type: %d.", block);
     case kRoomFblk_None:
         break; // continue to string ids
     default:
         return new RoomFileError(kRoomFileErr_UnknownBlockType,
-            String::FromFormat("Type: %d, known range: %d - %d.", block, kRoomFblk_Main, kRoomFblk_ObjectScNames));
+            "Type: %d, known range: %d - %d.", block, kRoomFblk_Main, kRoomFblk_ObjectScNames);
     }
 
     // Add extensions here checking ext_id, which is an up to 16-chars name
@@ -589,7 +589,7 @@ HError ReadRoomBlock(RoomData *room, RoomDataAux *room_aux, Stream *in, RoomFile
     }
 
     return new RoomFileError(kRoomFileErr_UnknownBlockType,
-        String::FromFormat("Type: %s", ext_id.GetCStr()));
+        "Type: %s", ext_id.GetCStr());
 }
 
 
@@ -678,9 +678,9 @@ HRoomFileError ReadRoomHeader(RoomDataSource &src)
 {
     src.DataVersion = (RoomFileVersion)static_cast<uint16_t>(src.InputStream->ReadInt16());
     if ((src.DataVersion < kRoomVersion_250b) || (src.DataVersion > kRoomVersion_Current))
-        return new RoomFileError(kRoomFileErr_FormatNotSupported, String::FromFormat("Required format version: %d, supported %d - %d", src.DataVersion, kRoomVersion_250b, kRoomVersion_Current));
+        return new RoomFileError(kRoomFileErr_FormatNotSupported, "Required format version: %d, supported %d - %d", src.DataVersion, kRoomVersion_250b, kRoomVersion_Current);
     if (src.DataVersion == kRoomVersion_399)
-        return new RoomFileError(kRoomFileErr_FormatNotSupported, String::FromFormat("Unsupported format version: %d", src.DataVersion));
+        return new RoomFileError(kRoomFileErr_FormatNotSupported, "Unsupported format version: %d", src.DataVersion);
     return HRoomFileError::None();
 }
 
@@ -702,7 +702,7 @@ HRoomFileError OpenRoomFile(const String &filename, RoomDataSource &src)
     // Try to open room file
     auto in = File::OpenFileRead(filename);
     if (in == nullptr)
-        return new RoomFileError(kRoomFileErr_FileOpenFailed, String::FromFormat("Filename: %s.", filename.GetCStr()));
+        return new RoomFileError(kRoomFileErr_FileOpenFailed, "Filename: %s.", filename.GetCStr());
     src.Filename = filename;
     src.InputStream = std::move(in);
     return ReadRoomHeader(src);
