@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <stdarg.h>
 #include "log_utils.h"
 #include "debug/debugmanager.h"
 #include "debug/outputhandler.h"
@@ -24,6 +26,14 @@ static const char* MTName(MessageType mt)
 
 using AGS::Common::IOutputHandler;
 using AGS::Common::DebugMessage;
+
+void PrintToStdOut(const char* fmt, ...)
+{
+    va_list argptr;
+    va_start(argptr, fmt);
+    vprintf(fmt, argptr);
+    va_end(argptr);
+}
 
 class ConsoleOutputTarget : public IOutputHandler
 {

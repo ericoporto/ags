@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
     ParseResult cmdargs = Parse(argc, argv, {"--gamename", "--uniqueid"});
     if (cmdargs.HelpRequested)
     {
-        LogInfo("%s\n", HELP_STRING);
+        PrintToStdOut("%s\n", HELP_STRING);
         return 0; // display help and bail out
     }
 

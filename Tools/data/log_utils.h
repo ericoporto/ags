@@ -25,6 +25,8 @@ using AGS::Common::String;
 
 void InitToolOutput(const String& ToolName);
 
+inline void PrintToStdOut(AGS_FORMAT_STRING_ARG const char* fmt, ...) AGS_FORMAT_STRING(1);
+
 void LogInfo(const String& msg);
 void LogInfo(AGS_FORMAT_STRING_ARG const char* fmt, ...) AGS_FORMAT_STRING(1);
 void LogInfo(AGS_FORMAT_STRING_ARG const char* fmt, va_list argptr) AGS_FORMAT_STRING_V(1);
