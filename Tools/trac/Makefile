@@ -50,6 +50,7 @@ COMMON_OBJS = \
 	../../Common/util/textstreamwriter.cpp
 
 TOOL_OBJS = \
+	../../Tools/data/log_utils.cpp \
 	../../Tools/data/tra_utils.cpp
 
 MINIMAL_ALLEGRO_OBJS = \
